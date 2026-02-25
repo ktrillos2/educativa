@@ -7,10 +7,6 @@ import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Button } from "@/components/ui/button"
 
-export const metadata = {
-    title: "Contacto - Academia de Formación Líderes del Mérito",
-    description: "Contáctanos para más información sobre nuestros programas académicos, inscripciones y alianzas institucionales.",
-}
 
 // Reusable animation variants
 const fadeUp = {
