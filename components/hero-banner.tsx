@@ -4,6 +4,7 @@ import { useState, useEffect } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { Button } from "@/components/ui/button"
 import { ChevronLeft, ChevronRight, Play, GraduationCap, Users, Award } from "@/components/ui/icons"
+import { VideoModal } from "@/components/video-modal"
 
 const slides = [
   {
@@ -34,6 +35,8 @@ const stats = [
 
 export function HeroBanner() {
   const [currentSlide, setCurrentSlide] = useState(0)
+  const [isVideoOpen, setIsVideoOpen] = useState(false)
+
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -105,6 +108,7 @@ export function HeroBanner() {
                 <Button
                   size="lg"
                   variant="outline"
+                  onClick={() => setIsVideoOpen(true)}
                   className="border-2 border-white/60 text-white hover:bg-white hover:text-black hover:border-white transition-all text-lg bg-black/20 backdrop-blur-md font-semibold px-8 h-14 rounded-full"
                 >
                   <Play className="mr-2 h-5 w-5" />
@@ -170,6 +174,12 @@ export function HeroBanner() {
 
       {/* Bottom fade for smooth transition to next section */}
       <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent z-20 pointer-events-none" />
+
+      <VideoModal
+        isOpen={isVideoOpen}
+        onClose={() => setIsVideoOpen(false)}
+        videoUrl="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1"
+      />
     </section>
   )
 }

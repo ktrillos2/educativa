@@ -4,7 +4,7 @@ import { GraduationCap, Clock, Users, Award, BookOpen } from "@/components/ui/ic
 
 export default function DiplomadosPage() {
   return (
-    <main className="flex-grow">
+    <main className="flex-grow pt-24">
 
       {/* Hero Section */}
       <section className="pb-12 bg-primary relative overflow-hidden">

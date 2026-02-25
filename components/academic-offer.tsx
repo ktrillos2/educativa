@@ -150,7 +150,7 @@ export function AcademicOffer() {
             Oferta Académica 2025
           </span>
           <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
-            Nuestros <span className="text-primary bg-clip-text text-transparent bg-gradient-to-r from-primary to-blue-600">Programas</span>
+            Nuestros <span className="text-primary">Programas</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
             Selecciona el área de tu interés e inscríbete en nuestros programas diseñados para multiplicar tus oportunidades laborales.

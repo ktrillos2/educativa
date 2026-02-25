@@ -31,7 +31,14 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
     let isEnrolled = false
     let paymentVerified = false
 
-    if (session?.userId) {
+    const { cookies } = await import("next/headers")
+    const cookieStore = await cookies()
+    const isMockPaid = cookieStore.get("mock_paid")?.value === "true"
+
+    if (isMockPaid) {
+        isEnrolled = true
+        paymentVerified = true
+    } else if (session?.userId) {
         const enrollment = await db.execute({
             sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
             args: [session.userId, course.id]
@@ -44,8 +51,8 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
 
     // Generate an array of modules based on course.modules length for visualization
     const courseModules = Array.from({ length: course.modules }).map((_, i) => ({
-        id: `mod - ${i + 1} `,
-        title: `Módulo ${i + 1} `,
+        id: `mod-${i + 1}`,
+        title: `Módulo ${i + 1}`,
         docName: `Modulo ${i + 1}.pdf`, // This matches the user's uploaded files (Modulo 1.pdf, etc)
         examName: `Cuestionario Modulo ${i + 1}.docx`
     }))
@@ -235,9 +242,9 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                 <div className="flex-1 min-w-0">
                                                     <span className="block font-bold text-sm truncate mb-1">{mod.docName}</span>
                                                     {paymentVerified ? (
-                                                        <a href={`/ api / download / ${mod.docName} `} download className="text-xs font-semibold text-blue-600 hover:underline">
-                                                            Descargar Material
-                                                        </a>
+                                                        <Link href={`/diplomados/${course.id}/vista/${mod.docName}`} className="text-xs font-semibold text-blue-600 hover:underline">
+                                                            Ver Material en Línea
+                                                        </Link>
                                                     ) : (
                                                         <span className="text-xs font-semibold text-red-500 flex items-center gap-1">
                                                             <AlertCircle className="w-3 h-3" /> Pago Pendiente
@@ -253,7 +260,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                 <div className="flex-1 min-w-0">
                                                     <span className="block font-bold text-sm truncate mb-1">Examen de Unidad</span>
                                                     {paymentVerified ? (
-                                                        <Link href={`/ diplomados / ${course.id} /exam/${mod.id} `} className="text-xs font-semibold text-secondary hover:underline">
+                                                        <Link href={`/diplomados/${course.id}/exam/${mod.id}`} className="text-xs font-semibold text-secondary hover:underline">
                                                             Rendir Cuestionario
                                                         </Link>
                                                     ) : (

@@ -14,38 +14,45 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
     }
 
     const session = await getSession()
-    if (!session?.userId) {
-        redirect(`/diplomados/${params.id}`)
-    }
+    const { cookies } = await import("next/headers")
+    const cookieStore = await cookies()
+    const isMockPaid = cookieStore.get("mock_paid")?.value === "true"
 
-    const enrollment = await db.execute({
-        sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
-        args: [session.userId, course.id]
-    })
+    if (!isMockPaid) {
+        if (!session?.userId) {
+            redirect(`/diplomados/${params.id}`)
+        }
 
-    if (enrollment.rows.length === 0 || !enrollment.rows[0].payment_verified) {
-        // Requires payment to take exams
-        redirect(`/diplomados/${params.id}`)
+        const enrollment = await db.execute({
+            sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
+            args: [session.userId, course.id]
+        })
+
+        if (enrollment.rows.length === 0 || !enrollment.rows[0].payment_verified) {
+            redirect(`/diplomados/${params.id}`)
+        }
     }
 
     // Get current progress or create if doesn't exist
     let progressStrId = ""
     let currentScore = 0
 
-    const progressCheck = await db.execute({
-        sql: "SELECT id, score, completed FROM progress WHERE user_id = ? AND course_id = ? AND module_id = ?",
-        args: [session.userId, course.id, params.moduleId]
-    })
-
-    if (progressCheck.rows.length > 0) {
-        progressStrId = String(progressCheck.rows[0].id)
-        currentScore = Number(progressCheck.rows[0].score)
-    } else {
-        progressStrId = crypto.randomUUID()
-        await db.execute({
-            sql: "INSERT INTO progress (id, user_id, course_id, module_id) VALUES (?, ?, ?, ?)",
-            args: [progressStrId, session.userId, course.id, params.moduleId]
+    if (!isMockPaid && session?.userId) {
+        const progressCheck = await db.execute({
+            sql: "SELECT id, score, completed FROM progress WHERE user_id = ? AND course_id = ? AND module_id = ?",
+            args: [session.userId, course.id, params.moduleId]
         })
+
+        if (progressCheck.rows.length > 0) {
+            progressStrId = String(progressCheck.rows[0].id)
+            currentScore = Number(progressCheck.rows[0].score)
+        } else {
+            progressStrId = crypto.randomUUID()
+            await db.execute({
+                sql: "INSERT INTO progress (id, user_id, course_id, module_id) VALUES (?, ?, ?, ?)",
+                args: [progressStrId, session.userId, course.id, params.moduleId]
+            })
+        }
     }
 
     return (
@@ -55,9 +62,9 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
                     <Breadcrumb items={[
                         { label: "Inicio", href: "/" },
                         { label: "Diplomados", href: "/diplomados" },
-                        { label: course.title, href: `/diplomados/\${course.id}` },
-                    {label: "Examen" }
-          ]} />
+                        { label: course.title, href: `/diplomados/${course.id}` },
+                        { label: "Examen" }
+                    ]} />
                     <h1 className="text-3xl md:text-4xl font-bold mt-6">Cuestionario: {params.moduleId.replace("-", " ")}</h1>
                     <p className="mt-2 text-white/80">Recuerda que necesitas un mínimo de 60% para aprobar esta unidad. Tienes intentos ilimitados.</p>
                 </div>

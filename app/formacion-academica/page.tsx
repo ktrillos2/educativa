@@ -9,7 +9,7 @@ export const metadata = {
 
 export default function FormacionAcademicaPage() {
     return (
-        <main className="flex-grow bg-muted/20">
+        <main className="flex-grow bg-muted/20 pt-24">
             {/* Hero Section */}
             <section className="pb-16 bg-gradient-to-br from-primary via-primary/95 to-primary/90 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')] bg-repeat" />

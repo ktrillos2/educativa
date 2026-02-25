@@ -11,6 +11,12 @@ export async function submitExam(courseId: string, moduleId: string, score: numb
     }
 
     try {
+        if (session.userId === "mock-user-no-db") {
+            revalidatePath(`/diplomados/${courseId}`)
+            revalidatePath(`/diplomados/${courseId}/exam/${moduleId}`)
+            return { success: true }
+        }
+
         const isCompleted = score >= 60 ? 1 : 0
 
         // Check if progress exists

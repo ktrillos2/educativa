@@ -61,25 +61,38 @@ export function ExamForm({ courseId, moduleId }: { courseId: string; moduleId: s
         setLoading(true)
 
         let correctCount = 0
+
         DUMMY_QUESTIONS.forEach(q => {
-            if (answers[q.id] === q.correct) correctCount++
+            if (answers[q.id] === q.correct) {
+                correctCount++
+            }
         })
 
         const score = (correctCount / DUMMY_QUESTIONS.length) * 100
+
+        // Grab attempts from localStorage
+        const attemptKey = `exam_attempts_${courseId}_${moduleId}`
+        const currentAttempts = parseInt(localStorage.getItem(attemptKey) || "0", 10)
+        const newAttempts = currentAttempts + 1
+        localStorage.setItem(attemptKey, newAttempts.toString())
 
         const result = await submitExam(courseId, moduleId, score)
         setLoading(false)
 
         if (result.error) {
             toast.error(result.error)
-        } else {
-            if (score >= 60) {
-                toast.success(`¡Examen aprobado con ${score}%!`)
-            } else {
-                toast.error(`Obtuviste ${score}%. Necesitas 60% para aprobar. Intenta de nuevo.`)
-            }
-            router.refresh()
+            return
         }
+
+        if (score >= 60) {
+            toast.success(`¡Examen aprobado con ${score}% en el intento #${newAttempts}!`, { duration: 6000 })
+        } else {
+            toast.error(`Suspendido (${score}%). No alcanzaste el puntaje mínimo de 60%. Intento #${newAttempts}. Debes repasar el material y volver a intentarlo.`, { duration: 8000 })
+        }
+
+        // Saca al usuario del examen
+        router.push(`/diplomados/${courseId}`)
+        router.refresh()
     }
 
     return (
