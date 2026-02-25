@@ -20,10 +20,9 @@ import {
   Sparkles,
   Search,
   SlidersHorizontal,
-} from "lucide-react"
+} from "@/components/ui/icons"
 import Link from "next/link"
-
-const categories = ["Todos", "Gestión", "Legal", "Tecnología", "Salud"]
+import { categories, diplomados } from "@/lib/data"
 
 const categoryIcons: Record<string, React.ElementType> = {
   Gestión: Building2,
@@ -38,113 +37,7 @@ const badgeIcons: Record<string, React.ElementType> = {
   Certificado: BadgeCheck,
 }
 
-const diplomados = [
-  {
-    id: 1,
-    title: "Diplomado en Gestión Empresarial",
-    description:
-      "Desarrolla habilidades directivas y de liderazgo para la gestión efectiva de organizaciones modernas.",
-    duration: "120 horas",
-    students: "25 cupos",
-    badge: "Nuevo",
-    category: "Gestión",
-    image: "/business-management-corporate-meeting-professional.jpg",
-    price: "$1.200.000",
-    startDate: "15 Feb 2025",
-    modules: 8,
-  },
-  {
-    id: 2,
-    title: "Diplomado en Seguridad y Salud en el Trabajo",
-    description: "Aprende a implementar sistemas de gestión de SST según la normatividad vigente colombiana.",
-    duration: "100 horas",
-    students: "30 cupos",
-    badge: "Popular",
-    category: "Salud",
-    image: "/workplace-safety-health-professional-training-equi.jpg",
-    price: "$980.000",
-    startDate: "20 Feb 2025",
-    modules: 6,
-  },
-  {
-    id: 3,
-    title: "Diplomado en Contratación Estatal",
-    description: "Domina los procesos de contratación pública y la normatividad aplicable en Colombia.",
-    duration: "80 horas",
-    students: "20 cupos",
-    badge: null,
-    category: "Legal",
-    image: "/government-contract-legal-documents-signing.jpg",
-    price: "$850.000",
-    startDate: "1 Mar 2025",
-    modules: 5,
-  },
-  {
-    id: 4,
-    title: "Diplomado en Gestión del Talento Humano",
-    description: "Estrategias modernas para la administración y desarrollo del capital humano organizacional.",
-    duration: "90 horas",
-    students: "25 cupos",
-    badge: "Certificado",
-    category: "Gestión",
-    image: "/human-resources-team-management-diverse-workplace.jpg",
-    price: "$920.000",
-    startDate: "10 Mar 2025",
-    modules: 6,
-  },
-  {
-    id: 5,
-    title: "Diplomado en Marketing Digital",
-    description: "Aprende estrategias digitales para posicionar marcas y generar resultados medibles.",
-    duration: "80 horas",
-    students: "30 cupos",
-    badge: "Nuevo",
-    category: "Tecnología",
-    image: "/digital-marketing-social-media-analytics-screens.jpg",
-    price: "$1.100.000",
-    startDate: "15 Mar 2025",
-    modules: 7,
-  },
-  {
-    id: 6,
-    title: "Diplomado en Finanzas y Presupuesto Público",
-    description: "Gestión financiera y presupuestal para entidades del sector público colombiano.",
-    duration: "100 horas",
-    students: "20 cupos",
-    badge: null,
-    category: "Gestión",
-    image: "/finance-budget-accounting-professional-calculator.jpg",
-    price: "$950.000",
-    startDate: "22 Mar 2025",
-    modules: 6,
-  },
-  {
-    id: 7,
-    title: "Diplomado en Derecho Laboral",
-    description: "Normatividad laboral colombiana, contratos de trabajo y relaciones laborales.",
-    duration: "90 horas",
-    students: "25 cupos",
-    badge: "Popular",
-    category: "Legal",
-    image: "/labor-law-legal-documents-office.jpg",
-    price: "$880.000",
-    startDate: "5 Abr 2025",
-    modules: 6,
-  },
-  {
-    id: 8,
-    title: "Diplomado en Transformación Digital",
-    description: "Lidera procesos de transformación digital en organizaciones de cualquier sector.",
-    duration: "100 horas",
-    students: "20 cupos",
-    badge: "Nuevo",
-    category: "Tecnología",
-    image: "/digital-transformation-technology-innovation.jpg",
-    price: "$1.300.000",
-    startDate: "12 Abr 2025",
-    modules: 8,
-  },
-]
+
 
 export function DiplomadosList() {
   const [activeCategory, setActiveCategory] = useState("Todos")
@@ -183,8 +76,8 @@ export function DiplomadosList() {
                   key={category}
                   onClick={() => setActiveCategory(category)}
                   className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 rounded border ${activeCategory === category
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                    ? "bg-primary text-primary-foreground border-primary"
+                    : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
                     }`}
                 >
                   {Icon && <Icon className="h-3.5 w-3.5" />}

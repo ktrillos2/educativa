@@ -1,9 +1,9 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { Menu, X, ChevronDown } from "lucide-react"
+import { Menu, X, ChevronDown } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
 
 const navItems = [
@@ -14,41 +14,29 @@ const navItems = [
     href: "#oferta",
     children: [
       { label: "Diplomados", href: "/diplomados" },
-      { label: "Cursos Cortos", href: "/cursos-cortos" },
-      { label: "Certificaciones", href: "/certificaciones" },
+      { label: "Formación Académica", href: "/formacion-academica" },
     ],
   },
-  { label: "Contacto", href: "#contacto" },
+  { label: "Contacto", href: "/contacto" },
 ]
 
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
-  const [scrolled, setScrolled] = useState(false)
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrolled(window.scrollY > 50)
-    }
-    window.addEventListener("scroll", handleScroll)
-    return () => window.removeEventListener("scroll", handleScroll)
-  }, [])
 
   return (
     <header
-      className={`fixed top-0 z-50 w-full transition-all duration-300 ${
-        scrolled ? "bg-card/95 backdrop-blur shadow-sm" : "bg-transparent"
-      }`}
+      className="fixed top-0 z-50 w-full transition-all duration-300 bg-card/95 backdrop-blur shadow-sm"
     >
       <div className="container mx-auto px-4">
-        <div className="flex h-16 items-center justify-between">
+        <div className="flex h-24 items-center justify-between">
           <Link href="/" className="flex items-center">
             <Image
               src="/images/image.png"
               alt="Academia de Formación Líderes del Mérito"
-              width={56}
-              height={56}
-              className="h-12 w-auto"
+              width={100}
+              height={100}
+              className="h-20 w-auto"
             />
           </Link>
 
@@ -62,9 +50,7 @@ export function Header() {
                     onMouseLeave={() => setOpenDropdown(null)}
                   >
                     <button
-                      className={`flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors ${
-                        scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-secondary"
-                      }`}
+                      className="flex items-center gap-1 px-4 py-2 text-sm font-medium transition-colors text-foreground hover:text-primary"
                     >
                       {item.label}
                       <ChevronDown className="h-4 w-4" />
@@ -86,9 +72,7 @@ export function Header() {
                 ) : (
                   <Link
                     href={item.href}
-                    className={`px-4 py-2 text-sm font-medium transition-colors ${
-                      scrolled ? "text-foreground hover:text-primary" : "text-white hover:text-secondary"
-                    }`}
+                    className="px-4 py-2 text-sm font-medium transition-colors text-foreground hover:text-primary"
                   >
                     {item.label}
                   </Link>
@@ -102,11 +86,7 @@ export function Header() {
               <Button
                 variant="outline"
                 size="sm"
-                className={`rounded-md ${
-                  scrolled
-                    ? "border-primary text-primary hover:bg-primary hover:text-white"
-                    : "border-white text-white hover:bg-white hover:text-primary bg-transparent"
-                }`}
+                className="rounded-md border-primary text-primary hover:bg-primary hover:text-white"
               >
                 Iniciar Sesión
               </Button>
@@ -117,7 +97,7 @@ export function Header() {
           </div>
 
           <button
-            className={`lg:hidden p-2 ${scrolled ? "text-foreground" : "text-white"}`}
+            className="lg:hidden p-2 text-foreground"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}

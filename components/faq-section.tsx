@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
-import { ChevronDown, HelpCircle, MessageSquare } from "lucide-react"
+import { ChevronDown, HelpCircle, MessageSquare } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
 
 function useScrollAnimation() {

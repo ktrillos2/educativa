@@ -1,7 +1,7 @@
 "use client"
 
 import { Card, CardContent } from "@/components/ui/card"
-import { Briefcase, Star, Trophy } from "lucide-react"
+import { Briefcase, Star, Trophy } from "@/components/ui/icons"
 import { useState } from "react"
 
 const teamAspects = [

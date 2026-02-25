@@ -1,16 +1,13 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
 import { DiplomadosList } from "@/components/diplomados-list"
 import { Breadcrumb } from "@/components/breadcrumb"
-import { GraduationCap, Clock, Users, Award, BookOpen } from "lucide-react"
+import { GraduationCap, Clock, Users, Award, BookOpen } from "@/components/ui/icons"
 
 export default function DiplomadosPage() {
   return (
-    <main className="min-h-screen">
-      <Header />
+    <main className="flex-grow">
 
       {/* Hero Section */}
-      <section className="pt-24 pb-12 bg-primary relative overflow-hidden">
+      <section className="pb-12 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div
             className="absolute top-0 left-0 w-full h-full"
@@ -55,7 +52,6 @@ export default function DiplomadosPage() {
       </section>
 
       <DiplomadosList />
-      <Footer />
     </main>
   )
 }

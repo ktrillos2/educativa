@@ -1,6 +1,6 @@
 "use client"
 
-import { Award, Users, Lightbulb, Heart, TrendingUp, Shield } from "lucide-react"
+import { Award, Users, Lightbulb, Heart, TrendingUp, Shield } from "@/components/ui/icons"
 import { Card, CardContent } from "@/components/ui/card"
 import { useState } from "react"
 

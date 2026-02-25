@@ -1,9 +1,9 @@
 "use client"
 
-import { GraduationCap, BookOpen, Users, Award } from "lucide-react"
+import { GraduationCap, BookOpen, Users, Award } from "@/components/ui/icons"
 import { Card, CardContent } from "@/components/ui/card"
 import { useEffect, useState, useRef } from "react"
-import type { LucideIcon } from "lucide-react"
+import type { LucideIcon } from "@/components/ui/icons"
 
 const stats = [
   {

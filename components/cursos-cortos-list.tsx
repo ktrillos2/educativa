@@ -19,7 +19,7 @@ import {
   CalendarDays,
   Sparkles,
   Flame,
-} from "lucide-react"
+} from "@/components/ui/icons"
 import Link from "next/link"
 
 const categories = ["Todos", "Ofimática", "Legal", "Finanzas", "Habilidades"]

@@ -1,5 +1,3 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
 import { AboutHero } from "@/components/about-hero"
 import { AboutMission } from "@/components/about-mission"
 import { AboutValues } from "@/components/about-values"
@@ -16,14 +14,12 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <main className="min-h-screen">
-      <Header />
       <AboutHero />
       <AboutMission />
       <AboutValues />
       <AboutStats />
       <AboutTeam />
       <CTASection />
-      <Footer />
     </main>
   )
 }

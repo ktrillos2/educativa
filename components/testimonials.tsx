@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Card, CardContent } from "@/components/ui/card"
-import { ChevronLeft, ChevronRight, MessageSquareQuote, Star } from "lucide-react"
+import { ChevronLeft, ChevronRight, MessageSquareQuote, Star } from "@/components/ui/icons"
 
 const testimonials = [
   {

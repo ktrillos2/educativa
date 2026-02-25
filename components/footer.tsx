@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import Image from "next/image"
 import Link from "next/link"
-import { MapPin, Phone, Mail, Clock, ArrowUpRight, Send } from "lucide-react"
+import { MapPin, Phone, Mail, Clock, ArrowUpRight, Send } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
@@ -87,7 +87,7 @@ export function Footer() {
                 alt="Academia de Formación Líderes del Mérito"
                 width={80}
                 height={80}
-                className="h-20 w-auto brightness-0 invert"
+                className="h-20 w-auto"
               />
             </div>
             <p className="text-background/70 mb-6 text-sm leading-relaxed">

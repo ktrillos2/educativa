@@ -1,16 +1,12 @@
-import { Header } from "@/components/header"
-import { Footer } from "@/components/footer"
 import { CursosCortosList } from "@/components/cursos-cortos-list"
 import { Breadcrumb } from "@/components/breadcrumb"
-import { Zap, Clock, TrendingUp, CheckCircle2, BookMarked } from "lucide-react"
+import { Zap, Clock, TrendingUp, CheckCircle2, BookMarked } from "@/components/ui/icons"
 
 export default function CursosCortosPage() {
   return (
-    <main className="min-h-screen">
-      <Header />
-
+    <main className="flex-grow">
       {/* Hero Section */}
-      <section className="pt-24 pb-12 bg-primary relative overflow-hidden">
+      <section className="pb-12 bg-primary relative overflow-hidden">
         <div className="absolute inset-0 opacity-5">
           <div
             className="absolute top-0 left-0 w-full h-full"
@@ -54,7 +50,6 @@ export default function CursosCortosPage() {
       </section>
 
       <CursosCortosList />
-      <Footer />
     </main>
   )
 }

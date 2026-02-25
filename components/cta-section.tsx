@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
-import { PhoneCall, Mail, ArrowRight, Headphones, MessageCircle, Clock, CheckCircle2 } from "lucide-react"
+import { PhoneCall, Mail, ArrowRight, Headphones, MessageCircle, Clock, CheckCircle2 } from "@/components/ui/icons"
 
 function useScrollAnimation() {
   const ref = useRef<HTMLDivElement>(null)
