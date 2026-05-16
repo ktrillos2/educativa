@@ -193,14 +193,24 @@ export function Footer() {
       <div className="border-t border-background/10">
         <div className="container mx-auto px-4 py-5">
           <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-background/60">
-            <p>© 2025 Academia de Formación Líderes del Mérito S.A.S. Todos los derechos reservados.</p>
-            <div className="flex gap-4">
-              <Link href="#" className="hover:text-secondary transition-colors">
-                Política de Privacidad
+            <p>© {new Date().getFullYear()} Academia de Formación Líderes del Mérito S.A.S. Todos los derechos reservados.</p>
+            <div className="flex flex-col md:flex-row items-center gap-4">
+              <Link 
+                href="https://www.kytcode.lat" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="hover:text-secondary transition-colors font-medium flex items-center gap-1"
+              >
+                Desarrollado por K&T <span className="text-white">❤</span>
               </Link>
-              <Link href="#" className="hover:text-secondary transition-colors">
-                Términos y Condiciones
-              </Link>
+              <div className="flex gap-4">
+                <Link href="#" className="hover:text-secondary transition-colors">
+                  Política de Privacidad
+                </Link>
+                <Link href="#" className="hover:text-secondary transition-colors">
+                  Términos y Condiciones
+                </Link>
+              </div>
             </div>
           </div>
         </div>

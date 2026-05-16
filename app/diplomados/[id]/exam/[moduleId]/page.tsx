@@ -24,11 +24,11 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
         }
 
         const enrollment = await db.execute({
-            sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
+            sql: "SELECT user_id FROM enrollments WHERE user_id = ? AND course_id = ?",
             args: [session.userId, course.id]
         })
 
-        if (enrollment.rows.length === 0 || !enrollment.rows[0].payment_verified) {
+        if (enrollment.rows.length === 0) {
             redirect(`/diplomados/${params.id}`)
         }
     }

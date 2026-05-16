@@ -11,21 +11,8 @@ export async function GET(
     const { filename } = await params
     const session = await getSession()
 
-    if (!session?.userId) {
-        return new NextResponse("Unauthorized", { status: 401 })
-    }
-
-    // We should ideally check the specific course payment, but here we just check if
-    // this user has ANY payment verified, or we query the exact enrollment.
-    // For simplicity, we'll assume if they have any paymentVerified = true, they can download.
-    const userEnrollments = await db.execute({
-        sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND payment_verified = 1",
-        args: [session.userId]
-    })
-
-    if (userEnrollments.rows.length === 0) {
-        return new NextResponse("Payment Required", { status: 403 })
-    }
+    // Downloading is not permitted as per system rules
+    return new NextResponse("Downloading material is not permitted. Only online viewing is allowed.", { status: 403 })
 
     // Serve the file from the diplomados folder in the root
     const filePath = path.join(process.cwd(), "diplomados", filename)

@@ -20,13 +20,20 @@ export async function GET(
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
-        const userEnrollments = await db.execute({
-            sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND payment_verified = 1",
-            args: [session.userId]
-        })
+        const { searchParams } = new URL(request.url)
+        const courseId = searchParams.get("courseId")
+
+        // Material is free for enrolled users
+        const sql = courseId 
+            ? "SELECT user_id FROM enrollments WHERE user_id = ? AND course_id = ?"
+            : "SELECT user_id FROM enrollments WHERE user_id = ?"
+        
+        const args = courseId ? [session.userId, courseId] : [session.userId]
+
+        const userEnrollments = await db.execute({ sql, args })
 
         if (userEnrollments.rows.length === 0) {
-            return new NextResponse("Payment Required", { status: 403 })
+            return new NextResponse("Enrollment Required", { status: 403 })
         }
     }
 

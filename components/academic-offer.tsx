@@ -18,6 +18,8 @@ import {
   Sparkles,
   ChevronRight,
 } from "@/components/ui/icons"
+import { diplomados as allDiplomados } from "@/lib/data"
+import Link from "next/link"
 
 const categories = ["Todos", "Gestión", "Legal", "Tecnología", "Salud"]
 
@@ -34,80 +36,7 @@ const badgeIcons: Record<string, React.ElementType> = {
   Certificado: BadgeCheck,
 }
 
-const programs = [
-  {
-    id: "p1",
-    title: "Diplomado en Gestión Empresarial",
-    description: "Desarrolla habilidades directivas y de liderazgo para la gestión efectiva de organizaciones modernas.",
-    duration: "120 horas",
-    students: "25 cupos",
-    badge: "Nuevo",
-    category: "Gestión",
-    image: "/business-management-corporate-meeting-professional.jpg",
-    price: "$1.200.000",
-    startDate: "15 Feb 2025",
-  },
-  {
-    id: "p2",
-    title: "Diplomado en Seguridad y Salud en el Trabajo",
-    description: "Aprende a implementar sistemas de gestión de SST según la normatividad vigente y estándares de calidad.",
-    duration: "100 horas",
-    students: "30 cupos",
-    badge: "Popular",
-    category: "Salud",
-    image: "/workplace-safety-health-professional-training-equi.jpg",
-    price: "$980.000",
-    startDate: "20 Feb 2025",
-  },
-  {
-    id: "p3",
-    title: "Diplomado en Contratación Estatal",
-    description: "Domina los procesos de contratación pública, selección objetiva y la normatividad aplicable al Estado.",
-    duration: "80 horas",
-    students: "20 cupos",
-    badge: null,
-    category: "Legal",
-    image: "/government-contract-legal-documents-signing.jpg",
-    price: "$850.000",
-    startDate: "1 Mar 2025",
-  },
-  {
-    id: "p4",
-    title: "Diplomado en Gestión del Talento Humano",
-    description: "Estrategias modernas para la selección, administración y el desarrollo integral del capital humano.",
-    duration: "90 horas",
-    students: "25 cupos",
-    badge: "Certificado",
-    category: "Gestión",
-    image: "/human-resources-team-management-diverse-workplace.jpg",
-    price: "$920.000",
-    startDate: "10 Mar 2025",
-  },
-  {
-    id: "p5",
-    title: "Diplomado en Marketing Digital Estratégico",
-    description: "Aprende herramientas digitales para posicionar marcas, optimizar campañas y generar resultados.",
-    duration: "80 horas",
-    students: "30 cupos",
-    badge: "Nuevo",
-    category: "Tecnología",
-    image: "/digital-marketing-social-media-analytics-screens.jpg",
-    price: "$1.100.000",
-    startDate: "15 Mar 2025",
-  },
-  {
-    id: "p6",
-    title: "Diplomado en Finanzas y Presupuesto Público",
-    description: "Fundamentos de la gestión financiera, ejecución y planeación presupuestal para entidades estatales.",
-    duration: "100 horas",
-    students: "20 cupos",
-    badge: null,
-    category: "Gestión",
-    image: "/finance-budget-accounting-professional-calculator.jpg",
-    price: "$950.000",
-    startDate: "22 Mar 2025",
-  },
-]
+const programs = allDiplomados.slice(0, 6)
 
 // Animation variants
 const containerVariants = {
@@ -242,40 +171,44 @@ export function AcademicOffer() {
                   </div>
 
                   {/* Content */}
-                  <div className="p-6 flex flex-col flex-grow">
-                    <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                      {program.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground line-clamp-3 mb-6 flex-grow">
-                      {program.description}
-                    </p>
+                    <div className="p-6 flex flex-col flex-grow">
+                      <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">
+                        {program.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-3 mb-6 flex-grow">
+                        {program.description}
+                      </p>
 
-                    <div className="flex items-center justify-between text-sm text-muted-foreground mb-6 pt-5 border-t border-border/60">
-                      <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-md">
-                        <Clock3 className="h-4 w-4 text-primary" />
-                        <span className="font-medium">{program.duration}</span>
+                      <div className="flex items-center justify-between text-sm text-muted-foreground mb-6 pt-5 border-t border-border/60">
+                        <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-md">
+                          <Clock3 className="h-4 w-4 text-primary" />
+                          <span className="font-medium">{program.duration}</span>
+                        </div>
+                        <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-md">
+                          <Users2 className="h-4 w-4 text-primary" />
+                          <span className="font-medium">{program.students}</span>
+                        </div>
                       </div>
-                      <div className="flex items-center gap-2 bg-muted/50 px-3 py-1.5 rounded-md">
-                        <Users2 className="h-4 w-4 text-primary" />
-                        <span className="font-medium">{program.students}</span>
+
+                      <div className="flex items-center gap-3">
+                        <Link href={`/diplomados/${program.id}`} className="flex-1">
+                          <Button className="w-full bg-primary hover:bg-primary/90 text-white rounded-xl h-11 font-semibold group/btn overflow-hidden relative">
+                            <span className="relative z-10 transition-transform group-hover/btn:-translate-x-1">Ver Diplomado</span>
+                            <MoveUpRight className="absolute right-4 w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-all group-hover/btn:translate-x-1" />
+                            <div className="absolute inset-0 bg-white/20 scale-x-0 origin-left group-hover/btn:scale-x-100 transition-transform duration-300 ease-out" />
+                          </Button>
+                        </Link>
+                        <Link href={`/diplomados/${program.id}`}>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-11 w-11 rounded-xl border-border hover:border-primary hover:bg-primary/5 hover:text-primary bg-transparent transition-colors"
+                          >
+                            <ChevronRight className="h-5 w-5" />
+                          </Button>
+                        </Link>
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3">
-                      <Button className="flex-1 bg-primary hover:bg-primary/90 text-white rounded-xl h-11 font-semibold group/btn overflow-hidden relative">
-                        <span className="relative z-10 transition-transform group-hover/btn:-translate-x-1">Inscribirse</span>
-                        <MoveUpRight className="absolute right-4 w-4 h-4 opacity-0 group-hover/btn:opacity-100 transition-all group-hover/btn:translate-x-1" />
-                        <div className="absolute inset-0 bg-white/20 scale-x-0 origin-left group-hover/btn:scale-x-100 transition-transform duration-300 ease-out" />
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="icon"
-                        className="h-11 w-11 rounded-xl border-border hover:border-primary hover:bg-primary/5 hover:text-primary bg-transparent transition-colors"
-                      >
-                        <ChevronRight className="h-5 w-5" />
-                      </Button>
-                    </div>
-                  </div>
                 </motion.div>
               )
             })}
@@ -291,13 +224,15 @@ export function AcademicOffer() {
           className="text-center mt-12"
         >
           <div className="inline-flex flex-col sm:flex-row items-center gap-4">
-            <Button
-              variant="outline"
-              className="border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full text-base font-bold h-12 px-8 bg-transparent transition-all"
-            >
-              Ver Catálogo Completo
-              <MoveUpRight className="ml-2 h-4 w-4" />
-            </Button>
+            <Link href="/diplomados">
+              <Button
+                variant="outline"
+                className="border-2 border-primary text-primary hover:bg-primary hover:text-white rounded-full text-base font-bold h-12 px-8 bg-transparent transition-all"
+              >
+                Ver Catálogo Completo
+                <MoveUpRight className="ml-2 h-4 w-4" />
+              </Button>
+            </Link>
             <Button className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full text-base font-bold h-12 px-8 shadow-lg shadow-secondary/20">
               Solicitar Asesoría Gratuita
             </Button>

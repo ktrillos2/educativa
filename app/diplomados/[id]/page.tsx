@@ -1,3 +1,4 @@
+// File updated to resolve build cache issues
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { EnrollmentDialog } from "@/components/enrollment-dialog"
@@ -13,11 +14,15 @@ import {
     ChevronRight,
     Download,
     AlertCircle,
-    Lock
+    Lock,
+    GraduationCap,
+    Award
 } from "@/components/ui/icons"
 import { diplomados } from "@/lib/data"
 import Link from "next/link"
 import * as motion from "framer-motion/client"
+import fs from "fs"
+import path from "path"
 
 export default async function DiplomadoDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
@@ -50,12 +55,23 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
     }
 
     // Generate an array of modules based on course.modules length for visualization
-    const courseModules = Array.from({ length: course.modules }).map((_, i) => ({
-        id: `mod-${i + 1}`,
-        title: `Módulo ${i + 1}`,
-        docName: `Modulo ${i + 1}.pdf`, // This matches the user's uploaded files (Modulo 1.pdf, etc)
-        examName: `Cuestionario Modulo ${i + 1}.docx`
-    }))
+    const courseModules = Array.from({ length: course.modules }).map((_, i) => {
+        // We use course ID in the filename to avoid collisions between courses
+        const docName = `Modulo ${i + 1} - ${course.id}.pdf`
+        const examName = `Cuestionario Modulo ${i + 1} - ${course.id}.docx`
+        
+        // Check if file exists in the diplomados folder
+        const filePath = path.join(process.cwd(), "diplomados", docName)
+        const fileExists = fs.existsSync(filePath)
+
+        return {
+            id: `mod-${i + 1}`,
+            title: `Módulo ${i + 1}`,
+            docName,
+            examName,
+            fileExists
+        }
+    })
 
     return (
         <main className="flex-grow bg-muted/30 pt-24">
@@ -132,14 +148,14 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         </div>
 
                                         {!paymentVerified ? (
-                                            <div className="flex items-start gap-3 p-4 bg-yellow-50 border border-yellow-200 text-yellow-800 rounded-2xl text-left shadow-sm">
-                                                <AlertCircle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-                                                <span className="text-sm">Tu pago está <strong>pendiente de verificación</strong>. Aún no puedes descargar los módulos ni rendir exámenes.</span>
+                                            <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl text-left shadow-sm">
+                                                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
+                                                <span className="text-sm">El diplomado es <strong>gratuito</strong>. Tu pago es necesario únicamente para **obtener el certificado oficial** al finalizar.</span>
                                             </div>
                                         ) : (
                                             <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 text-green-800 rounded-2xl text-left shadow-sm">
                                                 <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                                <span className="text-sm">Pago verificado. <strong>Puedes acceder a todo el material académico.</strong></span>
+                                                <span className="text-sm">Pago verificado. <strong>Podrás descargar tu certificado</strong> al completar satisfactoriamente todos los módulos.</span>
                                             </div>
                                         )}
 
@@ -186,120 +202,142 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                 </div>
             </section>
 
-            {/* Modules Content */}
-            <section id="programa" className="py-20">
-                <div className="container mx-auto px-4 max-w-4xl">
+            {/* Programa Académico Section */}
+            <section id="programa" className="py-20 bg-white">
+                <div className="container mx-auto px-4 max-w-7xl">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
-                        className="mb-12 text-center"
+                        className="mb-16 text-center"
                     >
-                        <h2 className="text-3xl md:text-4xl font-extrabold text-primary mb-4">Programa Académico</h2>
+                        <h2 className="text-4xl font-extrabold text-primary mb-4">Programa Académico</h2>
                         <div className="h-1.5 w-20 bg-secondary mx-auto rounded-full mb-4"></div>
-                        <p className="text-muted-foreground text-lg">Estructura detallada del curso diseñada para tu aprendizaje.</p>
+                        <p className="text-muted-foreground text-lg">Estructura detallada diseñada para tu formación profesional.</p>
                     </motion.div>
 
-                    <div className="max-w-3xl mx-auto space-y-0">
-                        {courseModules.map((mod, index) => (
-                            <motion.div
-                                key={mod.id}
-                                initial={{ opacity: 0, y: 20 }}
-                                whileInView={{ opacity: 1, y: 0 }}
-                                viewport={{ once: true, margin: "-100px" }}
-                                transition={{ delay: index * 0.1 }}
-                                className="flex gap-4 md:gap-8 group relative"
-                            >
-                                {/* Timeline Indicator */}
-                                <div className="flex flex-col items-center pt-2">
-                                    <div className="w-10 h-10 md:w-12 md:h-12 rounded-full bg-secondary/10 text-secondary flex items-center justify-center font-black border-4 border-white shadow-sm shrink-0 z-10 group-hover:bg-secondary group-hover:text-white transition-colors duration-300">
-                                        {index + 1}
-                                    </div>
-                                    {index !== courseModules.length - 1 && (
-                                        <div className="w-0.5 h-full min-h-[100px] bg-border/60 group-hover:bg-secondary/30 transition-colors duration-300 mt-2"></div>
-                                    )}
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Column 1: Módulos de Estudio */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-primary/5 rounded-2xl border border-primary/10">
+                                <div className="p-2 bg-primary text-white rounded-lg shadow-lg shadow-primary/20">
+                                    <BookOpen className="w-5 h-5" />
                                 </div>
-
-                                {/* Content Card */}
-                                <div className="flex-1 bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-border/60 hover:border-secondary/30 hover:shadow-lg transition-all duration-300 mb-8 md:mb-12">
-                                    <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                        <div>
-                                            <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-3 py-1 rounded-md font-bold text-xs uppercase tracking-wider mb-3">
-                                                <BookOpen className="w-3.5 h-3.5" />
-                                                Módulo {index + 1}
-                                            </div>
-                                            <h3 className="text-xl md:text-2xl font-bold mb-2 group-hover:text-primary transition-colors">{mod.title}</h3>
-                                            <p className="text-muted-foreground text-sm">Contenido fundamental y evaluación de la unidad actual.</p>
+                                <h3 className="text-xl font-bold">Módulos de Estudio</h3>
+                            </div>
+                            
+                            <div className="space-y-4">
+                                {courseModules.map((mod, index) => (
+                                    <motion.div
+                                        key={`mod-${mod.id}`}
+                                        initial={{ opacity: 0, x: -20 }}
+                                        whileInView={{ opacity: 1, x: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className="p-5 bg-muted/20 rounded-2xl border border-border/50 hover:border-primary/30 transition-all group"
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Unidad {index + 1}</span>
+                                            {mod.fileExists && isEnrolled && (
+                                                <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                    <CheckCircle className="w-3 h-3" /> PDF
+                                                </span>
+                                            )}
                                         </div>
-                                    </div>
+                                        <h4 className="font-bold mb-3 group-hover:text-primary transition-colors">{mod.title}</h4>
+                                        
+                                        {isEnrolled ? (
+                                            mod.fileExists ? (
+                                                <Link 
+                                                    href={`/diplomados/${course.id}/vista/${mod.docName}`}
+                                                    className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
+                                                >
+                                                    <BookOpen className="w-3 h-3" /> Ver Material
+                                                </Link>
+                                            ) : (
+                                                <span className="text-xs text-muted-foreground italic">Próximamente</span>
+                                            )
+                                        ) : (
+                                            <p className="text-[10px] text-muted-foreground">Inscríbete para acceder</p>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
 
-                                    {isEnrolled ? (
-                                        <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                            <div className="flex items-center gap-4 p-4 md:p-5 bg-muted/30 rounded-xl border border-border/50 hover:bg-muted/50 transition-colors">
-                                                <div className="p-3 bg-primary/10 rounded-lg text-primary shrink-0">
-                                                    <Download className="w-6 h-6" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <span className="block font-bold text-sm truncate mb-1">{mod.docName}</span>
-                                                    {paymentVerified ? (
-                                                        <Link href={`/diplomados/${course.id}/vista/${mod.docName}`} className="text-xs font-semibold text-blue-600 hover:underline">
-                                                            Ver Material en Línea
-                                                        </Link>
-                                                    ) : (
-                                                        <span className="text-xs font-semibold text-red-500 flex items-center gap-1">
-                                                            <AlertCircle className="w-3 h-3" /> Pago Pendiente
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            <div className="flex items-center gap-4 p-4 md:p-5 bg-secondary/5 rounded-xl border border-secondary/10 hover:bg-secondary/10 transition-colors">
-                                                <div className="p-3 bg-secondary/10 rounded-lg text-secondary shrink-0">
-                                                    <CheckCircle className="w-6 h-6" />
-                                                </div>
-                                                <div className="flex-1 min-w-0">
-                                                    <span className="block font-bold text-sm truncate mb-1">Examen de Unidad</span>
-                                                    {paymentVerified ? (
-                                                        <Link href={`/diplomados/${course.id}/exam/${mod.id}`} className="text-xs font-semibold text-secondary hover:underline">
-                                                            Rendir Cuestionario
-                                                        </Link>
-                                                    ) : (
-                                                        <span className="text-xs font-semibold text-red-500 flex items-center gap-1">
-                                                            <AlertCircle className="w-3 h-3" /> Pago Pendiente
-                                                        </span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    ) : (
-                                        <div className="mt-6 flex items-start gap-4 p-4 md:p-5 bg-muted/20 rounded-xl border border-dashed border-border/60 text-muted-foreground">
-                                            <div className="p-2 bg-muted rounded-lg shrink-0">
-                                                <Lock className="w-5 h-5 text-muted-foreground/70" />
-                                            </div>
-                                            <p className="text-sm font-medium leading-relaxed">
-                                                Inscríbete a este diplomado para desbloquear el material de lectura y los cuestionarios de evaluación.
-                                            </p>
-                                        </div>
-                                    )}
+                        {/* Column 2: Cuestionarios */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-secondary/5 rounded-2xl border border-secondary/10">
+                                <div className="p-2 bg-secondary text-white rounded-lg shadow-lg shadow-secondary/20">
+                                    <Award className="w-5 h-5" />
                                 </div>
-                            </motion.div>
-                        ))}
+                                <h3 className="text-xl font-bold text-secondary-dark">Cuestionarios</h3>
+                            </div>
+
+                            <div className="space-y-4">
+                                {courseModules.map((mod, index) => (
+                                    <motion.div
+                                        key={`ques-${mod.id}`}
+                                        initial={{ opacity: 0, y: 10 }}
+                                        whileInView={{ opacity: 1, y: 0 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: index * 0.05 }}
+                                        className="p-5 bg-secondary/5 rounded-2xl border border-secondary/10 hover:border-secondary/30 transition-all group"
+                                    >
+                                        <div className="flex justify-between items-start mb-2">
+                                            <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Eval. {index + 1}</span>
+                                        </div>
+                                        <h4 className="font-bold mb-3 group-hover:text-secondary transition-colors">Test de Unidad</h4>
+                                        
+                                        {isEnrolled ? (
+                                            <Link 
+                                                href={`/diplomados/${course.id}/exam/${mod.id}`}
+                                                className="inline-flex items-center gap-2 text-xs font-bold text-secondary hover:underline"
+                                            >
+                                                <Award className="w-3 h-3" /> Iniciar Test
+                                            </Link>
+                                        ) : (
+                                            <p className="text-[10px] text-muted-foreground">Disponible tras inscripción</p>
+                                        )}
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Column 3: Exámenes Finales */}
+                        <div className="space-y-6">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-red-50 rounded-2xl border border-red-100">
+                                <div className="p-2 bg-red-500 text-white rounded-lg shadow-lg shadow-red-200">
+                                    <GraduationCap className="w-5 h-5" />
+                                </div>
+                                <h3 className="text-xl font-bold text-red-900">Exámenes</h3>
+                            </div>
+
+                            <div className="flex flex-col items-center justify-center min-h-[300px] bg-red-50/30 border-2 border-dashed border-red-200 rounded-3xl p-8 text-center">
+                                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-400">
+                                    <Lock className="w-8 h-8" />
+                                </div>
+                                <h4 className="font-bold text-red-900 mb-2">Sección en Construcción</h4>
+                                <p className="text-[10px] text-red-700/70">Los exámenes finales se habilitarán una vez se complete el cargue total de los contenidos del programa.</p>
+                            </div>
+                        </div>
                     </div>
 
+                    {/* Completion Section */}
                     {isEnrolled && paymentVerified && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="mt-12 text-center bg-primary/5 p-12 rounded-3xl border border-primary/10"
+                            className="mt-20 text-center bg-primary/5 p-12 rounded-3xl border border-primary/10"
                         >
                             <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
                                 <CheckCircle className="w-8 h-8" />
                             </div>
-                            <h3 className="text-2xl font-bold mb-4">¡Felicidades por tu progreso!</h3>
-                            <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Cuando hayas culminado todos los módulos del programa, podrás obtener tu certificado oficial ingresando al siguiente enlace.</p>
+                            <h3 className="text-2xl font-bold mb-4">Certificación Disponible</h3>
+                            <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Has completado los requisitos de este diplomado. Ya puedes descargar tu certificado oficial y acta de finalización.</p>
                             <Link href={`/diplomados/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
-                                Obtener Certificado Digital <ChevronRight className="ml-2 w-5 h-5" />
+                                Ver Documentos de Grado <ChevronRight className="ml-2 w-5 h-5" />
                             </Link>
                         </motion.div>
                     )}

@@ -2,7 +2,7 @@ import { notFound, redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
 import { db } from "@/lib/db"
 import { diplomados } from "@/lib/data"
-import { Award, Download, ArrowLeft } from "@/components/ui/icons"
+import { Award, Download, ArrowLeft, FileSpreadsheet } from "@/components/ui/icons"
 import Link from "next/link"
 
 export default async function CertificatePage(props: { params: Promise<{ id: string }> }) {
@@ -55,7 +55,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
     <main className="flex-grow bg-muted/20">
       <section className="pt-8 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <Link href={`/diplomados/\${course.id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors">
+          <Link href={`/diplomados/\${course.id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors print:hidden">
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Diplomado
           </Link>
 
@@ -75,15 +75,27 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
             </div>
           ) : (
             <div className="space-y-8">
-              <div className="flex justify-between items-center">
-                <h1 className="text-2xl font-bold">Tu Certificado</h1>
-                <button 
-                  onClick={() => window.print()}
-                  className="bg-secondary text-white px-4 py-2 rounded-md font-medium hover:bg-secondary/90 flex items-center gap-2"
-                >
-                  <Download className="w-4 h-4" />
-                  Descargar PDF
-                </button>
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
+                <div>
+                    <h1 className="text-3xl font-bold text-primary">Certificación Académica</h1>
+                    <p className="text-muted-foreground">Has completado exitosamente todos los requisitos del programa.</p>
+                </div>
+                <div className="flex flex-wrap gap-3">
+                    <Link
+                        href={`/diplomados/${course.id}/acta`}
+                        className="bg-white text-secondary border-2 border-secondary px-6 py-2.5 rounded-xl font-bold hover:bg-secondary/5 flex items-center gap-2 transition-all shadow-sm"
+                    >
+                        <FileSpreadsheet className="w-5 h-5" />
+                        Ver Acta Académica
+                    </Link>
+                    <button 
+                        onClick={() => typeof window !== 'undefined' && window.print()}
+                        className="bg-secondary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-secondary/90 flex items-center gap-2 transition-all shadow-lg shadow-secondary/20"
+                    >
+                        <Download className="w-5 h-5" />
+                        Descargar Certificado
+                    </button>
+                </div>
               </div>
 
               {/* Certificate UI designed for printing */}
