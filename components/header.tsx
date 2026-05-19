@@ -5,6 +5,9 @@ import Image from "next/image"
 import Link from "next/link"
 import { Menu, X, ChevronDown } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
+import { logoutAction } from "@/app/actions/auth"
+import { useRouter } from "next/navigation"
+import { toast } from "sonner"
 
 const navItems = [
   { label: "Inicio", href: "/" },
@@ -20,9 +23,33 @@ const navItems = [
   { label: "Contacto", href: "/contacto" },
 ]
 
-export function Header() {
+interface HeaderProps {
+  session?: { userId: string } | null
+}
+
+export function Header({ session }: HeaderProps) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
+  const [isLoggingOut, setIsLoggingOut] = useState(false)
+  const router = useRouter()
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true)
+    try {
+      const res = await logoutAction()
+      if (res?.success) {
+        toast.success("Sesión cerrada correctamente")
+        router.push("/")
+        router.refresh()
+      } else {
+        toast.error("Error al cerrar sesión")
+      }
+    } catch (e) {
+      toast.error("Error al cerrar sesión")
+    } finally {
+      setIsLoggingOut(false)
+    }
+  }
 
   return (
     <header
@@ -82,18 +109,41 @@ export function Header() {
           </nav>
 
           <div className="hidden lg:flex items-center gap-2">
-            <Link href="/login">
-              <Button
-                variant="outline"
-                size="sm"
-                className="rounded-md border-primary text-primary hover:bg-primary hover:text-white"
-              >
-                Iniciar Sesión
-              </Button>
-            </Link>
-            <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md">
-              Inscribirse
-            </Button>
+            {session ? (
+              <>
+                <Button 
+                  variant="outline"
+                  size="sm" 
+                  onClick={handleLogout}
+                  disabled={isLoggingOut}
+                  className="rounded-md border-primary text-primary hover:bg-primary hover:text-white font-medium"
+                >
+                  {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
+                </Button>
+                <Link href="/diplomados">
+                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md font-bold">
+                    Inscribirse
+                  </Button>
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link href="/login">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="rounded-md border-primary text-primary hover:bg-primary hover:text-white"
+                  >
+                    Iniciar Sesión
+                  </Button>
+                </Link>
+                <Link href="/register">
+                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md font-bold">
+                    Inscribirse
+                  </Button>
+                </Link>
+              </>
+            )}
           </div>
 
           <button
@@ -134,14 +184,40 @@ export function Header() {
               ))}
             </nav>
             <div className="flex flex-col gap-2 mt-4 px-4">
-              <Link href="/login">
-                <Button variant="outline" size="sm" className="w-full bg-transparent rounded-md">
-                  Iniciar Sesión
-                </Button>
-              </Link>
-              <Button size="sm" className="w-full bg-secondary text-secondary-foreground rounded-md">
-                Inscribirse
-              </Button>
+              {session ? (
+                <>
+                  <Button 
+                    variant="outline"
+                    size="sm" 
+                    onClick={() => {
+                      setMobileMenuOpen(false)
+                      handleLogout()
+                    }}
+                    disabled={isLoggingOut}
+                    className="w-full bg-transparent rounded-md font-medium"
+                  >
+                    {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
+                  </Button>
+                  <Link href="/diplomados" onClick={() => setMobileMenuOpen(false)}>
+                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground rounded-md font-bold">
+                      Inscribirse
+                    </Button>
+                  </Link>
+                </>
+              ) : (
+                <>
+                  <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
+                    <Button variant="outline" size="sm" className="w-full bg-transparent rounded-md">
+                      Iniciar Sesión
+                    </Button>
+                  </Link>
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
+                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground rounded-md font-bold">
+                      Inscribirse
+                    </Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         )}

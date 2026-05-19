@@ -257,6 +257,21 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                             ) : (
                                                 <span className="text-xs text-muted-foreground italic">Próximamente</span>
                                             )
+                                        ) : !session ? (
+                                            <div className="text-[10px] text-muted-foreground space-y-1">
+                                                <p>
+                                                    ¿Ya estás inscrito/a?{" "}
+                                                    <Link href="/login" className="text-primary hover:underline font-bold">
+                                                        Inicia sesión
+                                                    </Link>
+                                                </p>
+                                                <p>
+                                                    ¿No tienes cuenta?{" "}
+                                                    <Link href="/register" className="text-secondary hover:underline font-bold">
+                                                        Inscríbete aquí
+                                                    </Link>
+                                                </p>
+                                            </div>
                                         ) : (
                                             <p className="text-[10px] text-muted-foreground">Inscríbete para acceder</p>
                                         )}
@@ -296,6 +311,21 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                             >
                                                 <Award className="w-3 h-3" /> Iniciar Test
                                             </Link>
+                                        ) : !session ? (
+                                            <div className="text-[10px] text-muted-foreground space-y-1">
+                                                <p>
+                                                    ¿Ya estás inscrito/a?{" "}
+                                                    <Link href="/login" className="text-primary hover:underline font-bold">
+                                                        Inicia sesión
+                                                    </Link>
+                                                </p>
+                                                <p>
+                                                    ¿No tienes cuenta?{" "}
+                                                    <Link href="/register" className="text-secondary hover:underline font-bold">
+                                                        Inscríbete aquí
+                                                    </Link>
+                                                </p>
+                                            </div>
                                         ) : (
                                             <p className="text-[10px] text-muted-foreground">Disponible tras inscripción</p>
                                         )}
