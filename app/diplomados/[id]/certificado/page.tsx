@@ -99,34 +99,88 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </div>
 
               {/* Certificate UI designed for printing */}
-              <div id="certificate" className="bg-white border-8 border-double border-primary/20 p-12 md:p-20 text-center relative overflow-hidden shadow-lg aspect-[1.4/1] flex flex-col justify-center">
-                <div className="absolute top-0 left-0 w-full h-full opacity-5 pointer-events-none" style={{ backgroundImage: "url('/placeholder.svg')" }}></div>
+              <div id="certificate" className="bg-white text-black p-8 md:p-12 text-center relative overflow-hidden shadow-lg aspect-[1.414/1] flex flex-col justify-between" style={{ border: '12px solid #C5A059' }}>
+                <div className="absolute inset-0 m-1 pointer-events-none" style={{ border: '2px solid #C5A059' }}></div>
                 
-                <div className="relative z-10">
-                  <div className="mb-8">
-                    <Award className="w-16 h-16 mx-auto text-primary" />
+                {/* Cabecera */}
+                <div className="flex justify-between items-center w-full px-4 pt-4 relative z-10">
+                  {/* Escudo Placeholder */}
+                  <div className="w-28 h-28 rounded-full border-2 border-gray-300 flex items-center justify-center bg-gray-50 flex-shrink-0 shadow-sm">
+                    <span className="text-xs text-gray-400 font-medium">ESCUDO</span>
                   </div>
                   
-                  <h2 className="text-3xl md:text-5xl font-serif text-primary mb-2 uppercase tracking-wide">Certificado de Aprobación</h2>
-                  <p className="text-lg text-muted-foreground mb-8">La Academia de Formación Líderes del Mérito S.A.S. certifica que:</p>
-                  
-                  <h3 className="text-4xl md:text-5xl font-bold text-foreground mb-2">{String(user.name)}</h3>
-                  <p className="text-muted-foreground mb-8">Con documento de identidad: {String(user.document)}</p>
-                  
-                  <p className="text-lg text-muted-foreground mb-4">Ha completado satisfactoriamente los requisitos académicos del:</p>
-                  <h4 className="text-2xl md:text-3xl font-bold text-secondary mb-12">{course.title}</h4>
-                  
-                  <div className="flex justify-between items-end px-12 mt-12">
-                    <div className="text-center border-t border-black/20 pt-2 w-48">
-                      <p className="font-bold text-sm">Director Académico</p>
-                      <p className="text-xs text-muted-foreground">FLM S.A.S.</p>
+                  {/* Texto Central */}
+                  <div className="flex-1 flex flex-col items-center justify-center px-4">
+                    <h1 className="text-xl md:text-2xl lg:text-3xl font-bold text-[#006838] uppercase tracking-wide leading-tight">
+                      ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
+                    </h1>
+                    <div className="flex gap-4 md:gap-8 text-[#006838] text-sm md:text-base font-bold mt-2">
+                      <span>Registro mercantil: 95312</span>
+                      <span>NIT: 900361774-5</span>
                     </div>
+                  </div>
+                  
+                  {/* Logo Academia Placeholder */}
+                  <div className="w-28 h-32 border-2 border-[#006838] flex items-center justify-center bg-[#006838] text-white flex-shrink-0 relative overflow-hidden shadow-sm">
                     <div className="text-center">
-                      <p className="text-sm font-medium mb-1">Fecha de Emisión</p>
-                      <p className="text-sm border-b border-black/20 px-4 pb-1">
-                        {new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}
-                      </p>
+                      <Award className="w-10 h-10 mx-auto text-[#C5A059]" />
+                      <span className="text-[8px] leading-tight block mt-2 uppercase font-bold px-1">Academia de Formación<br/>Líderes del Mérito<br/>S.A.S.</span>
                     </div>
+                  </div>
+                </div>
+
+                {/* Cuerpo Central */}
+                <div className="flex-1 flex flex-col items-center justify-center space-y-4 relative z-10 mt-6">
+                  <p className="text-2xl md:text-3xl font-bold text-[#C5A059] uppercase tracking-widest">¡EL MÉRITO ES TUYO!</p>
+                  <p className="text-xl md:text-2xl font-bold uppercase text-black mt-2">HACE CONSTAR QUE</p>
+                  
+                  <h2 className="text-4xl md:text-5xl lg:text-[3.5rem] font-serif font-bold text-black uppercase mt-6 mb-2 tracking-wide">
+                    {String(user.name)}
+                  </h2>
+                  <p className="text-base md:text-lg text-black">
+                    Identificado(a) con documento de identidad N° <span className="border-b border-black inline-block px-8 font-medium pb-0.5">{String(user.document)}</span>
+                  </p>
+                  
+                  <p className="text-xl md:text-2xl font-bold text-black mt-8">CURSÓ Y APROBÓ EL</p>
+                  <h3 className="text-2xl md:text-3xl lg:text-4xl font-bold text-black uppercase px-12 tracking-wide">{course.title}</h3>
+                  
+                  <p className="text-sm md:text-base text-black mt-8 max-w-4xl leading-relaxed">
+                    Modalidad virtual asincrónica a los <span className="border-b border-black px-4 inline-block font-medium pb-0.5">{new Date().getDate()}</span> días del mes de <span className="border-b border-black px-4 inline-block font-medium pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="border-b border-black px-6 inline-block font-medium pb-0.5">{new Date().getFullYear()}</span>.
+                    <br/>
+                    <span className="block mt-4">Con una intensidad académica de <span className="font-medium">{course.duration || 'sesenta y cinco (65) horas'}</span>.</span>
+                  </p>
+                  <p className="text-sm md:text-base text-black mt-6">
+                    Registrado en el Libro de Actas N° <span className="border-b border-black px-8 inline-block font-medium pb-0.5">2026-00001</span>
+                  </p>
+                </div>
+
+                {/* Pie / Footer */}
+                <div className="flex justify-between items-end w-full px-8 md:px-16 mt-8 mb-4 relative z-10">
+                  {/* QR */}
+                  <div className="text-center w-40 flex flex-col items-center">
+                    <p className="text-xs font-bold text-black mb-2">QR DE VERIFICACIÓN</p>
+                    <div className="w-24 h-24 bg-gray-50 border border-gray-300 flex items-center justify-center text-xs text-gray-400 rounded">
+                      [QR]
+                    </div>
+                    <p className="text-xs text-black mt-2">(Insertar aquí)</p>
+                  </div>
+                  
+                  {/* Signature */}
+                  <div className="text-center w-72 flex flex-col items-center">
+                    {/* Placeholder Firma */}
+                    <div className="h-24 w-56 bg-transparent rounded mb-1 flex flex-col items-center justify-center">
+                      <span className="italic transform -rotate-6 font-serif text-4xl text-gray-800/40">Auden V.</span>
+                    </div>
+                    <div className="border-t border-black w-full pt-2">
+                      <p className="font-bold text-sm text-black uppercase">AUDEN VILORIA TORRES</p>
+                      <p className="text-sm text-black">Director Académico</p>
+                    </div>
+                  </div>
+                  
+                  {/* Unique Code */}
+                  <div className="text-center w-40 flex flex-col items-center justify-end h-full mb-4">
+                    <p className="text-sm text-black mb-1">Código único:</p>
+                    <p className="text-sm text-black font-medium">AFLM-2026-00001</p>
                   </div>
                 </div>
               </div>
