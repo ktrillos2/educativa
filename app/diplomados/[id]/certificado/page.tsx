@@ -46,16 +46,16 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
     args: [session.userId, course.id]
   })
 
-  // To get the certificate, user must have completed all modules
+  // Para obtener el certificado, el usuario debe completar al menos 4 módulos o el 80%
   const completedModules = progressCheck.rows.length
-  const totalModules = course.modules
-  const isEligible = completedModules >= totalModules
+  const totalModules = course.modules || 1
+  const isEligible = completedModules >= 4 || (completedModules / totalModules) >= 0.8
 
   return (
     <main className="flex-grow bg-muted/20">
       <section className="pt-8 pb-16">
         <div className="container mx-auto px-4 max-w-4xl">
-          <Link href={`/diplomados/\${course.id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors print:hidden">
+          <Link href={`/diplomados/${course.id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors print:hidden">
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Diplomado
           </Link>
 
@@ -66,8 +66,9 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </div>
               <h2 className="text-2xl font-bold mb-4">Aún no cumples los requisitos</h2>
               <p className="text-muted-foreground mb-6">
-                Has completado {completedModules} de {totalModules} módulos requeridos para obtener el certificado.
-                Asegúrate de aprobar todos los exámenes de unidad con al menos 60%.
+                Has completado {completedModules} unidades.
+                Para obtener el certificado oficial necesitas completar al menos 4 módulos o el 80% del programa.
+                Asegúrate de aprobar las evaluaciones requeridas.
               </p>
               <Link href={`/diplomados/\${course.id}`} className="inline-block bg-primary text-white px-6 py-2 rounded-md font-medium hover:bg-primary/90">
                 Continuar Estudiando

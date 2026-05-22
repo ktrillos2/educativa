@@ -91,7 +91,7 @@ export function Testimonials() {
   }
 
   return (
-    <section className="py-12 md:py-16 bg-muted/40" ref={sectionRef}>
+    <section className="py-8 md:py-10 bg-muted/40" ref={sectionRef}>
       <div className="container mx-auto px-4">
         <div className={`text-center mb-8 ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
           <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium mb-3 rounded border border-primary/20">

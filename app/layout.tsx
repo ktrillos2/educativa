@@ -5,6 +5,7 @@ import { Analytics } from "@vercel/analytics/next"
 import "./globals.css"
 import { Header } from "@/components/header"
 import { Footer } from "@/components/footer"
+import { WhatsAppButton } from "@/components/whatsapp-button"
 import { Toaster } from "@/components/ui/sonner"
 import { getSession } from "@/lib/auth"
 
@@ -31,6 +32,7 @@ export default async function RootLayout({
         <Header session={session} />
         {children}
         <Footer />
+        <WhatsAppButton />
         <Toaster />
         <Analytics />
       </body>

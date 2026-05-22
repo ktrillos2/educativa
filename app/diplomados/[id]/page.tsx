@@ -54,6 +54,18 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
         }
     }
 
+    let completedModules = 0;
+    if (session?.userId && isEnrolled) {
+        const progressCheck = await db.execute({
+            sql: "SELECT module_id FROM progress WHERE user_id = ? AND course_id = ? AND completed = 1",
+            args: [session.userId, course.id]
+        });
+        completedModules = progressCheck.rows.length;
+    }
+
+    const totalModules = course.modules || 1;
+    const isEligibleForCert = completedModules >= 4 || (completedModules / totalModules) >= 0.8;
+
     // Generate an array of modules based on course.modules length for visualization
     const courseModules = Array.from({ length: course.modules }).map((_, i) => {
         // We use course ID in the filename to avoid collisions between courses
@@ -354,7 +366,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                     </div>
 
                     {/* Completion Section */}
-                    {isEnrolled && paymentVerified && (
+                    {isEnrolled && paymentVerified && isEligibleForCert && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
@@ -369,6 +381,22 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             <Link href={`/diplomados/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
                                 Ver Documentos de Grado <ChevronRight className="ml-2 w-5 h-5" />
                             </Link>
+                        </motion.div>
+                    )}
+                    {isEnrolled && paymentVerified && !isEligibleForCert && (
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.95 }}
+                            whileInView={{ opacity: 1, scale: 1 }}
+                            viewport={{ once: true }}
+                            className="mt-20 text-center bg-muted/30 p-10 rounded-3xl border border-border"
+                        >
+                            <div className="w-14 h-14 bg-muted text-muted-foreground rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Award className="w-6 h-6" />
+                            </div>
+                            <h3 className="text-xl font-bold mb-2">Certificación en Progreso</h3>
+                            <p className="text-muted-foreground text-sm max-w-lg mx-auto">
+                                Tu pago está verificado. Continúa estudiando y completa al menos 4 unidades (o el 80% del diplomado) para habilitar la descarga de tu certificado oficial.
+                            </p>
                         </motion.div>
                     )}
                 </div>

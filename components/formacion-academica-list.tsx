@@ -66,7 +66,7 @@ export function FormacionAcademicaList() {
                                 key={cat}
                                 variant={activeCategory === cat ? "default" : "outline"}
                                 onClick={() => setActiveCategory(cat)}
-                                className="rounded-full whitespace-nowrap transition-transform duration-200 hover:scale-105"
+                                className="rounded-none whitespace-nowrap transition-transform duration-200 hover:scale-105"
                             >
                                 {cat}
                             </Button>
@@ -77,7 +77,7 @@ export function FormacionAcademicaList() {
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-primary transition-colors" />
                         <Input
                             placeholder="Buscar programas..."
-                            className="pl-9 pr-10 rounded-full border-muted-foreground/20 focus-visible:ring-primary/20 bg-white"
+                            className="pl-9 pr-10 rounded-none border-muted-foreground/20 focus-visible:ring-primary/20 bg-white"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                         />
@@ -102,7 +102,7 @@ export function FormacionAcademicaList() {
                                     animate={{ opacity: 1, scale: 1 }}
                                     exit={{ opacity: 0, scale: 0.9 }}
                                     transition={{ duration: 0.3 }}
-                                    className="bg-white rounded-2xl overflow-hidden shadow-sm border border-border hover:shadow-xl transition-all duration-300 group flex flex-col h-full"
+                                    className="bg-white rounded-none overflow-hidden shadow-sm border border-border hover:shadow-[8px_8px_0_0_#C5A059] transition-all duration-300 group flex flex-col h-full"
                                 >
                                     <div className="relative h-48 w-full overflow-hidden">
                                         <div className="absolute inset-0 bg-primary/20 z-10 group-hover:bg-transparent transition-colors duration-500" />
@@ -114,7 +114,7 @@ export function FormacionAcademicaList() {
                                             className="object-cover group-hover:scale-110 transition-transform duration-700"
                                         />
                                         <div className="absolute top-4 left-4 z-20">
-                                            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-primary text-xs font-bold rounded-full shadow-sm">
+                                            <span className="px-3 py-1 bg-white/90 backdrop-blur-sm text-primary text-xs font-bold rounded-none shadow-sm">
                                                 {program.category}
                                             </span>
                                         </div>
@@ -143,7 +143,7 @@ export function FormacionAcademicaList() {
                                             </div>
                                         </div>
 
-                                        <Button asChild className="w-full rounded-xl group/btn overflow-hidden relative">
+                                        <Button asChild className="w-full rounded-none group/btn overflow-hidden relative shadow-[4px_4px_0_0_#C5A059]">
                                             {/* Using href="#" temporarily since individual dynamic pages for formacion-academica aren't created yet */}
                                             <Link href={`#`} className="flex items-center justify-center">
                                                 <span className="relative z-10 font-semibold">Ver Detalles</span>
@@ -160,7 +160,7 @@ export function FormacionAcademicaList() {
                                 animate={{ opacity: 1 }}
                                 className="col-span-full py-20 text-center"
                             >
-                                <div className="inline-flex w-20 h-20 items-center justify-center bg-muted rounded-full mb-4">
+                                <div className="inline-flex w-20 h-20 items-center justify-center bg-muted rounded-none mb-4">
                                     <Search className="h-8 w-8 text-muted-foreground" />
                                 </div>
                                 <h3 className="text-2xl font-bold text-foreground mb-2">No se encontraron resultados</h3>

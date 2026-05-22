@@ -27,11 +27,9 @@ export function AboutHero() {
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="inline-block mb-6 px-4 py-1.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full"
+            className="inline-flex items-center gap-3 px-4 sm:px-5 py-2 bg-white/10 text-white border-l-4 border-secondary text-[10px] sm:text-xs font-bold uppercase tracking-[0.25em] mb-8 shadow-[4px_4px_0_0_rgba(197,160,89,0.3)] backdrop-blur-md"
           >
-            <span className="text-white text-sm font-bold uppercase tracking-widest mx-2">
-              Líderes del Mérito S.A.S.
-            </span>
+            Líderes del Mérito S.A.S.
           </motion.div>
 
           <motion.h1

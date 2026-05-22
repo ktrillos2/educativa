@@ -159,7 +159,7 @@ export function CursosCortosList() {
               placeholder="Buscar cursos..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-border rounded bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full pl-10 pr-4 py-2.5 border border-border rounded-none bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
 
@@ -171,7 +171,7 @@ export function CursosCortosList() {
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 rounded border ${activeCategory === category
+                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 rounded-none border ${activeCategory === category
                       ? "bg-primary text-primary-foreground border-primary"
                       : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
                     }`}
@@ -197,7 +197,7 @@ export function CursosCortosList() {
             return (
               <Card
                 key={curso.id}
-                className="group overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-200 rounded-lg hover:shadow-lg p-0"
+                className="group overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-200 rounded-none hover:shadow-lg p-0"
               >
                 <div className="relative h-36 overflow-hidden">
                   <img
@@ -207,12 +207,12 @@ export function CursosCortosList() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                  <div className="absolute top-3 left-3 p-2 bg-white rounded shadow-sm">
+                  <div className="absolute top-3 left-3 p-2 bg-white rounded-none shadow-sm">
                     <CategoryIcon className="h-4 w-4 text-primary" />
                   </div>
 
                   {badge && (
-                    <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary text-white text-xs font-semibold rounded shadow-sm">
+                    <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary text-white text-xs font-semibold rounded-none shadow-sm">
                       <badge.icon className="h-3 w-3" />
                       {badge.label}
                     </span>
@@ -223,7 +223,7 @@ export function CursosCortosList() {
                       <Banknote className="h-4 w-4 text-secondary" />
                       <span className="font-bold text-lg text-white">{curso.price}</span>
                     </div>
-                    <span className="px-2 py-0.5 bg-white/95 text-xs font-medium text-foreground rounded">
+                    <span className="px-2 py-0.5 bg-white/95 text-xs font-medium text-foreground rounded-none">
                       {curso.level}
                     </span>
                   </div>
@@ -247,7 +247,7 @@ export function CursosCortosList() {
                   </div>
 
                   <Link href={`/cursos-cortos/${curso.id}`}>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded text-sm h-9">
+                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-none text-sm h-9 shadow-[4px_4px_0_0_#C5A059]">
                       Ver Detalles
                       <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                     </Button>

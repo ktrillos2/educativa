@@ -1,6 +1,7 @@
 "use client"
 
 import { useEffect, useRef, useState } from "react"
+import Link from "next/link"
 import { Button } from "@/components/ui/button"
 import { PhoneCall, Mail, ArrowRight, Headphones, MessageCircle, Clock, CheckCircle2 } from "@/components/ui/icons"
 
@@ -38,7 +39,7 @@ export function CTASection() {
   const { ref, isVisible } = useScrollAnimation()
 
   return (
-    <section className="py-12 md:py-16 bg-primary relative overflow-hidden" ref={ref}>
+    <section className="py-8 md:py-10 bg-primary relative overflow-hidden" ref={ref}>
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-5">
         <div
@@ -50,11 +51,11 @@ export function CTASection() {
       </div>
 
       <div className="container mx-auto px-4 relative">
-        <div className="max-w-4xl mx-auto">
-          <div className={`grid lg:grid-cols-2 gap-8 items-center ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
+        <div className="max-w-6xl mx-auto">
+          <div className={`grid lg:grid-cols-2 gap-12 lg:gap-16 items-center ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
             {/* Left Content */}
             <div className="text-center lg:text-left">
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 text-white text-sm font-medium mb-4 rounded border border-white/20">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/10 text-white text-sm font-medium mb-4 rounded-none border border-white/20">
                 <MessageCircle className="h-3.5 w-3.5" />
                 Estamos para ayudarte
               </span>
@@ -78,12 +79,12 @@ export function CTASection() {
             </div>
 
             {/* Right - Contact Card */}
-            <div className="bg-white p-6 rounded-lg shadow-xl">
+            <div className="bg-white p-6 md:p-8 rounded-none shadow-[8px_8px_0_0_rgba(197,160,89,0.5)] border border-border">
               <h3 className="text-lg font-semibold text-foreground mb-4">Solicita información</h3>
 
               <div className="space-y-3 mb-6">
-                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded border border-border">
-                  <div className="p-2 bg-primary/10 rounded">
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-none border border-border">
+                  <div className="p-2 bg-primary/10 rounded-none">
                     <PhoneCall className="h-4 w-4 text-primary" />
                   </div>
                   <div>
@@ -92,8 +93,8 @@ export function CTASection() {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded border border-border">
-                  <div className="p-2 bg-primary/10 rounded">
+                <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-none border border-border">
+                  <div className="p-2 bg-primary/10 rounded-none">
                     <Mail className="h-4 w-4 text-primary" />
                   </div>
                   <div>
@@ -104,12 +105,16 @@ export function CTASection() {
               </div>
 
               <div className="space-y-3">
-                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded h-11">
-                  Solicitar Asesoría
-                  <ArrowRight className="ml-2 h-4 w-4" />
+                <Button asChild className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded-none h-11 shadow-[4px_4px_0_0_#C5A059]">
+                  <a href="https://wa.me/573000000000?text=Hola,%20quisiera%20solicitar%20asesor%C3%ADa%20sobre%20los%20programas." target="_blank" rel="noopener noreferrer">
+                    Solicitar Asesoría
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </a>
                 </Button>
-                <Button variant="outline" className="w-full rounded h-11 border-border hover:bg-muted bg-transparent">
-                  Ver Programas
+                <Button asChild variant="outline" className="w-full rounded-none h-11 border-border hover:bg-muted bg-transparent shadow-[4px_4px_0_0_#000]">
+                  <Link href="/diplomados">
+                    Ver Programas
+                  </Link>
                 </Button>
               </div>
             </div>

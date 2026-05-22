@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import { usePathname } from "next/navigation"
 import Image from "next/image"
 import Link from "next/link"
 import { MapPin, Phone, Mail, Clock, ArrowUpRight, Send } from "@/components/ui/icons"
@@ -33,12 +34,12 @@ function useScrollAnimation() {
 
 export function Footer() {
   const { ref: ctaRef, isVisible: ctaVisible } = useScrollAnimation()
-  const [email, setEmail] = useState("")
-
+  const pathname = usePathname()
   return (
     <footer id="contacto" className="bg-foreground text-background">
       {/* CTA Section - Simplified, no animated circles */}
-      <div ref={ctaRef} className="py-16 bg-primary">
+      {pathname === "/" && (
+        <div ref={ctaRef} className="py-16 bg-primary">
         <div className={`container mx-auto px-4 ${ctaVisible ? "animate-fade-up" : "opacity-0"}`}>
           <div className="max-w-3xl mx-auto text-center">
             <span className="inline-block px-4 py-2 bg-white/10 text-white text-sm font-semibold mb-6 rounded-md border border-white/20">
@@ -51,32 +52,22 @@ export function Footer() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-3 justify-center items-center max-w-md mx-auto mb-6">
-              <Input
-                type="email"
-                placeholder="tu@email.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="h-12 px-4 bg-white/10 border-white/20 text-white placeholder:text-white/50 focus:bg-white/20 rounded-md"
-              />
               <Button
+                asChild
                 size="lg"
                 className="h-12 px-6 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold rounded-md whitespace-nowrap"
               >
-                <Send className="mr-2 h-4 w-4" />
-                Inscríbete
+                <Link href="/contacto">
+                  <Send className="mr-2 h-4 w-4" />
+                  Inscríbete
+                </Link>
               </Button>
             </div>
 
-            <Button
-              variant="outline"
-              className="border-2 border-white/30 text-white hover:bg-white hover:text-primary bg-transparent px-6 rounded-md"
-            >
-              Solicitar Información
-              <ArrowUpRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
         </div>
       </div>
+      )}
 
       <div className="container mx-auto px-4 py-12">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">

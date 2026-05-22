@@ -3,7 +3,6 @@ import { AboutMission } from "@/components/about-mission"
 import { AboutValues } from "@/components/about-values"
 import { AboutTeam } from "@/components/about-team"
 import { AboutStats } from "@/components/about-stats"
-import { CTASection } from "@/components/cta-section"
 
 export const metadata = {
   title: "Nosotros - Academia de Formación Líderes del Mérito",
@@ -19,7 +18,6 @@ export default function AboutPage() {
       <AboutValues />
       <AboutStats />
       <AboutTeam />
-      <CTASection />
     </main>
   )
 }

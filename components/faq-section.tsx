@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import Link from "next/link"
 import { ChevronDown, HelpCircle, MessageSquare } from "@/components/ui/icons"
 import { Button } from "@/components/ui/button"
 
@@ -66,10 +67,18 @@ export function FAQSection() {
   const { ref, isVisible } = useScrollAnimation()
 
   return (
-    <section className="py-12 md:py-16 bg-background" ref={ref}>
-      <div className="container mx-auto px-4">
+    <section className="py-8 md:py-10 bg-background relative overflow-hidden" ref={ref}>
+      {/* Watermarks */}
+      <div className="absolute -top-10 -left-10 text-primary font-black opacity-[0.03] text-[300px] md:text-[400px] select-none pointer-events-none leading-none rotate-[-15deg] z-0">
+        ?
+      </div>
+      <div className="absolute -bottom-10 -right-10 text-primary font-black opacity-[0.03] text-[300px] md:text-[400px] select-none pointer-events-none leading-none rotate-[15deg] z-0">
+        ?
+      </div>
+
+      <div className="container mx-auto px-4 relative z-10">
         <div className={`text-center mb-8 ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium mb-3 rounded border border-primary/20">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium mb-3 rounded-none border border-primary/20">
             <HelpCircle className="h-3.5 w-3.5" />
             Preguntas Frecuentes
           </span>
@@ -86,7 +95,7 @@ export function FAQSection() {
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className={`border rounded-lg transition-all duration-200 ${
+                className={`border rounded-none transition-all duration-200 ${
                   openIndex === index
                     ? "border-primary/50 bg-primary/5"
                     : "border-border bg-card hover:border-primary/30"
@@ -118,9 +127,11 @@ export function FAQSection() {
 
           <div className={`mt-8 text-center ${isVisible ? "animate-fade-up stagger-3" : "opacity-0"}`}>
             <p className="text-muted-foreground mb-4 text-sm">¿No encontraste lo que buscabas?</p>
-            <Button className="bg-primary hover:bg-primary/90 text-primary-foreground rounded h-10">
-              <MessageSquare className="mr-2 h-4 w-4" />
-              Contáctanos
+            <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground rounded h-10">
+              <Link href="/contacto">
+                <MessageSquare className="mr-2 h-4 w-4" />
+                Contáctanos
+              </Link>
             </Button>
           </div>
         </div>
