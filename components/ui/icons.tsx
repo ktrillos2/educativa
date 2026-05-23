@@ -68,6 +68,10 @@ const iconMap: Record<string, string> = {
   "FileSpreadsheet": "solar:document-text-bold-duotone",
   "Scale": "solar:scale-bold-duotone",
   "Calculator": "solar:calculator-bold-duotone",
+  "Facebook": "mdi:facebook",
+  "Instagram": "mdi:instagram",
+  "Linkedin": "mdi:linkedin",
+  "Twitter": "mdi:twitter",
 }
 
 const createIcon = (name: string) => {
@@ -140,3 +144,7 @@ export const X = createIcon("X")
 export const ChevronLeft = createIcon("ChevronLeft")
 export const Play = createIcon("Play")
 export const MessageSquareQuote = createIcon("MessageSquareQuote")
+export const Facebook = createIcon("Facebook")
+export const Instagram = createIcon("Instagram")
+export const Linkedin = createIcon("Linkedin")
+export const Twitter = createIcon("Twitter")

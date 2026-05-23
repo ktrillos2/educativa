@@ -52,8 +52,8 @@ export function DiplomadosList() {
   })
 
   return (
-    <section className="py-12 bg-muted/30">
-      <div className="container mx-auto px-4">
+    <section className="py-[1cm] min-h-[100dvh] bg-muted/30 flex flex-col">
+      <div className="container mx-auto px-4 h-full flex flex-col justify-between flex-grow">
         {/* Filters */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <div className="relative flex-1 max-w-md">

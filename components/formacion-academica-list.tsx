@@ -17,7 +17,7 @@ const formacionData = [
         duration: "18 meses",
         students: "100+",
         rating: 4.8,
-        image: "/images/bg1.png",
+        image: "/images/bg1.webp",
         description: "Desarrolla habilidades clave para la gestión de recursos, atención al cliente y procesos administrativos empresariales.",
     },
     {
@@ -27,7 +27,7 @@ const formacionData = [
         duration: "24 meses",
         students: "300+",
         rating: 4.9,
-        image: "/images/bg2.png",
+        image: "/images/bg2.webp",
         description: "Aprende las tecnologías más demandadas por el mercado y conviértete en un desarrollador preparado para la industria actual.",
     },
     {
@@ -37,7 +37,7 @@ const formacionData = [
         duration: "18 meses",
         students: "150+",
         rating: 4.7,
-        image: "/images/bg3.png",
+        image: "/images/bg3.webp",
         description: "Fórmate para cuidar, guiar y apoyar el desarrollo integral de niños en sus primeros años de vida de forma responsable.",
     }
 ]
@@ -55,8 +55,8 @@ export function FormacionAcademicaList() {
     )
 
     return (
-        <section className="py-16 bg-muted/20 min-h-[600px]">
-            <div className="container mx-auto px-4">
+        <section className="py-[1cm] bg-muted/20 min-h-[100dvh] flex flex-col">
+            <div className="container mx-auto px-4 h-full flex flex-col justify-between flex-grow">
 
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">

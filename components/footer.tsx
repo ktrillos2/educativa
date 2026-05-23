@@ -37,39 +37,7 @@ export function Footer() {
   const pathname = usePathname()
   return (
     <footer id="contacto" className="bg-foreground text-background">
-      {/* CTA Section - Simplified, no animated circles */}
-      {pathname === "/" && (
-        <div ref={ctaRef} className="py-16 bg-primary">
-        <div className={`container mx-auto px-4 ${ctaVisible ? "animate-fade-up" : "opacity-0"}`}>
-          <div className="max-w-3xl mx-auto text-center">
-            <span className="inline-block px-4 py-2 bg-white/10 text-white text-sm font-semibold mb-6 rounded-md border border-white/20">
-              Comienza tu transformación
-            </span>
-
-            <h2 className="text-3xl md:text-4xl font-bold text-white mb-4">¿Listo para dar el siguiente paso?</h2>
-            <p className="text-white/80 text-lg mb-8 max-w-xl mx-auto">
-              Únete a miles de profesionales que han transformado sus carreras.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center max-w-md mx-auto mb-6">
-              <Button
-                asChild
-                size="lg"
-                className="h-12 px-6 bg-secondary text-secondary-foreground hover:bg-secondary/90 font-semibold rounded-md whitespace-nowrap"
-              >
-                <Link href="/contacto">
-                  <Send className="mr-2 h-4 w-4" />
-                  Inscríbete
-                </Link>
-              </Button>
-            </div>
-
-          </div>
-        </div>
-      </div>
-      )}
-
-      <div className="container mx-auto px-4 py-12">
+      <div className="container mx-auto px-4 py-[1cm]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="mb-6">

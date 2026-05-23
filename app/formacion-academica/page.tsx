@@ -9,14 +9,15 @@ export const metadata = {
 
 export default function FormacionAcademicaPage() {
     return (
-        <main className="flex-grow bg-muted/20 pt-24">
+        <main className="flex-grow bg-muted/20">
             {/* Hero Section */}
-            <section className="pb-16 bg-gradient-to-br from-primary via-primary/95 to-primary/90 relative overflow-hidden">
+            <section className="pt-[calc(6rem+1cm)] pb-[1cm] min-h-[100dvh] flex flex-col bg-gradient-to-br from-primary via-primary/95 to-primary/90 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')] bg-repeat" />
-                <div className="container mx-auto px-4 relative z-10">
-                    <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Oferta Académica", href: "/#oferta" }, { label: "Formación Académica" }]} />
+                <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-between flex-grow">
+                    <div>
+                        <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Oferta Académica", href: "/#oferta" }, { label: "Formación Académica" }]} />
 
-                    <div className="max-w-3xl mt-10">
+                        <div className="max-w-3xl mt-10">
                         <div className="flex items-center gap-3 mb-6">
                             <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-xl">
                                 <BookOpen className="h-6 w-6 text-white" />
@@ -29,6 +30,7 @@ export default function FormacionAcademicaPage() {
                         <p className="text-white/80 text-xl max-w-2xl leading-relaxed">
                             Programas diseñados para forjar los líderes del mañana, ofreciendo conocimientos profundos y habilidades clave para el éxito profesional en un entorno competitivo.
                         </p>
+                        </div>
                     </div>
 
                     {/* Stats Bar */}

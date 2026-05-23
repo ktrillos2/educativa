@@ -64,8 +64,8 @@ export function AcademicOffer() {
     : programs.filter((p) => p.category === activeCategory)
 
   return (
-    <section id="oferta" className="py-8 md:py-10 bg-muted/30 overflow-hidden">
-      <div className="container mx-auto px-4">
+    <section id="oferta" className="py-[1cm] bg-muted/30 overflow-hidden">
+      <div className="container mx-auto px-4 ">
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

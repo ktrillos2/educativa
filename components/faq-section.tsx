@@ -67,12 +67,12 @@ export function FAQSection() {
   const { ref, isVisible } = useScrollAnimation()
 
   return (
-    <section className="py-8 md:py-10 bg-background relative overflow-hidden" ref={ref}>
+    <section className="py-[1cm] bg-muted/30 relative overflow-hidden" ref={ref}>
       {/* Watermarks */}
-      <div className="absolute -top-10 -left-10 text-primary font-black opacity-[0.03] text-[300px] md:text-[400px] select-none pointer-events-none leading-none rotate-[-15deg] z-0">
+      <div className="absolute top-0 left-0 text-primary font-black opacity-[0.03] text-[300px] md:text-[400px] select-none pointer-events-none leading-none rotate-[-15deg] z-0">
         ?
       </div>
-      <div className="absolute -bottom-10 -right-10 text-primary font-black opacity-[0.03] text-[300px] md:text-[400px] select-none pointer-events-none leading-none rotate-[15deg] z-0">
+      <div className="absolute bottom-0 right-0 text-primary font-black opacity-[0.03] text-[300px] md:text-[400px] select-none pointer-events-none leading-none rotate-[15deg] z-0">
         ?
       </div>
 

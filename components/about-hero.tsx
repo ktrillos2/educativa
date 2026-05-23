@@ -5,7 +5,7 @@ import { motion } from "framer-motion"
 
 export function AboutHero() {
   return (
-    <section className="relative bg-primary pt-32 pb-24 overflow-hidden flex items-center justify-center min-h-[500px]">
+    <section className="relative bg-primary pt-32 pb-[1cm] overflow-hidden min-h-[500px]">
       <div className="absolute inset-0 opacity-20">
         <Image
           src="/professional-education-classroom-students-learning.jpg"

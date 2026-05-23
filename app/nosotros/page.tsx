@@ -2,7 +2,7 @@ import { AboutHero } from "@/components/about-hero"
 import { AboutMission } from "@/components/about-mission"
 import { AboutValues } from "@/components/about-values"
 import { AboutTeam } from "@/components/about-team"
-import { AboutStats } from "@/components/about-stats"
+
 
 export const metadata = {
   title: "Nosotros - Academia de Formación Líderes del Mérito",
@@ -16,7 +16,7 @@ export default function AboutPage() {
       <AboutHero />
       <AboutMission />
       <AboutValues />
-      <AboutStats />
+
       <AboutTeam />
     </main>
   )

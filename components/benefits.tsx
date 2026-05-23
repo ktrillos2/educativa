@@ -107,12 +107,12 @@ const cardVariants = {
 
 export function Benefits() {
   return (
-    <section id="nosotros" className="py-8 md:py-10 relative overflow-hidden bg-background">
+    <section id="nosotros" className="py-[1cm] relative overflow-hidden bg-background">
       {/* Decorative background elements */}
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10 translate-x-1/2 -translate-y-1/2" />
       <div className="absolute bottom-0 left-0 w-[500px] h-[500px] bg-secondary/5 rounded-full blur-3xl -z-10 -translate-x-1/2 translate-y-1/2" />
 
-      <div className="container mx-auto px-4 mb-20 relative z-10">
+      <div className="container mx-auto px-4 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}

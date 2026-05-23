@@ -2,8 +2,8 @@ import Image from "next/image"
 
 export function AboutMission() {
   return (
-    <section className="py-16 md:py-24 bg-background">
-      <div className="container mx-auto px-4">
+    <section className="py-[1cm] bg-background overflow-hidden">
+      <div className="container mx-auto px-4 ">
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             <div className="order-2 lg:order-1">

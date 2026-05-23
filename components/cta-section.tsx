@@ -39,7 +39,7 @@ export function CTASection() {
   const { ref, isVisible } = useScrollAnimation()
 
   return (
-    <section className="py-8 md:py-10 bg-primary relative overflow-hidden" ref={ref}>
+    <section className="py-[1cm] bg-primary relative overflow-hidden" ref={ref}>
       {/* Subtle pattern overlay */}
       <div className="absolute inset-0 opacity-5">
         <div

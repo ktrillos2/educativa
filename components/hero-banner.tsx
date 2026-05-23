@@ -28,10 +28,6 @@ const slides = [
   },
 ]
 
-const stats = [
-  { icon: GraduationCap, label: "Graduados Exitosos" },
-  { icon: Users, label: "Programas Activos" },
-]
 
 export function HeroBanner() {
   const [currentSlide, setCurrentSlide] = useState(0)
@@ -57,7 +53,7 @@ export function HeroBanner() {
       <div className="absolute inset-0 flex flex-col lg:flex-row w-full h-full">
         
         {/* Left Column: Typography & CTAs */}
-        <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 bg-foreground/90 lg:bg-foreground relative z-20">
+        <div className="w-full lg:w-1/2 h-full flex flex-col justify-center px-6 sm:px-12 lg:px-16 xl:px-24 pt-24 bg-foreground/90 lg:bg-foreground relative z-20">
           
           {/* Subtle decorative radial gradient and plus pattern for depth */}
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,_var(--tw-gradient-stops))] from-primary/10 via-transparent to-transparent pointer-events-none hidden lg:block"></div>
@@ -70,7 +66,7 @@ export function HeroBanner() {
             }}
           ></div>
 
-          <div className="relative z-10 max-w-2xl mx-auto lg:mx-0 pt-20 lg:pt-10">
+          <div className="relative z-10 max-w-2xl mx-auto lg:mx-0">
             <AnimatePresence mode="wait">
               <motion.div
                 key={currentSlide}
@@ -97,7 +93,7 @@ export function HeroBanner() {
                 </p>
 
                 {/* Call to Action */}
-                <div className="inline-flex relative mb-6 sm:mb-8">
+                <div className="inline-flex relative">
                   <div className="absolute -inset-1 bg-secondary/20 blur-xl rounded-full z-0"></div>
                   <Button size="lg" asChild className="relative z-10 h-12 sm:h-14 px-8 sm:px-10 text-xs sm:text-sm w-full sm:w-auto shadow-[4px_4px_0_0_#C5A059] hover:shadow-[2px_2px_0_0_#C5A059]">
                     <Link href="/diplomados">
@@ -107,25 +103,7 @@ export function HeroBanner() {
                   </Button>
                 </div>
                 
-                {/* Stats Block (Glassmorphism) - Hidden on very small screens to save height */}
-                <div className="hidden sm:grid grid-cols-2 gap-4 sm:gap-6 pt-4 sm:pt-6 border-t border-background/10">
-                  {stats.map((stat, index) => (
-                    <motion.div 
-                      key={index} 
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
-                      className="flex items-center gap-3 sm:gap-5 p-3 sm:p-4 bg-background/5 backdrop-blur-sm border border-background/10 hover:bg-background/10 transition-colors"
-                    >
-                      <div className="p-2 sm:p-3 bg-secondary/10 text-secondary shadow-[inset_0_0_10px_rgba(197,160,89,0.2)]">
-                        <stat.icon className="h-5 w-5 sm:h-7 sm:w-7" />
-                      </div>
-                      <div>
-                        <p className="text-[10px] sm:text-xs md:text-sm font-bold text-background/90 uppercase tracking-widest leading-tight">{stat.label}</p>
-                      </div>
-                    </motion.div>
-                  ))}
-                </div>
+
               </motion.div>
             </AnimatePresence>
           </div>
