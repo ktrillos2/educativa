@@ -19,7 +19,7 @@ export default function FormacionAcademicaPage() {
 
                         <div className="max-w-3xl mt-10">
                         <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-white/10 backdrop-blur-md rounded-xl border border-white/20 shadow-xl">
+                            <div className="p-3 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
                                 <BookOpen className="h-6 w-6 text-white" />
                             </div>
                             <span className="text-white/90 text-sm font-semibold tracking-wider uppercase">Excelencia Educativa</span>
@@ -34,7 +34,7 @@ export default function FormacionAcademicaPage() {
                     </div>
 
                     {/* Stats Bar */}
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-12 bg-white/5 backdrop-blur-sm p-6 rounded-2xl border border-white/10 shadow-2xl">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 bg-white/5 backdrop-blur-sm p-6 border border-white/10 shadow-2xl">
                         {[
                             { icon: GraduationCap, value: "15+", label: "Especialidades" },
                             { icon: BookOpen, value: "Flexible", label: "Modalidad" },
@@ -42,7 +42,7 @@ export default function FormacionAcademicaPage() {
                             { icon: Trophy, value: "Avalados", label: "Por MinEducación" },
                         ].map((stat, index) => (
                             <div key={index} className="text-center group hover:-translate-y-1 transition-transform duration-300">
-                                <div className="bg-secondary/20 p-3 rounded-xl mx-auto mb-3 w-12 h-12 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
+                                <div className="bg-secondary/20 p-3 mx-auto mb-3 w-12 h-12 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
                                     <stat.icon className="h-6 w-6 text-secondary" />
                                 </div>
                                 <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>

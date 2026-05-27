@@ -72,10 +72,10 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
 
             <section className="py-12">
                 <div className="container mx-auto px-4 max-w-3xl">
-                    <div className="bg-white rounded-lg shadow-sm border p-6 md:p-8">
+                    <div className="bg-white shadow-sm border p-6 md:p-8">
                         <h2 className="text-xl font-bold mb-6">Preguntas de la Unidad</h2>
                         {currentScore >= 60 && (
-                            <div className="mb-6 p-4 bg-green-50 text-green-800 border border-green-200 rounded">
+                            <div className="mb-6 p-4 bg-green-50 text-green-800 border border-green-200">
                                 ¡Felicidades! Ya aprobaste este módulo con un puntaje de {currentScore}%. Puedes volver a intentarlo si deseas mejorar tu calificación.
                             </div>
                         )}

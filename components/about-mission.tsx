@@ -7,7 +7,7 @@ export function AboutMission() {
         <div className="max-w-6xl mx-auto">
           <div className="grid lg:grid-cols-2 gap-12 items-center mb-16">
             <div className="order-2 lg:order-1">
-              <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
+              <div className="relative h-96  overflow-hidden shadow-lg">
                 <Image
                   src="/professional-teacher-instructor-training.jpg"
                   alt="Misión académica"
@@ -37,7 +37,7 @@ export function AboutMission() {
               </p>
             </div>
             <div>
-              <div className="relative h-96 rounded-lg overflow-hidden shadow-lg">
+              <div className="relative h-96  overflow-hidden shadow-lg">
                 <Image
                   src="/graduation-ceremony-academic-success.jpg"
                   alt="Visión académica"

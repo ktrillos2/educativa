@@ -127,7 +127,7 @@ export function FAQSection() {
 
           <div className={`mt-8 text-center ${isVisible ? "animate-fade-up stagger-3" : "opacity-0"}`}>
             <p className="text-muted-foreground mb-4 text-sm">¿No encontraste lo que buscabas?</p>
-            <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground rounded h-10">
+            <Button asChild className="bg-primary hover:bg-primary/90 text-primary-foreground  h-10">
               <Link href="/contacto">
                 <MessageSquare className="mr-2 h-4 w-4" />
                 Contáctanos

@@ -37,7 +37,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
   })
 
   if (enrollment.rows.length === 0 || !enrollment.rows[0].payment_verified) {
-    redirect(`/diplomados/${params.id}`)
+    redirect(`/diplomados/${params.id}/certificado`)
   }
 
   // Get all module progress
@@ -74,14 +74,14 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
             </Link>
             <button 
               onClick={() => typeof window !== 'undefined' && window.print()}
-              className="bg-primary text-white px-4 py-2 rounded-md font-medium hover:bg-primary/90 flex items-center gap-2 print:hidden shadow-lg shadow-primary/20"
+              className="bg-primary text-white px-4 py-2 font-medium hover:bg-primary/90 flex items-center gap-2 print:hidden shadow-lg shadow-primary/20"
             >
               <Download className="w-4 h-4" />
               Imprimir Acta
             </button>
           </div>
 
-          <div id="academic-record" className="bg-white border shadow-2xl rounded-sm p-12 md:p-16 print:shadow-none print:border-none relative overflow-hidden">
+          <div id="academic-record" className="bg-white border shadow-2xl p-12 md:p-16 print:shadow-none print:border-none relative overflow-hidden">
             {/* Watermark/Pattern */}
             <div className="absolute top-0 right-0 w-64 h-64 opacity-[0.03] pointer-events-none -mr-20 -mt-20">
                 <FileSpreadsheet className="w-full h-full" />
@@ -106,7 +106,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
                 </div>
               </div>
               <div className="flex flex-col items-start md:items-end justify-center text-left md:text-right">
-                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10">
+                <div className="bg-primary/5 p-4 border border-primary/10">
                     <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Promedio General</p>
                     <p className="text-4xl font-black text-primary">{averageScore.toFixed(1)}%</p>
                     <p className="text-xs text-green-600 font-bold mt-1 flex items-center justify-end gap-1">
@@ -118,10 +118,10 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
 
             <div className="mb-12">
               <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
-                  <div className="w-2 h-6 bg-secondary rounded-full"></div>
+                  <div className="w-2 h-6 bg-secondary"></div>
                   Calificaciones Detalladas
               </h2>
-              <div className="overflow-hidden border border-border/60 rounded-xl">
+              <div className="overflow-hidden border border-border/60">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-muted/50 text-xs font-bold uppercase tracking-wider border-b">
@@ -138,7 +138,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
                         <td className="px-6 py-4 text-sm text-muted-foreground">{mod.title}</td>
                         <td className="px-6 py-4 text-center font-mono font-bold">{mod.score}%</td>
                         <td className="px-6 py-4 text-right">
-                          <span className={`text-[10px] font-black uppercase px-2 py-1 rounded-md ${mod.score >= 60 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                          <span className={`text-[10px] font-black uppercase px-2 py-1 ${mod.score >= 60 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
                             {mod.score >= 60 ? 'Aprobado' : 'Reprobado'}
                           </span>
                         </td>

@@ -208,3 +208,13 @@
 .stagger-6 {
   animation-delay: 0.18s;
 }
+
+/* Utilidad para ocultar la barra de scroll pero permitir el desplazamiento */
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none; /* Chrome, Safari and Opera */
+}
+

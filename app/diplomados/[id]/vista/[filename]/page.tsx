@@ -21,7 +21,7 @@ export default async function DocumentViewerPage(props: { params: Promise<{ id: 
                     ]} />
                 </div>
 
-                <div className="flex-grow bg-white rounded-xl shadow-sm border border-border overflow-hidden">
+                <div className="flex-grow bg-white shadow-sm border border-border overflow-hidden">
                     <iframe
                         src={`/api/file/${params.filename}?courseId=${params.id}#toolbar=0&navpanes=0`}
                         className="w-full h-full border-none"

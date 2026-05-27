@@ -63,11 +63,11 @@ export function DiplomadosList() {
               placeholder="Buscar diplomados..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 border border-border rounded bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+              className="w-full pl-10 pr-4 py-2.5 border border-border  bg-card text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
             />
           </div>
 
-          <div className="flex items-center gap-2 flex-wrap">
+          <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground hidden md:block" />
             {categories.map((category) => {
               const Icon = categoryIcons[category]
@@ -75,7 +75,7 @@ export function DiplomadosList() {
                 <button
                   key={category}
                   onClick={() => setActiveCategory(category)}
-                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200 rounded border ${activeCategory === category
+                  className={`inline-flex items-center gap-2 px-4 py-2 text-sm font-medium transition-all duration-200  border ${activeCategory === category
                     ? "bg-primary text-primary-foreground border-primary"
                     : "bg-card text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
                     }`}
@@ -94,14 +94,14 @@ export function DiplomadosList() {
         </p>
 
         {/* Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 md:gap-4">
           {filteredDiplomados.map((diplomado) => {
             const CategoryIcon = categoryIcons[diplomado.category] || Building2
             const BadgeIcon = diplomado.badge ? badgeIcons[diplomado.badge] : null
             return (
               <Card
                 key={diplomado.id}
-                className="group overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-200 rounded-lg hover:shadow-lg p-0"
+                className="group overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-200  hover:shadow-lg p-0"
               >
                 <div className="relative h-40 overflow-hidden">
                   <img
@@ -111,12 +111,12 @@ export function DiplomadosList() {
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
 
-                  <div className="absolute top-3 left-3 p-2 bg-white rounded shadow-sm">
+                  <div className="absolute top-3 left-3 p-2 bg-white  shadow-sm">
                     <CategoryIcon className="h-4 w-4 text-primary" />
                   </div>
 
                   {diplomado.badge && BadgeIcon && (
-                    <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary text-white text-xs font-semibold rounded shadow-sm">
+                    <span className="absolute top-3 right-3 inline-flex items-center gap-1.5 px-2.5 py-1 bg-secondary text-white text-xs font-semibold  shadow-sm">
                       <BadgeIcon className="h-3 w-3" />
                       {diplomado.badge}
                     </span>
@@ -129,7 +129,7 @@ export function DiplomadosList() {
                         <span className="font-bold text-lg text-white">{diplomado.price}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 bg-white/95 px-2 py-1 rounded text-xs">
+                    <div className="flex items-center gap-1.5 bg-white/95 px-2 py-1  text-xs">
                       <CalendarDays className="h-3 w-3 text-primary" />
                       <span className="font-medium text-foreground">{diplomado.startDate}</span>
                     </div>
@@ -154,7 +154,7 @@ export function DiplomadosList() {
                   </div>
 
                   <Link href={`/diplomados/${diplomado.id}`}>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground rounded text-sm h-9">
+                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground  text-sm h-9">
                       Ver Detalles
                       <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
                     </Button>

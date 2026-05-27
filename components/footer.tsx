@@ -57,7 +57,7 @@ export function Footer() {
                 <Link
                   key={social}
                   href="#"
-                  className="p-2.5 bg-background/10 hover:bg-secondary hover:text-secondary-foreground transition-all rounded-md"
+                  className="p-2.5 bg-background/10 hover:bg-secondary hover:text-secondary-foreground transition-all "
                   aria-label={social}
                 >
                   <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
@@ -138,7 +138,7 @@ export function Footer() {
                 { icon: Clock, text: "Lun - Vie: 8:00 AM - 6:00 PM" },
               ].map(({ icon: Icon, text }, index) => (
                 <li key={index} className="flex items-start gap-3 group">
-                  <div className="p-2 bg-secondary/20 group-hover:bg-secondary transition-colors rounded-md">
+                  <div className="p-2 bg-secondary/20 group-hover:bg-secondary transition-colors ">
                     <Icon className="h-4 w-4 text-secondary group-hover:text-secondary-foreground transition-colors shrink-0" />
                   </div>
                   <span className="text-background/70 text-sm whitespace-pre-line">{text}</span>
@@ -150,23 +150,23 @@ export function Footer() {
       </div>
 
       <div className="border-t border-background/10">
-        <div className="container mx-auto px-4 py-5">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-3 text-xs text-background/60">
-            <p>© {new Date().getFullYear()} Academia de Formación Líderes del Mérito S.A.S. Todos los derechos reservados.</p>
-            <div className="flex flex-col md:flex-row items-center gap-4">
+        <div className="container mx-auto px-4 py-6">
+          <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-xs text-background/60">
+            <p className="text-center md:text-left leading-relaxed">© {new Date().getFullYear()} Academia de Formación Líderes del Mérito S.A.S. Todos los derechos reservados.</p>
+            <div className="flex flex-col sm:flex-row items-center gap-4 md:gap-6 text-center">
               <Link 
                 href="https://www.kytcode.lat" 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="hover:text-secondary transition-colors font-medium flex items-center gap-1"
+                className="hover:text-secondary transition-colors font-medium flex items-center justify-center gap-1"
               >
                 Desarrollado por K&T <span className="text-white">❤</span>
               </Link>
-              <div className="flex gap-4">
-                <Link href="#" className="hover:text-secondary transition-colors">
+              <div className="flex gap-4 justify-center flex-wrap">
+                <Link href="#" className="hover:text-secondary transition-colors whitespace-nowrap">
                   Política de Privacidad
                 </Link>
-                <Link href="#" className="hover:text-secondary transition-colors">
+                <Link href="#" className="hover:text-secondary transition-colors whitespace-nowrap">
                   Términos y Condiciones
                 </Link>
               </div>

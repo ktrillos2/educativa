@@ -94,7 +94,7 @@ export function Testimonials() {
     <section className="py-8 md:py-10 bg-muted/40" ref={sectionRef}>
       <div className="container mx-auto px-4">
         <div className={`text-center mb-8 ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
-          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium mb-3 rounded border border-primary/20">
+          <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-primary/10 text-primary text-sm font-medium mb-3  border border-primary/20">
             <MessageSquareQuote className="h-3.5 w-3.5" />
             Testimonios
           </span>
@@ -112,7 +112,7 @@ export function Testimonials() {
             {testimonials.map((testimonial, index) => (
               <Card
                 key={index}
-                className="bg-card border border-border rounded-lg overflow-hidden hover:border-primary/30 transition-colors"
+                className="bg-card border border-border  overflow-hidden hover:border-primary/30 transition-colors"
               >
                 <CardContent className="p-0">
                   <div className="flex">
@@ -137,7 +137,7 @@ export function Testimonials() {
                         "{testimonial.content}"
                       </blockquote>
                       <div className="flex items-center gap-3">
-                        <div className="w-9 h-9 overflow-hidden rounded border border-primary/20">
+                        <div className="w-9 h-9 overflow-hidden  border border-primary/20">
                           <img
                             src={testimonial.image || "/placeholder.svg"}
                             alt={testimonial.name}
@@ -159,14 +159,14 @@ export function Testimonials() {
 
           {/* Mobile/Tablet: Carrusel */}
           <div className="lg:hidden">
-            <div className="overflow-hidden rounded-lg">
+            <div className="overflow-hidden ">
               <div
                 className="flex transition-transform duration-500 ease-out"
                 style={{ transform: `translateX(-${currentIndex * 100}%)` }}
               >
                 {testimonials.map((testimonial, index) => (
                   <div key={index} className="w-full flex-shrink-0">
-                    <Card className="bg-card border border-border rounded-lg overflow-hidden mx-1">
+                    <Card className="bg-card border border-border  overflow-hidden mx-1">
                       <CardContent className="p-5">
                         <div className="flex gap-0.5 mb-3">
                           {[...Array(testimonial.rating)].map((_, i) => (
@@ -177,7 +177,7 @@ export function Testimonials() {
                           "{testimonial.content}"
                         </blockquote>
                         <div className="flex items-center gap-3">
-                          <div className="w-10 h-10 overflow-hidden rounded border border-primary/20">
+                          <div className="w-10 h-10 overflow-hidden  border border-primary/20">
                             <img
                               src={testimonial.image || "/placeholder.svg"}
                               alt={testimonial.name}
@@ -201,7 +201,7 @@ export function Testimonials() {
             <div className="flex justify-center items-center gap-4 mt-4">
               <button
                 onClick={prev}
-                className="p-2 bg-card border border-border hover:border-primary text-foreground transition-all rounded"
+                className="p-2 bg-card border border-border hover:border-primary text-foreground transition-all "
                 aria-label="Anterior testimonio"
               >
                 <ChevronLeft className="h-4 w-4" />
@@ -215,7 +215,7 @@ export function Testimonials() {
                       setIsAutoPlaying(false)
                       setCurrentIndex(index)
                     }}
-                    className={`h-1.5 transition-all duration-200 rounded-sm ${
+                    className={`h-1.5 transition-all duration-200  ${
                       index === currentIndex ? "bg-primary w-5" : "bg-border w-1.5 hover:bg-primary/50"
                     }`}
                     aria-label={`Ir a testimonio ${index + 1}`}
@@ -225,7 +225,7 @@ export function Testimonials() {
 
               <button
                 onClick={next}
-                className="p-2 bg-card border border-border hover:border-primary text-foreground transition-all rounded"
+                className="p-2 bg-card border border-border hover:border-primary text-foreground transition-all "
                 aria-label="Siguiente testimonio"
               >
                 <ChevronRight className="h-4 w-4" />

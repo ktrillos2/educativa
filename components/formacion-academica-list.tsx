@@ -55,8 +55,8 @@ export function FormacionAcademicaList() {
     )
 
     return (
-        <section className="py-[1cm] bg-muted/20 min-h-[100dvh] flex flex-col">
-            <div className="container mx-auto px-4 h-full flex flex-col justify-between flex-grow">
+        <section className="py-[1cm] bg-muted/20">
+            <div className="container mx-auto px-4">
 
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">

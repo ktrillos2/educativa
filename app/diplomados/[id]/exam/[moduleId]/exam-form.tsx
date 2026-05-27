@@ -537,7 +537,7 @@ export function ExamForm({ courseId, moduleId }: { courseId: string; moduleId: s
             ))}
 
             <div className="pt-6 border-t border-slate-200">
-                <Button type="submit" size="lg" className="w-full sm:w-auto font-bold bg-secondary hover:bg-secondary/90 text-white rounded-xl shadow-lg hover:shadow-secondary/25 transition-all" disabled={loading}>
+                <Button type="submit" size="lg" className="w-full sm:w-auto font-bold bg-secondary hover:bg-secondary/90 text-white shadow-lg hover:shadow-secondary/25 transition-all" disabled={loading}>
                     {loading ? "Evaluando..." : "Enviar Respuestas"}
                 </Button>
             </div>

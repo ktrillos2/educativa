@@ -111,7 +111,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             transition={{ duration: 0.7, delay: 0.2 }}
                             className="lg:col-span-2 space-y-6"
                         >
-                            <div className="inline-flex px-4 py-1.5 bg-secondary/20 border border-secondary/30 backdrop-blur-sm rounded-full text-sm font-bold text-secondary tracking-wide uppercase">
+                            <div className="inline-flex px-4 py-1.5 bg-secondary/20 border border-secondary/30 backdrop-blur-sm text-sm font-bold text-secondary tracking-wide uppercase">
                                 {course.category}
                             </div>
 
@@ -129,8 +129,8 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                     { icon: Users, text: course.students, label: "Cupos" },
                                     { icon: BookOpen, text: `${course.modules} Módulos`, label: "Contenido" }
                                 ].map((stat, i) => (
-                                    <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 rounded-xl border border-white/10">
-                                        <div className="p-2 bg-secondary/20 rounded-lg">
+                                    <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 border border-white/10">
+                                        <div className="p-2 bg-secondary/20">
                                             <stat.icon className="w-5 h-5 text-secondary" />
                                         </div>
                                         <div>
@@ -148,10 +148,10 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             animate={{ opacity: 1, y: 0 }}
                             transition={{ duration: 0.7, delay: 0.4 }}
                         >
-                            <div className="bg-white/95 backdrop-blur-xl text-foreground rounded-3xl p-8 shadow-2xl border border-white/20 sticky top-32">
+                            <div className="bg-white/95 backdrop-blur-xl text-foreground p-8 shadow-2xl border border-white/20 sticky top-32">
                                 {isEnrolled ? (
                                     <div className="text-center space-y-6">
-                                        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto shadow-inner">
+                                        <div className="w-20 h-20 bg-green-100 text-green-600 flex items-center justify-center mx-auto shadow-inner">
                                             <CheckCircle className="w-10 h-10" />
                                         </div>
                                         <div>
@@ -160,18 +160,18 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         </div>
 
                                         {!paymentVerified ? (
-                                            <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 text-blue-800 rounded-2xl text-left shadow-sm">
+                                            <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 text-blue-800 text-left shadow-sm">
                                                 <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
                                                 <span className="text-sm">El diplomado es <strong>gratuito</strong>. Tu pago es necesario únicamente para **obtener el certificado oficial** al finalizar.</span>
                                             </div>
                                         ) : (
-                                            <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 text-green-800 rounded-2xl text-left shadow-sm">
+                                            <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 text-green-800 text-left shadow-sm">
                                                 <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
                                                 <span className="text-sm">Pago verificado. <strong>Podrás descargar tu certificado</strong> al completar satisfactoriamente todos los módulos.</span>
                                             </div>
                                         )}
 
-                                        <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 rounded-xl font-bold hover:bg-primary/20 transition-colors">
+                                        <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 font-bold hover:bg-primary/20 transition-colors">
                                             Ir al Programa <ChevronRight className="w-4 h-4" />
                                         </a>
                                     </div>
@@ -185,16 +185,16 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         </div>
 
                                         <div className="space-y-4 mb-8">
-                                            <div className="flex items-center justify-between bg-muted/50 p-4 rounded-xl">
+                                            <div className="flex items-center justify-between bg-muted/50 p-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-primary/10 rounded-lg"><CalendarDays className="w-4 h-4 text-primary" /></div>
+                                                    <div className="p-2 bg-primary/10"><CalendarDays className="w-4 h-4 text-primary" /></div>
                                                     <span className="text-sm font-medium">Inicia</span>
                                                 </div>
                                                 <span className="font-bold">{course.startDate}</span>
                                             </div>
-                                            <div className="flex items-center justify-between bg-muted/50 p-4 rounded-xl">
+                                            <div className="flex items-center justify-between bg-muted/50 p-4">
                                                 <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-primary/10 rounded-lg"><Banknote className="w-4 h-4 text-primary" /></div>
+                                                    <div className="p-2 bg-primary/10"><Banknote className="w-4 h-4 text-primary" /></div>
                                                     <span className="text-sm font-medium">Modalidad</span>
                                                 </div>
                                                 <span className="font-bold">100% Virtual</span>
@@ -224,15 +224,15 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                         className="mb-16 text-center"
                     >
                         <h2 className="text-4xl font-extrabold text-primary mb-4">Programa Académico</h2>
-                        <div className="h-1.5 w-20 bg-secondary mx-auto rounded-full mb-4"></div>
+                        <div className="h-1.5 w-20 bg-secondary mx-auto mb-4"></div>
                         <p className="text-muted-foreground text-lg">Estructura detallada diseñada para tu formación profesional.</p>
                     </motion.div>
 
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
                         {/* Column 1: Módulos de Estudio */}
                         <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-primary/5 rounded-2xl border border-primary/10">
-                                <div className="p-2 bg-primary text-white rounded-lg shadow-lg shadow-primary/20">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-primary/5 border border-primary/10">
+                                <div className="p-2 bg-primary text-white shadow-lg shadow-primary/20">
                                     <BookOpen className="w-5 h-5" />
                                 </div>
                                 <h3 className="text-xl font-bold">Módulos de Estudio</h3>
@@ -246,12 +246,12 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         whileInView={{ opacity: 1, x: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="p-5 bg-muted/20 rounded-2xl border border-border/50 hover:border-primary/30 transition-all group"
+                                        className="p-5 bg-muted/20 border border-border/50 hover:border-primary/30 transition-all group"
                                     >
                                         <div className="flex justify-between items-start mb-2">
                                             <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Unidad {index + 1}</span>
                                             {mod.fileExists && isEnrolled && (
-                                                <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5 rounded-full">
+                                                <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5">
                                                     <CheckCircle className="w-3 h-3" /> PDF
                                                 </span>
                                             )}
@@ -294,8 +294,8 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
 
                         {/* Column 2: Cuestionarios */}
                         <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-secondary/5 rounded-2xl border border-secondary/10">
-                                <div className="p-2 bg-secondary text-white rounded-lg shadow-lg shadow-secondary/20">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-secondary/5 border border-secondary/10">
+                                <div className="p-2 bg-secondary text-white shadow-lg shadow-secondary/20">
                                     <Award className="w-5 h-5" />
                                 </div>
                                 <h3 className="text-xl font-bold text-secondary-dark">Cuestionarios</h3>
@@ -309,7 +309,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         whileInView={{ opacity: 1, y: 0 }}
                                         viewport={{ once: true }}
                                         transition={{ delay: index * 0.05 }}
-                                        className="p-5 bg-secondary/5 rounded-2xl border border-secondary/10 hover:border-secondary/30 transition-all group"
+                                        className="p-5 bg-secondary/5 border border-secondary/10 hover:border-secondary/30 transition-all group"
                                     >
                                         <div className="flex justify-between items-start mb-2">
                                             <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Eval. {index + 1}</span>
@@ -348,15 +348,15 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
 
                         {/* Column 3: Exámenes Finales */}
                         <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-red-50 rounded-2xl border border-red-100">
-                                <div className="p-2 bg-red-500 text-white rounded-lg shadow-lg shadow-red-200">
+                            <div className="flex items-center gap-3 mb-6 p-4 bg-red-50 border border-red-100">
+                                <div className="p-2 bg-red-500 text-white shadow-lg shadow-red-200">
                                     <GraduationCap className="w-5 h-5" />
                                 </div>
                                 <h3 className="text-xl font-bold text-red-900">Exámenes</h3>
                             </div>
 
-                            <div className="flex flex-col items-center justify-center min-h-[300px] bg-red-50/30 border-2 border-dashed border-red-200 rounded-3xl p-8 text-center">
-                                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mb-4 text-red-400">
+                            <div className="flex flex-col items-center justify-center min-h-[300px] bg-red-50/30 border-2 border-dashed border-red-200 p-8 text-center">
+                                <div className="w-16 h-16 bg-red-100 flex items-center justify-center mb-4 text-red-400">
                                     <Lock className="w-8 h-8" />
                                 </div>
                                 <h4 className="font-bold text-red-900 mb-2">Sección en Construcción</h4>
@@ -371,14 +371,14 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="mt-20 text-center bg-primary/5 p-12 rounded-3xl border border-primary/10"
+                            className="mt-20 text-center bg-primary/5 p-12 border border-primary/10"
                         >
-                            <div className="w-16 h-16 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-6">
+                            <div className="w-16 h-16 bg-primary/10 text-primary flex items-center justify-center mx-auto mb-6">
                                 <CheckCircle className="w-8 h-8" />
                             </div>
                             <h3 className="text-2xl font-bold mb-4">Certificación Disponible</h3>
                             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Has completado los requisitos de este diplomado. Ya puedes descargar tu certificado oficial y acta de finalización.</p>
-                            <Link href={`/diplomados/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold rounded-xl text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
+                            <Link href={`/diplomados/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
                                 Ver Documentos de Grado <ChevronRight className="ml-2 w-5 h-5" />
                             </Link>
                         </motion.div>
@@ -388,9 +388,9 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="mt-20 text-center bg-muted/30 p-10 rounded-3xl border border-border"
+                            className="mt-20 text-center bg-muted/30 p-10 border border-border"
                         >
-                            <div className="w-14 h-14 bg-muted text-muted-foreground rounded-full flex items-center justify-center mx-auto mb-4">
+                            <div className="w-14 h-14 bg-muted text-muted-foreground flex items-center justify-center mx-auto mb-4">
                                 <Award className="w-6 h-6" />
                             </div>
                             <h3 className="text-xl font-bold mb-2">Certificación en Progreso</h3>

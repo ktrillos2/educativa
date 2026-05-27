@@ -53,7 +53,7 @@ export function Header({ session }: HeaderProps) {
 
   return (
     <header
-      className="fixed top-0 z-50 w-full transition-all duration-300 bg-card/95 backdrop-blur shadow-sm"
+      className="fixed top-0 z-50 w-full transition-all duration-300 bg-background shadow-sm"
     >
       <div className="container mx-auto px-4">
         <div className="flex h-24 items-center justify-between">
@@ -63,7 +63,7 @@ export function Header({ session }: HeaderProps) {
               alt="Academia de Formación Líderes del Mérito"
               width={100}
               height={100}
-              className="h-20 w-auto"
+              className="h-16 md:h-20 w-auto"
             />
           </Link>
 
@@ -83,7 +83,7 @@ export function Header({ session }: HeaderProps) {
                       <ChevronDown className="h-4 w-4" />
                     </button>
                     {openDropdown === item.label && (
-                      <div className="absolute top-full left-0 w-44 border border-border bg-card shadow-lg py-1 rounded-md">
+                      <div className="absolute top-full left-0 w-44 border border-border bg-card shadow-lg py-1 ">
                         {item.children.map((child) => (
                           <Link
                             key={child.label}
@@ -116,12 +116,12 @@ export function Header({ session }: HeaderProps) {
                   size="sm" 
                   onClick={handleLogout}
                   disabled={isLoggingOut}
-                  className="rounded-md border-primary text-primary hover:bg-primary hover:text-white font-medium"
+                  className=" border-primary text-primary hover:bg-primary hover:text-white font-medium"
                 >
                   {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                 </Button>
                 <Link href="/diplomados">
-                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md font-bold">
+                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90  font-bold">
                     Inscribirse
                   </Button>
                 </Link>
@@ -132,13 +132,13 @@ export function Header({ session }: HeaderProps) {
                   <Button
                     variant="outline"
                     size="sm"
-                    className="rounded-md border-primary text-primary hover:bg-primary hover:text-white"
+                    className=" border-primary text-primary hover:bg-primary hover:text-white"
                   >
                     Iniciar Sesión
                   </Button>
                 </Link>
                 <Link href="/register">
-                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-md font-bold">
+                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90  font-bold">
                     Inscribirse
                   </Button>
                 </Link>
@@ -194,12 +194,12 @@ export function Header({ session }: HeaderProps) {
                       handleLogout()
                     }}
                     disabled={isLoggingOut}
-                    className="w-full bg-transparent rounded-md font-medium"
+                    className="w-full bg-transparent  font-medium"
                   >
                     {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                   </Button>
                   <Link href="/diplomados" onClick={() => setMobileMenuOpen(false)}>
-                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground rounded-md font-bold">
+                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground  font-bold">
                       Inscribirse
                     </Button>
                   </Link>
@@ -207,12 +207,12 @@ export function Header({ session }: HeaderProps) {
               ) : (
                 <>
                   <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                    <Button variant="outline" size="sm" className="w-full bg-transparent rounded-md">
+                    <Button variant="outline" size="sm" className="w-full bg-transparent ">
                       Iniciar Sesión
                     </Button>
                   </Link>
                   <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground rounded-md font-bold">
+                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground  font-bold">
                       Inscribirse
                     </Button>
                   </Link>

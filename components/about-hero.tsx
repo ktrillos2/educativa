@@ -18,8 +18,8 @@ export function AboutHero() {
       </div>
 
       {/* Decorative elements */}
-      <div className="absolute top-1/4 left-10 w-24 h-24 bg-secondary/30 rounded-full blur-2xl" />
-      <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-white/10 rounded-full blur-2xl" />
+      <div className="absolute top-1/4 left-10 w-24 h-24 bg-secondary/30  blur-2xl" />
+      <div className="absolute bottom-1/4 right-10 w-32 h-32 bg-white/10  blur-2xl" />
 
       <div className="container mx-auto px-4 relative z-10">
         <div className="max-w-4xl mx-auto text-center">
@@ -45,7 +45,7 @@ export function AboutHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
-            className="w-24 h-1.5 bg-secondary mx-auto mb-8 rounded-full"
+            className="w-24 h-1.5 bg-secondary mx-auto mb-8 "
           />
 
           <motion.p

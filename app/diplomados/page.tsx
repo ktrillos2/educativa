@@ -38,17 +38,17 @@ export default function DiplomadosPage() {
             </div>
           </div>
           {/* 4 Imágenes en fila al estilo brutalista */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 w-full">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 w-full">
             <div className="relative h-48 md:h-56 lg:h-64 w-full border-2 border-white/20 shadow-[4px_4px_0_0_rgba(255,255,255,0.1)]">
               <Image src="/images/diplomado-1.webp" fill className="object-cover" alt="Formación 1" />
             </div>
             <div className="relative h-48 md:h-56 lg:h-64 w-full border-2 border-white/20 shadow-[4px_4px_0_0_rgba(255,255,255,0.1)]">
               <Image src="/images/diplomado-2.webp" fill className="object-cover" alt="Formación 2" />
             </div>
-            <div className="relative h-48 md:h-56 lg:h-64 w-full border-2 border-white/20 shadow-[4px_4px_0_0_rgba(255,255,255,0.1)]">
+            <div className="hidden sm:block relative h-48 md:h-56 lg:h-64 w-full border-2 border-white/20 shadow-[4px_4px_0_0_rgba(255,255,255,0.1)]">
               <Image src="/images/diplomado-3.webp" fill className="object-cover" alt="Formación 3" />
             </div>
-            <div className="relative h-48 md:h-56 lg:h-64 w-full border-2 border-white/20 shadow-[4px_4px_0_0_rgba(255,255,255,0.1)]">
+            <div className="hidden sm:block relative h-48 md:h-56 lg:h-64 w-full border-2 border-white/20 shadow-[4px_4px_0_0_rgba(255,255,255,0.1)]">
               <Image src="/images/diplomado-4.webp" fill className="object-cover" alt="Formación 4" />
             </div>
           </div>

@@ -77,7 +77,7 @@ export function AboutValues() {
                   <CardContent className="p-6">
                     <div className="flex flex-col items-center text-center gap-4">
                       <div
-                        className={`p-4 rounded-xl transition-all duration-500 ${value.color} ${hoveredIndex === index ? "scale-110 rotate-6" : "scale-100 rotate-0"}`}
+                        className={`p-4  transition-all duration-500 ${value.color} ${hoveredIndex === index ? "scale-110 rotate-6" : "scale-100 rotate-0"}`}
                       >
                         <Icon
                           className={`h-8 w-8 transition-all duration-500 ${value.iconColor} ${hoveredIndex === index ? "scale-110" : "scale-100"}`}

@@ -4,6 +4,7 @@ import { db } from "@/lib/db"
 import { diplomados } from "@/lib/data"
 import { Award, Download, ArrowLeft, FileSpreadsheet } from "@/components/ui/icons"
 import Link from "next/link"
+import { CertificatePayment } from "@/components/certificate-payment"
 
 export default async function CertificatePage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
@@ -36,9 +37,8 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
     args: [session.userId, course.id]
   })
 
-  if (enrollment.rows.length === 0 || !enrollment.rows[0].payment_verified) {
-    redirect(`/diplomados/\${params.id}`)
-  }
+  // Removed strict payment_verified redirect. Now it decides UI.
+  const hasPaid = enrollment.rows.length > 0 && enrollment.rows[0].payment_verified
 
   // Check progress
   const progressCheck = await db.execute({
@@ -60,8 +60,8 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
           </Link>
 
           {!isEligible ? (
-            <div className="bg-white rounded-lg shadow-sm border p-8 text-center">
-              <div className="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="bg-white shadow-sm border p-8 text-center">
+              <div className="w-16 h-16 bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8" />
               </div>
               <h2 className="text-2xl font-bold mb-4">Aún no cumples los requisitos</h2>
@@ -70,10 +70,12 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 Para obtener el certificado oficial necesitas completar al menos 4 módulos o el 80% del programa.
                 Asegúrate de aprobar las evaluaciones requeridas.
               </p>
-              <Link href={`/diplomados/\${course.id}`} className="inline-block bg-primary text-white px-6 py-2 rounded-md font-medium hover:bg-primary/90">
+              <Link href={`/diplomados/${course.id}`} className="inline-block bg-primary text-white px-6 py-2 font-medium hover:bg-primary/90">
                 Continuar Estudiando
               </Link>
             </div>
+          ) : !hasPaid ? (
+            <CertificatePayment courseId={course.id} programName={course.title} />
           ) : (
             <div className="space-y-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
@@ -84,14 +86,14 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 <div className="flex flex-wrap gap-3">
                     <Link
                         href={`/diplomados/${course.id}/acta`}
-                        className="bg-white text-secondary border-2 border-secondary px-6 py-2.5 rounded-xl font-bold hover:bg-secondary/5 flex items-center gap-2 transition-all shadow-sm"
+                        className="bg-white text-secondary border-2 border-secondary px-6 py-2.5 font-bold hover:bg-secondary/5 flex items-center gap-2 transition-all shadow-sm"
                     >
                         <FileSpreadsheet className="w-5 h-5" />
                         Ver Acta Académica
                     </Link>
                     <button 
                         onClick={() => typeof window !== 'undefined' && window.print()}
-                        className="bg-secondary text-white px-6 py-2.5 rounded-xl font-bold hover:bg-secondary/90 flex items-center gap-2 transition-all shadow-lg shadow-secondary/20"
+                        className="bg-secondary text-white px-6 py-2.5 font-bold hover:bg-secondary/90 flex items-center gap-2 transition-all shadow-lg shadow-secondary/20"
                     >
                         <Download className="w-5 h-5" />
                         Descargar Certificado
@@ -106,7 +108,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 {/* Cabecera */}
                 <div className="flex justify-between items-center w-full px-4 pt-4 relative z-10">
                   {/* Escudo Placeholder */}
-                  <div className="w-28 h-28 rounded-full border-2 border-gray-300 flex items-center justify-center bg-gray-50 flex-shrink-0 shadow-sm">
+                  <div className="w-28 h-28 border-2 border-gray-300 flex items-center justify-center bg-gray-50 flex-shrink-0 shadow-sm">
                     <span className="text-xs text-gray-400 font-medium">ESCUDO</span>
                   </div>
                   

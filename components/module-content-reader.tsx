@@ -431,8 +431,8 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
                         
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                            <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-                                <div className="p-3 bg-primary text-white w-fit rounded-xl mb-4 shadow-lg shadow-primary/20">
+                            <div className="bg-gradient-to-br from-primary/5 to-primary/10 border border-primary/20  p-6 shadow-sm hover:shadow-md transition-all">
+                                <div className="p-3 bg-primary text-white w-fit  mb-4 shadow-lg shadow-primary/20">
                                     <Sparkles className="w-5 h-5" />
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-900 mb-2">Objetivos de la Unidad</h3>
@@ -452,8 +452,8 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 </ul>
                             </div>
 
-                            <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 border border-secondary/20 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all">
-                                <div className="p-3 bg-secondary text-secondary-foreground w-fit rounded-xl mb-4 shadow-lg shadow-secondary/15">
+                            <div className="bg-gradient-to-br from-secondary/5 to-secondary/10 border border-secondary/20  p-6 shadow-sm hover:shadow-md transition-all">
+                                <div className="p-3 bg-secondary text-secondary-foreground w-fit  mb-4 shadow-lg shadow-secondary/15">
                                     <BookMarked className="w-5 h-5" />
                                 </div>
                                 <h3 className="text-lg font-bold text-slate-900 mb-2">Estructura Temática</h3>
@@ -461,13 +461,13 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                     A lo largo de este módulo exploraremos los fundamentos conceptuales de las finanzas estatales, las normas que rigen a los entes territoriales e industriales, el rol del CONFIS, y el procedimiento técnico para ordenar los gastos e ingresos de la Nación.
                                 </p>
                                 <div className="flex gap-2">
-                                    <span className="px-3 py-1 bg-white/70 border border-border text-xs rounded-full font-medium">9 Temas Clave</span>
-                                    <span className="px-3 py-1 bg-white/70 border border-border text-xs rounded-full font-medium">10 Principios</span>
+                                    <span className="px-3 py-1 bg-white/70 border border-border text-xs  font-medium">9 Temas Clave</span>
+                                    <span className="px-3 py-1 bg-white/70 border border-border text-xs  font-medium">10 Principios</span>
                                 </div>
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl mt-8">
+                        <div className="bg-slate-50 border border-slate-200 p-6  mt-8">
                             <h3 className="font-bold text-lg text-slate-900 mb-2">¿Cómo utilizar este visor interactivo?</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Este lector interactivo ha sido desarrollado por <strong>K&T</strong> para brindarte una experiencia de aprendizaje premium. Utiliza el panel de navegación izquierdo para explorar los subtemas estructurados en jerarquías lógicas. En cada sección encontrarás el material de estudio resumido, explicaciones ilustrativas y conceptos técnicos detallados. Al finalizar de leer cada tema, avanza con los controles ubicados al final de la página.
@@ -489,7 +489,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El presupuesto como instrumento financiero por excelencia, está llamado a permitir al Estado garantizar el cumplimiento de su función económica y asegurar la coordinación y organización eficiente en la producción de bienes y servicios públicos.
                         </p>
                         
-                        <div className="bg-blue-50 border border-blue-200 text-blue-900 p-6 rounded-2xl flex gap-4 items-start shadow-sm">
+                        <div className="bg-blue-50 border border-blue-200 text-blue-900 p-6  flex gap-4 items-start shadow-sm">
                             <AlertCircle className="w-6 h-6 text-blue-600 shrink-0 mt-0.5" />
                             <div className="space-y-2">
                                 <h4 className="font-bold text-sm">Base Constitucional</h4>
@@ -507,7 +507,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                     { title: "Ley 179 de 1994", desc: "Introdujo reformas sustanciales orientadas a la modernización y flexibilización de la gestión fiscal." },
                                     { title: "Ley 225 de 1995", desc: "Realizó modificaciones técnicas al régimen de ingresos, recursos de capital y disposiciones generales." }
                                 ].map((ley, idx) => (
-                                    <div key={idx} className="bg-white border border-border p-5 rounded-2xl shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
+                                    <div key={idx} className="bg-white border border-border p-5  shadow-sm hover:shadow-md hover:-translate-y-1 transition-all">
                                         <span className="text-xs font-bold text-secondary uppercase tracking-wider">Norma</span>
                                         <h4 className="font-extrabold text-slate-900 mt-1 mb-2">{ley.title}</h4>
                                         <p className="text-xs text-slate-600 leading-relaxed">{ley.desc}</p>
@@ -516,8 +516,8 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             </div>
                         </div>
 
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6 mt-8">
-                            <div className="p-4 bg-primary/10 rounded-2xl text-primary">
+                        <div className="bg-slate-50 border border-slate-200 p-6  flex flex-col md:flex-row items-center gap-6 mt-8">
+                            <div className="p-4 bg-primary/10  text-primary">
                                 <Landmark className="w-10 h-10" />
                             </div>
                             <div className="flex-1 space-y-1">
@@ -540,14 +540,14 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El <strong>Estatuto Orgánico del Presupuesto (EOP)</strong> es una ley orgánica y, por lo tanto, tiene una jerarquía superior sobre las leyes ordinarias. Esto significa que la ley anual de presupuesto debe estar estrictamente supeditada a las disposiciones generales y los principios trazados en el Estatuto.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">¿Qué comprende la cobertura del EOP?</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El Estatuto consta de dos niveles de cobertura que determinan a qué organismos y entidades del Estado se les aplica su régimen. Este alcance asegura la consistencia fiscal global de las cuentas públicas del país.
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                                <div className="border border-border/80 p-5 rounded-xl bg-slate-50/50">
+                                <div className="border border-border/80 p-5  bg-slate-50/50">
                                     <span className="text-xs font-extrabold text-primary uppercase tracking-wider">Primer Nivel</span>
                                     <h4 className="font-bold text-slate-900 mt-1 mb-2">Presupuesto General de la Nación (PGN)</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed mb-3">
@@ -562,7 +562,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                     </ul>
                                 </div>
 
-                                <div className="border border-border/80 p-5 rounded-xl bg-slate-50/50">
+                                <div className="border border-border/80 p-5  bg-slate-50/50">
                                     <span className="text-xs font-extrabold text-secondary uppercase tracking-wider">Segundo Nivel</span>
                                     <h4 className="font-bold text-slate-900 mt-1 mb-2">Entidades Descentralizadas y Estatales</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed mb-3">
@@ -578,7 +578,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             </div>
                         </div>
 
-                        <div className="bg-secondary/5 border border-secondary/20 p-6 rounded-2xl">
+                        <div className="bg-secondary/5 border border-secondary/20 p-6 ">
                             <h4 className="font-bold text-slate-900 mb-2">Regla de Oro Presupuestal</h4>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Ninguna autoridad podrá contraer obligaciones públicas con cargo al tesoro o que comprometan vigencias futuras sin la previa autorización legal o reglamentaria consignada en el marco legal del EOP. Toda erogación debe tener una partida de ingreso equivalente.
@@ -598,7 +598,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="space-y-6">
-                            <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                            <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                                 <h3 className="text-xl font-bold text-slate-950">Los Niveles del Estatuto</h3>
                                 <div className="space-y-4">
                                     {[
@@ -606,7 +606,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                         { title: "Establecimientos Públicos y Entidades Descentralizadas", desc: "Se les aplican las disposiciones del Estatuto que rigen a los establecimientos públicos del Estado. Aplica a todas las personas jurídicas públicas cuyo patrimonio esté constituido por fondos públicos, cuenten con patrimonio propio, autonomía administrativa y personería jurídica." },
                                         { title: "Empresas Industriales y Comerciales del Estado (EICE) y Sociedades de Economía Mixta (SEM)", desc: "Se les aplicarán las normas del Estatuto que contengan regulaciones expresas sobre las mismas. Los demás aspectos serán regulados por sus respectivas juntas directivas, siguiendo los lineamientos que para el mismo tipo de entidades tiene la Nación." }
                                     ].map((nivel, idx) => (
-                                        <div key={idx} className="p-4 bg-slate-50 border border-slate-200 rounded-xl">
+                                        <div key={idx} className="p-4 bg-slate-50 border border-slate-200 ">
                                             <h4 className="font-extrabold text-slate-900 mb-1">{nivel.title}</h4>
                                             <p className="text-sm text-slate-600 leading-relaxed">{nivel.desc}</p>
                                         </div>
@@ -648,13 +648,13 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                     desc: "Comprende: Despacho del Alcalde, Secretarías de Despacho, Organismos de Control local, Concejo Municipal, Personería Municipal." 
                                 }
                             ].map((item, idx) => (
-                                <div key={idx} className="bg-white border border-border rounded-2xl p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                                <div key={idx} className="bg-white border border-border  p-6 shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                                     <div className="space-y-3">
-                                        <div className="p-3 bg-primary/10 text-primary rounded-xl w-fit">
+                                        <div className="p-3 bg-primary/10 text-primary  w-fit">
                                             <item.icon className="w-6 h-6" />
                                         </div>
                                         <h3 className="font-extrabold text-slate-900 text-lg leading-tight">{item.level}</h3>
-                                        <span className="inline-block text-[10px] bg-secondary/20 text-secondary font-bold px-2 py-0.5 rounded-full uppercase tracking-wider">{item.focus}</span>
+                                        <span className="inline-block text-[10px] bg-secondary/20 text-secondary font-bold px-2 py-0.5  uppercase tracking-wider">{item.focus}</span>
                                         <p className="text-xs text-slate-600 leading-relaxed pt-2">{item.desc}</p>
                                     </div>
                                 </div>
@@ -673,21 +673,21 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Las <strong>Empresas Industriales y Comerciales del Estado (EICE)</strong> son entidades descentralizadas creadas por la ley que desarrollan actividades de naturaleza comercial o industrial y de gestión económica, de acuerdo con las reglas del derecho privado (salvo excepciones consagradas por ley).
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Clasificación Presupuestal</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El Estatuto clasifica presupuestalmente a las EICE en dos categorías fundamentales para regular sus finanzas y excedentes financieros:
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                                <div className="border border-border/60 p-5 rounded-xl bg-slate-50">
+                                <div className="border border-border/60 p-5  bg-slate-50">
                                     <span className="text-xs font-bold text-primary uppercase">Categoría 1</span>
                                     <h4 className="font-extrabold text-slate-900 text-base mt-1 mb-2">EICE Societarias</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
                                         Participa la Nación y otras entidades públicas o mixtas. El porcentaje de excedentes financieros se distribuye y determina estrictamente según su participación accionaria.
                                     </p>
                                 </div>
-                                <div className="border border-border/60 p-5 rounded-xl bg-slate-50">
+                                <div className="border border-border/60 p-5  bg-slate-50">
                                     <span className="text-xs font-bold text-primary uppercase">Categoría 2</span>
                                     <h4 className="font-extrabold text-slate-900 text-base mt-1 mb-2">EICE No Societarias</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
@@ -696,7 +696,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-slate-100/80 rounded-xl border border-slate-200 text-xs font-mono text-slate-700 mt-4">
+                            <div className="p-4 bg-slate-100/80  border border-slate-200 text-xs font-mono text-slate-700 mt-4">
                                 <strong>Fórmula de Excedente Neto:</strong> Excedente = Patrimonio - Capital Social - Reservas - Superávit y Donaciones
                             </div>
                         </div>
@@ -713,21 +713,21 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Las <strong>Sociedades de Economía Mixta (SEM)</strong> son organismos constituidos bajo la forma de sociedades comerciales con aportes estatales y de capital privado. Desarrollan actividades de naturaleza industrial o mercantil en competencia con particulares.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Aplicación del Régimen Presupuestal</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El Estatuto establece una división clara para el manejo presupuestal de estas sociedades:
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-4">
-                                <div className="p-5 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-5 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 mb-2">1. SEM Financieras</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
                                         Entidades públicas dedicadas al sector financiero (por ejemplo, bancos de segundo piso como FINDETER, FEN o empresas estatales de leasing y crédito). Tienen regulaciones particulares por la Superintendencia Financiera.
                                     </p>
                                 </div>
 
-                                <div className="p-5 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-5 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 mb-2">2. SEM No Financieras</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
                                         Sujetas a los lineamientos del Estatuto para la distribución y reporte de excedentes. En general, los excedentes financieros se calculan según el porcentaje de participación del Estado sobre la utilidad disponible de la empresa.
@@ -749,7 +749,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-3">
+                            <div className="bg-white border border-border p-6  shadow-sm space-y-3">
                                 <span className="text-xs uppercase font-extrabold text-primary tracking-wider">Directrices</span>
                                 <h3 className="text-base font-bold text-slate-900">1. Controles de Gobierno</h3>
                                 <p className="text-xs text-slate-600 leading-relaxed">
@@ -757,7 +757,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 </p>
                             </div>
 
-                            <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-3">
+                            <div className="bg-white border border-border p-6  shadow-sm space-y-3">
                                 <span className="text-xs uppercase font-extrabold text-primary tracking-wider">Giro a la Nación</span>
                                 <h3 className="text-base font-bold text-slate-900">2. Excedentes EICE</h3>
                                 <p className="text-xs text-slate-600 leading-relaxed">
@@ -765,7 +765,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 </p>
                             </div>
 
-                            <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-3">
+                            <div className="bg-white border border-border p-6  shadow-sm space-y-3">
                                 <span className="text-xs uppercase font-extrabold text-primary tracking-wider">Participación</span>
                                 <h3 className="text-base font-bold text-slate-900">3. Utilidades SEM</h3>
                                 <p className="text-xs text-slate-600 leading-relaxed">
@@ -789,7 +789,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             La Constitución y la Ley Orgánica de Presupuesto determinan los procedimientos que se deben seguir para aprobar y ejecutar los presupuestos anuales. Para lograr la articulación con el desarrollo local, la Entidad Pública debe adoptar un sistema presupuestal, ordenado por el Estatuto Orgánico del Presupuesto (EOP), que permita una adecuada programación y elaboración del presupuesto, así como una eficiente ejecución del mismo.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Los Tres Componentes del Sistema Presupuestal</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El Estatuto establece en su artículo 6º que el Sistema Presupuestal está constituido de forma integral por:
@@ -801,8 +801,8 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                     { title: "El Plan Operativo Anual de Inversiones (POAI)", desc: "Prioriza los proyectos de inversión a ejecutar financiados o cofinanciados con recursos del presupuesto de la vigencia fiscal respectiva." },
                                     { title: "El Presupuesto General de la Entidad", desc: "Acto administrativo de estimación anual de ingresos y autorización de gastos que materializa de forma operativa los planes anteriores." }
                                 ].map((componente, idx) => (
-                                    <div key={idx} className="flex gap-4 p-4 border border-border/70 rounded-xl hover:bg-slate-50 transition-colors">
-                                        <div className="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
+                                    <div key={idx} className="flex gap-4 p-4 border border-border/70  hover:bg-slate-50 transition-colors">
+                                        <div className="w-8 h-8  bg-primary/10 text-primary flex items-center justify-center font-bold shrink-0">
                                             {idx + 1}
                                         </div>
                                         <div>
@@ -826,7 +826,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El <strong>Plan Financiero</strong> es un instrumento de planificación y gestión financiera, coordinador de la política del gasto con los objetivos económicos del representante legal de la Entidad Pública. Toma en consideración las previsiones de ingreso, gasto, déficit y su financiación compatible con el programa anual de caja y el Plan de Desarrollo.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Importancia y Proyección Temporal</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El Plan Financiero permite a todos los niveles de la administración pública proyectar la necesidad de recursos durante el periodo del gobernante para atender la realización de obras, que sin esto no es factible obtener durante una sola vigencia fiscal.
@@ -836,13 +836,13 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <div className="p-4 border border-border rounded-xl bg-slate-50">
+                                <div className="p-4 border border-border  bg-slate-50">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Base del PAC</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">
                                         El Plan define las metas máximas de pago a efectuarse durante el año, que servirán de base para elaborar el Programa Anual Mensualizado de Caja (PAC). Tiene como base las proyecciones efectivas de caja.
                                     </p>
                                 </div>
-                                <div className="p-4 border border-border rounded-xl bg-slate-50">
+                                <div className="p-4 border border-border  bg-slate-50">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Metas Cuantificables</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">
                                         En este Plan se deben establecer metas cuantificables de recaudo, gastos de funcionamiento, manejo de la deuda e inversión, garantizando la financiación del Plan de Desarrollo.
@@ -863,7 +863,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El <strong>Plan Operativo Anual de Inversiones (POAI)</strong> es el instrumento de priorización de las inversiones contempladas y la materialización en la vigencia fiscal respectiva en el plan plurianual de inversiones del Plan de Desarrollo o programa de gobierno.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Estructura del POAI</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El POAI es un instrumento de planeación de corto plazo para el manejo de la inversión en las Entidades del Estado. Sus principales lineamientos legales (Ley 715 de 2001 y Ley 152 de 1994) obligan a:
@@ -890,7 +890,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El <strong>Presupuesto General</strong> es un acto administrativo por el cual se prevén o se computan anticipadamente las rentas e ingresos que la Entidad espera recibir en una determinada vigencia fiscal, lo mismo que los gastos y apropiaciones en que incurrirán todos los órganos que lo integran y refleja las proyecciones del Plan Financiero.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Funciones y Utilidad del Presupuesto</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El presupuesto general sirve como instrumento político, económico, financiero y administrativo para la toma de decisiones del Estado, determinar la categorización institucional y las cuantías autorizadas para contratar, entre otros.
@@ -899,7 +899,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 El acuerdo anual sobre el Presupuesto General de la Entidad es el instrumento mediante el cual se da aplicación operativa al Plan de Desarrollo municipal o territorial.
                             </p>
 
-                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex gap-3 items-start">
+                            <div className="p-4 bg-slate-50 border border-slate-200  flex gap-3 items-start">
                                 <AlertCircle className="w-5 h-5 text-primary shrink-0 mt-0.5" />
                                 <div className="space-y-1">
                                     <h4 className="font-bold text-slate-900 text-sm">Preparación Técnica Obligatoria</h4>
@@ -923,9 +923,9 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div className="p-6 border border-border bg-white rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                            <div className="p-6 border border-border bg-white  shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                                 <div className="space-y-2">
-                                    <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5 rounded-full uppercase">Parte 1</span>
+                                    <span className="text-[10px] bg-primary/10 text-primary font-bold px-2 py-0.5  uppercase">Parte 1</span>
                                     <h4 className="font-extrabold text-slate-900 text-base mt-2">Presupuesto de Ingresos</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">
                                         Consiste en el estimativo de las rentas e ingresos corrientes, recursos de capital, fondos especiales e ingresos de los establecimientos públicos.
@@ -933,9 +933,9 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 </div>
                             </div>
 
-                            <div className="p-6 border border-border bg-white rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                            <div className="p-6 border border-border bg-white  shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                                 <div className="space-y-2">
-                                    <span className="text-[10px] bg-secondary/20 text-secondary font-bold px-2 py-0.5 rounded-full uppercase">Parte 2</span>
+                                    <span className="text-[10px] bg-secondary/20 text-secondary font-bold px-2 py-0.5  uppercase">Parte 2</span>
                                     <h4 className="font-extrabold text-slate-900 text-base mt-2">Presupuesto de Gastos</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">
                                         Denominado también Acuerdo o Ley de Apropiaciones. Contiene la autorización de los gastos de funcionamiento, inversión y servicio de la deuda pública.
@@ -943,9 +943,9 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 </div>
                             </div>
 
-                            <div className="p-6 border border-border bg-white rounded-2xl shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
+                            <div className="p-6 border border-border bg-white  shadow-sm hover:shadow-md transition-all flex flex-col justify-between">
                                 <div className="space-y-2">
-                                    <span className="text-[10px] bg-slate-100 text-slate-700 font-bold px-2 py-0.5 rounded-full uppercase">Parte 3</span>
+                                    <span className="text-[10px] bg-slate-100 text-slate-700 font-bold px-2 py-0.5  uppercase">Parte 3</span>
                                     <h4 className="font-extrabold text-slate-900 text-base mt-2">Disposiciones Generales</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">
                                         Corresponden a las normas tendientes a asegurar la correcta ejecución del presupuesto general, las cuales rigen únicamente para la vigencia fiscal en curso.
@@ -966,26 +966,26 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Esta primera gran sección del presupuesto general contiene la estimación de los recursos monetarios que la entidad espera recaudar durante la vigencia fiscal respectiva.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Estructura Detallada de Ingresos</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 De conformidad con el artículo 6º del Estatuto Orgánico, el presupuesto de ingresos y recursos de capital contendrá la estimación detallada de:
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-4 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Ingresos Corrientes</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">Aquellos recaudos regulares que provienen del cobro de tributos (directos o indirectos) e ingresos no tributarios (tasas, multas, contribuciones y rentas de naturaleza corriente).</p>
                                 </div>
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-4 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Recursos de Capital</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">Ingresos extraordinarios por crédito interno o externo, recursos del balance, rendimientos financieros de tesorería, donaciones, excedentes financieros de empresas industriales.</p>
                                 </div>
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-4 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Contribuciones Parafiscales</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">Pagos obligatorios que afectan a un determinado grupo social y económico y se utilizan en su propio beneficio exclusivo, cuando sean administrados por órganos que formen parte del presupuesto.</p>
                                 </div>
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-4 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Fondos Especiales e Ingresos de Establecimientos Públicos</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">Fondos creados por ley para un fin específico e ingresos propios que recaudan directamente los establecimientos descentralizados del ente territorial.</p>
                                 </div>
@@ -1004,7 +1004,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Es el estimativo de los gastos autorizados y apropiaciones que podrán ejecutar los diferentes órganos e instituciones durante el año fiscal respectivo. Constituye el límite legal de gasto del sector público.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Títulos y Orígenes que Habilitan el Gasto</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 En el presupuesto de gastos, sólo se pueden incluir apropiaciones que correspondan a:
@@ -1016,7 +1016,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 <li>Las destinadas a dar cumplimiento a los planes y programas de desarrollo económico y social y a las de las obras públicas de que trata el plan de desarrollo, aprobados por la respectiva corporación corporativa (Concejo, Asamblea o Congreso).</li>
                             </ul>
 
-                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col md:flex-row gap-6 mt-4">
+                            <div className="p-4 bg-slate-50 border border-slate-200  flex flex-col md:flex-row gap-6 mt-4">
                                 <div className="flex-1 space-y-1">
                                     <h4 className="font-extrabold text-slate-900 text-sm">Clasificación Básica del Gasto:</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
@@ -1043,13 +1043,13 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Las <strong>Disposiciones Generales</strong> corresponden a las normas operativas y de control tendientes a asegurar la correcta ejecución del Presupuesto General de la vigencia.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Características y Restricciones Legales</h3>
                             <p className="text-sm text-slate-600 leading-relaxed font-semibold text-slate-855">
                                 Estas normas regirán únicamente para el año fiscal para el cual se expidan.
                             </p>
 
-                            <div className="bg-red-50 border border-red-200 text-red-900 p-5 rounded-2xl">
+                            <div className="bg-red-50 border border-red-200 text-red-900 p-5 ">
                                 <h4 className="font-extrabold text-sm mb-2 flex items-center gap-1.5"><Shield className="w-4 h-4 text-red-600" /> Restricciones Severas</h4>
                                 <p className="text-xs leading-relaxed text-red-800">
                                     Mediante las disposiciones generales NO se podrán:
@@ -1076,8 +1076,8 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             La planeación financiera y la programación del gasto requieren una dirección técnica centralizada para garantizar que el total del gasto público anual sea plenamente congruente con los límites de recaudo y las políticas macroeconómicas.
                         </p>
 
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6">
-                            <div className="p-4 bg-primary/10 rounded-2xl text-primary shrink-0">
+                        <div className="bg-slate-50 border border-slate-200 p-6  flex flex-col md:flex-row items-center gap-6">
+                            <div className="p-4 bg-primary/10  text-primary shrink-0">
                                 <Landmark className="w-12 h-12" />
                             </div>
                             <div className="flex-1 space-y-1">
@@ -1100,31 +1100,31 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El Sistema Presupuestal será coordinado de manera técnica por el <strong>Comité de Hacienda</strong>, que para tal efecto es el órgano de asesoría, consulta, coordinación y seguimiento del Sistema Presupuestal dependiente del despacho del Representante Legal.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Integración Legal del Comité</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 De conformidad con las normas orgánicas, el Comité de Hacienda estará integrado estrictamente por:
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl text-center">
-                                    <div className="p-2 bg-primary text-white w-fit rounded-lg mx-auto mb-2"><Landmark className="w-5 h-5" /></div>
+                                <div className="p-4 border border-border bg-slate-50  text-center">
+                                    <div className="p-2 bg-primary text-white w-fit  mx-auto mb-2"><Landmark className="w-5 h-5" /></div>
                                     <h4 className="font-bold text-sm text-slate-900">El Representante Legal</h4>
                                     <p className="text-xs text-slate-500 mt-1">Alcalde o Gobernador (quien lo presidirá y tiene la última palabra sobre las políticas).</p>
                                 </div>
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl text-center">
-                                    <div className="p-2 bg-primary text-white w-fit rounded-lg mx-auto mb-2"><Calculator className="w-5 h-5" /></div>
+                                <div className="p-4 border border-border bg-slate-50  text-center">
+                                    <div className="p-2 bg-primary text-white w-fit  mx-auto mb-2"><Calculator className="w-5 h-5" /></div>
                                     <h4 className="font-bold text-sm text-slate-900">Jefe de Área Financiera</h4>
                                     <p className="text-xs text-slate-500 mt-1">Secretario de Hacienda o Director de Finanzas (responsable del flujo de caja y recaudo).</p>
                                 </div>
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl text-center">
-                                    <div className="p-2 bg-primary text-white w-fit rounded-lg mx-auto mb-2"><BookOpen className="w-5 h-5" /></div>
+                                <div className="p-4 border border-border bg-slate-50  text-center">
+                                    <div className="p-2 bg-primary text-white w-fit  mx-auto mb-2"><BookOpen className="w-5 h-5" /></div>
                                     <h4 className="font-bold text-sm text-slate-900">Jefe de Planeación</h4>
                                     <p className="text-xs text-slate-500 mt-1">Director o Secretario de Planeación (encargado de priorizar los proyectos y consolidar el POAI).</p>
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs leading-relaxed mt-4">
+                            <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900  text-xs leading-relaxed mt-4">
                                 <strong>Audiencia y Autonomía:</strong> Las decisiones que tengan que ver con las entidades descentralizadas se tomarán con audiencia de sus Directores o Gerentes, quienes participarán en el Comité con voz pero sin voto.
                             </div>
                         </div>
@@ -1141,7 +1141,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El Estatuto Orgánico del Presupuesto le atribuye al Comité de Hacienda (CONFIS a nivel territorial) responsabilidades clave y de estricto cumplimiento para regir las finanzas públicas:
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Competencias Detalladas</h3>
                             <ul className="space-y-3 text-sm text-slate-600">
                                 <li className="flex items-start gap-2.5">
@@ -1183,12 +1183,12 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Los principios presupuestales son preceptos generales que sirven de orientación para la formulación, elaboración, aprobación y ejecución de los elementos del sistema presupuestal.
                         </p>
 
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl space-y-4">
+                        <div className="bg-slate-50 border border-slate-200 p-6  space-y-4">
                             <h4 className="font-bold text-slate-900 flex items-center gap-1.5"><Shield className="w-5 h-5 text-primary" /> Condicionantes de Validez Legal</h4>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Si bien estos principios constituyen los ideales hacia los cuales debe orientarse una buena gestión presupuestal, su no aplicación en la práctica puede afectar la validez del proceso presupuestal.
                             </p>
-                            <p className="text-xs text-slate-500 leading-relaxed italic bg-white p-4 rounded-xl border border-slate-200">
+                            <p className="text-xs text-slate-500 leading-relaxed italic bg-white p-4  border border-slate-200">
                                 Sentencia C-357 de agosto 11 de 1994 (Corte Constitucional): “…, los principios consagrados en el Estatuto Orgánico de Presupuesto, son precedentes que condicionan la validez del proceso presupuestal, de manera que, al no ser tenidos en cuenta, vician la legitimidad del mismo. No son simples requisitos, sino pautas determinadas por la Ley orgánica y determinantes de la Ley anual de presupuesto (o Acuerdo Territorial de presupuesto).”
                             </p>
                         </div>
@@ -1205,7 +1205,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Este principio establece que el presupuesto general de la Entidad debe guardar estricta concordancia con los contenidos del Plan de Desarrollo, el Plan Plurianual de Inversiones, el proceso de planeación financiera (Plan Financiero) y el Plan Operativo Anual de Inversiones (POAI).
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Armonía Estratégica Obligatoria</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Entre el presupuesto anual y el Plan de Desarrollo debe existir una estricta armonía, tal como lo dispone de manera imperativa el <strong>artículo 346 de la Constitución Política</strong>, ya que el presupuesto de cada año debe ser un fiel reflejo de lo que, para plazos mayores, prevé el Plan de Desarrollo de la administración.
@@ -1227,7 +1227,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El principio de anualidad circunscribe la vigencia del presupuesto al año fiscal, comprendido rigurosamente entre el <strong>1 de enero y el 31 de diciembre</strong> de cada año.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Implicación Operativa</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Por consiguiente, se autoriza y programa el Presupuesto sólo para dicha vigencia fiscal. Transcurrido el 31 de diciembre, las apropiaciones presupuestales expiran y las sumas no comprometidas no podrán ejecutarse, debiendo reincorporarse a través del proceso del balance en la siguiente vigencia.
@@ -1246,7 +1246,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El principio de universalidad considera que el presupuesto general contendrá la <strong>totalidad de los gastos públicos</strong> que la administración espera realizar durante la vigencia fiscal respectiva.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Prohibición de Gastos Fuera del Presupuesto</h3>
                             <p className="text-sm text-slate-600 leading-relaxed font-semibold text-slate-850">
                                 Ninguna autoridad podrá efectuar gastos públicos, erogaciones con cargo al tesoro público, o transferir crédito alguno que no figuren explícita y previamente autorizados en el presupuesto aprobado.
@@ -1268,7 +1268,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Este principio consagra que, con el recaudo de todas las rentas y recursos de capital del ente territorial, se atenderá el pago oportuno de las apropiaciones autorizadas en el presupuesto general.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Manejo Unificado de Tesorería</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Significa que todos los ingresos fiscales, sin importar su origen tributario o no tributario, se incluyen en una sola bolsa común (la cuenta única o de tesorería del municipio), con la cual se pagan todos los gastos autorizados.
@@ -1290,7 +1290,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             La programación integral implica que <span className="font-semibold text-slate-900">“todo programa presupuestal deberá contemplar simultáneamente los gastos de inversión y de funcionamiento que las exigencias técnicas y administrativas demanden como necesarios para su ejecución y operación, de conformidad con los procedimientos y normas legales vigentes”</span>.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-950">Vínculo Indisoluble de Gastos</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Este principio prohíbe formular un programa o proyecto de inversión de infraestructura (por ejemplo, construir un hospital o una sede educativa) sin prever de forma simultánea y en la misma vigencia los gastos de funcionamiento (nómina de médicos o profesores, servicios públicos, mantenimiento) requeridos para poner en marcha dicha obra.
@@ -1309,7 +1309,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El principio de especialización exige que las apropiaciones autorizadas en el presupuesto se refieran, en cada órgano de la administración, estrictamente a su objeto misional y funciones legales.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Rigidez de la Destinación</h3>
                             <p className="text-sm text-slate-600 leading-relaxed font-semibold text-slate-800">
                                 Las apropiaciones se ejecutarán estrictamente conforme al fin para el cual fueron programadas.
@@ -1331,7 +1331,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Está consagrado formalmente en el <strong>artículo 19 del decreto 111 de 1996</strong> y consiste en que las rentas incorporadas en el presupuesto general de la entidad, así como los bienes y derechos de los órganos que lo conforman, son inembargables.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Protección del Patrimonio Público</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Con este principio se busca proteger de manera rigurosa los dineros de la Nación y de las Entidades Territoriales, para garantizar la aplicación efectiva del gasto público a los fines de beneficio general y prestación de servicios esenciales.
@@ -1340,7 +1340,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 El objetivo primordial es evitar la imposibilidad de ejecutar el presupuesto de gasto social, ya que no sería viable asumir erogaciones si las rentas fuesen congeladas o retenidas mediante medidas cautelares promovidas por acreedores particulares.
                             </p>
 
-                            <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900 rounded-xl text-xs font-semibold">
+                            <div className="p-4 bg-amber-50 border border-amber-200 text-amber-900  text-xs font-semibold">
                                 Del principio de Inembargabilidad, se exceptúan las empresas industriales y comerciales del municipio y los procesos judiciales de orden laboral y sentencias ejecutoriadas (bajo reglas específicas).
                             </div>
                         </div>
@@ -1357,7 +1357,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El presupuesto general del Estado es el principal instrumento de política fiscal del país. Por consiguiente, su volumen global no puede definirse de forma aislada a las metas de inflación o crecimiento económico.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-950">Alineación con la Autoridad Monetaria</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El presupuesto debe ser compatible con las metas macroeconómicas fijadas por el Gobierno Nacional, en estricta coordinación con la Junta Directiva del Banco de la República (quien tiene a su cargo el control de la inflación y la política cambiaria).
@@ -1376,7 +1376,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             La homeostasis es un concepto biológico que se aplica al equilibrio fiscal. El principio presupuestal establece que el crecimiento del gasto debe guardar congruencia con el crecimiento económico real.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Evitar Desequilibrios Macroeconómicos</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El crecimiento real del presupuesto de rentas, incluida la totalidad de los créditos adicionales de cualquier naturaleza, deberá guardar estricta congruencia con el crecimiento de la economía de tal manera que no genere un desequilibrio económico de orden nacional o local.
@@ -1395,8 +1395,8 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             En esta unidad, abordaremos las fases y aspectos procedimentales que el Estatuto establece para estructurar, clasificar y ordenar los ingresos y egresos tanto a nivel nacional como de las entidades territoriales colombianas.
                         </p>
 
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl flex flex-col md:flex-row items-center gap-6">
-                            <div className="p-4 bg-primary/10 rounded-2xl text-primary shrink-0">
+                        <div className="bg-slate-50 border border-slate-200 p-6  flex flex-col md:flex-row items-center gap-6">
+                            <div className="p-4 bg-primary/10  text-primary shrink-0">
                                 <BookOpen className="w-12 h-12" />
                             </div>
                             <div className="flex-1 space-y-1">
@@ -1419,7 +1419,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El presupuesto es un acto administrativo por el cual se prevén o se computan anticipadamente las rentas e ingresos de la Entidad esperan recibir en una determinada vigencia fiscal, lo mismo que los gastos y apropiaciones en que incurrirán todos los órganos que lo integran y refleja las proyecciones del Plan Financiero.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">La Utilidad del Presupuesto en el Proceso Administrativo</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Sirve como instrumento político, económico, financiero y administrativo, para la toma de decisiones, determinar la categorización y cuantías para contratar entre otros.
@@ -1441,7 +1441,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Para efectos procedimentales, el Estatuto establece con precisión las tres partes estructurales del Presupuesto:
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">División Estructural Tripartita</h3>
                             <ul className="space-y-3 text-sm text-slate-600 list-disc pl-5">
                                 <li><strong>Presupuesto de ingresos o rentas y recursos de capital:</strong> Contiene el estimativo de recursos a percibir.</li>
@@ -1461,7 +1461,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         <p className="text-lg leading-relaxed font-light text-slate-600">
                             El presupuesto de ingresos y recursos de capital contendrá la estimación detallada de los ingresos corrientes, recursos de capital, contribuciones parafiscales cuando sean administradas por un órgano que haga parte del presupuesto, fondos especiales e ingresos de los establecimientos públicos.
                         </p>
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl">
+                        <div className="bg-slate-50 border border-slate-200 p-6 ">
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 Esta estimación debe estar estrictamente alineada con el Plan Financiero para evitar sobreestimaciones que afecten la liquidez y generen un posterior déficit fiscal.
                             </p>
@@ -1479,7 +1479,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Es el estimativo de gastos autorizados para la vigencia fiscal. En el presupuesto de gastos, sólo se pueden incluir apropiaciones que correspondan a créditos judicialmente reconocidos, gastos decretados conforme a las normas preexistentes y las destinadas a dar cumplimiento a los planes y programas de desarrollo.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Capacidad de Contratación y Autonomía</h3>
                             <p className="text-sm text-slate-600 leading-relaxed font-semibold text-slate-800">
                                 El presupuesto de gastos está conformado por secciones, que para el nivel municipal son: la Administración Central, el Concejo, la Contraloría (donde exista), la Personería Municipal y los establecimientos públicos descentralizados que tengan autonomía jurídica.
@@ -1487,7 +1487,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 La clasificación en secciones va ligada a la capacidad de contratación según lo regulado por la Ley, a la ordenación del gasto y a la autonomía presupuestal. Aquellos órganos que representan una sección “tendrán la capacidad de contratar y comprometer a nombre de la persona jurídica de la cual hagan parte y ordenar el gasto en desarrollo de las apropiaciones incorporadas en la respectiva sección, lo que constituye la autonomía presupuestal”.
                             </p>
-                            <div className="p-4 bg-slate-100 rounded-xl border border-slate-200 text-xs text-slate-600">
+                            <div className="p-4 bg-slate-100  border border-slate-200 text-xs text-slate-600">
                                 Tienen esta capacidad las entidades territoriales, los concejos, las contralorías, las personerías y todos los demás órganos estatales de cualquier nivel que tengan personería jurídica, sin perjuicio de la capacidad del Alcalde para celebrar contratos a nombre del municipio.
                             </div>
                         </div>
@@ -1504,7 +1504,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Las disposiciones generales son normas operativas anuales destinadas a asegurar la correcta ejecución del Presupuesto General de la entidad.
                         </p>
 
-                        <div className="bg-red-50 border border-red-200 text-red-900 p-5 rounded-2xl">
+                        <div className="bg-red-50 border border-red-200 text-red-900 p-5 ">
                             <h4 className="font-extrabold text-sm mb-2 flex items-center gap-1.5"><Shield className="w-4 h-4 text-red-600" /> Limitaciones del Legislativo Anual</h4>
                             <p className="text-xs leading-relaxed text-red-800">
                                 Mediante las disposiciones generales NO se podrán:
@@ -1530,19 +1530,19 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-4">
-                            <div className="p-5 border border-border bg-white rounded-xl shadow-sm">
+                            <div className="p-5 border border-border bg-white  shadow-sm">
                                 <h4 className="font-bold text-slate-900 text-base mb-2">1. Por su Naturaleza</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Clasificación intrínseca del ingreso que define si proviene de flujos ordinarios y recurrentes o de ingresos esporádicos y extraordinarios.
                                 </p>
                             </div>
-                            <div className="p-5 border border-border bg-white rounded-xl shadow-sm">
+                            <div className="p-5 border border-border bg-white  shadow-sm">
                                 <h4 className="font-bold text-slate-900 text-base mb-2">2. Por su Destinación</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Define si los recursos están predeterminados por mandato legal para un fin exclusivo o si son de libre asignación para la planeación territorial.
                                 </p>
                             </div>
-                            <div className="p-5 border border-border bg-white rounded-xl shadow-sm">
+                            <div className="p-5 border border-border bg-white  shadow-sm">
                                 <h4 className="font-bold text-slate-900 text-base mb-2">3. Por su Temporalidad</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Divide los ingresos según correspondan a recaudos de la vigencia en curso o a saldos y recursos acumulados en vigencias anteriores.
@@ -1563,16 +1563,16 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="p-5 border border-border bg-slate-50 rounded-xl space-y-2">
-                                <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase">Ingreso Recurrente</span>
+                            <div className="p-5 border border-border bg-slate-50  space-y-2">
+                                <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5  uppercase">Ingreso Recurrente</span>
                                 <h4 className="font-bold text-slate-900 text-base">Ingresos Regulares</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Son aquellos recibidos de manera regular y constante, y están dados por el desarrollo de las propias actividades y tributos normales de la entidad. Son la base de su normal funcionamiento.
                                 </p>
                             </div>
 
-                            <div className="p-5 border border-border bg-slate-50 rounded-xl space-y-2">
-                                <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5 rounded-full uppercase">Ingreso No Recurrente</span>
+                            <div className="p-5 border border-border bg-slate-50  space-y-2">
+                                <span className="text-[10px] bg-blue-100 text-blue-800 font-bold px-2 py-0.5  uppercase">Ingreso No Recurrente</span>
                                 <h4 className="font-bold text-slate-900 text-base">Ingresos Esporádicos</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Son ingresos recibidos de manera esporádica e infrecuente. Tienen carácter excepcional y pueden llegar a percibirse una única vez en el horizonte presupuestal (por ejemplo, venta de activos).
@@ -1593,16 +1593,16 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div className="p-5 border border-border bg-slate-50 rounded-xl space-y-2">
-                                <span className="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5 rounded-full uppercase">Uso Excluyente</span>
+                            <div className="p-5 border border-border bg-slate-50  space-y-2">
+                                <span className="text-[10px] bg-red-100 text-red-800 font-bold px-2 py-0.5  uppercase">Uso Excluyente</span>
                                 <h4 className="font-bold text-slate-900 text-base">Destinación Específica</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Son ingresos con un uso determinado legal o constitucionalmente, de carácter excluyente. Los ingresos no se destinan de manera voluntaria por la administración, sino que obligan a financiar proyectos particulares predefinidos.
                                 </p>
                             </div>
 
-                            <div className="p-5 border border-border bg-slate-50 rounded-xl space-y-2">
-                                <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5 rounded-full uppercase">Uso Flexible</span>
+                            <div className="p-5 border border-border bg-slate-50  space-y-2">
+                                <span className="text-[10px] bg-green-100 text-green-800 font-bold px-2 py-0.5  uppercase">Uso Flexible</span>
                                 <h4 className="font-bold text-slate-900 text-base">Libre Destinación</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Son ingresos con un uso determinado, pero en concordancia con la planeación financiera global del Ente. Su asignación y uso son determinados directamente por el ordenador del gasto o el ordenador del pago.
@@ -1623,21 +1623,21 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                            <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                            <div className="p-4 border border-border bg-slate-50 ">
                                 <h4 className="font-bold text-slate-900 text-sm mb-1">Vigencia Presupuestal</h4>
                                 <p className="text-xs text-slate-500 leading-relaxed">
                                     Si los ingresos se perciben e ingresan efectivamente en la actual vigencia en curso, se clasifican procedimentalmente en <strong>ingresos corrientes</strong> de la vigencia.
                                 </p>
                             </div>
 
-                            <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                            <div className="p-4 border border-border bg-slate-50 ">
                                 <h4 className="font-bold text-slate-900 text-sm mb-1">Vigencias Anteriores</h4>
                                 <p className="text-xs text-slate-500 leading-relaxed">
                                     Si los ingresos percibidos corresponden a recursos no ejecutados en anteriores vigencias fiscales, se clasifican como <strong>recursos del balance</strong> del ente público.
                                 </p>
                             </div>
 
-                            <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                            <div className="p-4 border border-border bg-slate-50 ">
                                 <h4 className="font-bold text-slate-900 text-sm mb-1">Anticipo de Inversiones</h4>
                                 <p className="text-xs text-slate-500 leading-relaxed">
                                     Es el uso anticipado de los tributos futuros el cual genera endeudamiento público, y se debe establecer estrictamente por el período del gobernante en cumplimiento (según lo regulado por la Ley 617 de 2000).
@@ -1656,7 +1656,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         <p className="text-lg leading-relaxed font-light text-slate-600">
                             La consolidación presupuestal del orden nacional agrupa las cuentas de la Nación con el fin de proyectar de forma consistente la balanza comercial y fiscal ante los organismos de crédito internacional.
                         </p>
-                        <div className="bg-slate-50 border border-slate-200 p-6 rounded-2xl flex gap-3">
+                        <div className="bg-slate-50 border border-slate-200 p-6  flex gap-3">
                             <AlertCircle className="w-6 h-6 text-primary shrink-0" />
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El Estatuto establece las reglas técnicas mediante las cuales se consolida e integra el Presupuesto General de la Nación (PGN), el cual es presentado y debatido anualmente ante el Congreso de la República.
@@ -1675,16 +1675,16 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El Estatuto Orgánico establece que los ingresos del Presupuesto General de la Nación (PGN) se componen obligatoriamente de la siguiente manera:
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Dos Grandes Fuentes de Composición:</h3>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
-                                <div className="p-5 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-5 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 mb-1">Ingresos de la Nación</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
                                         Flujos y recaudos ordinarios y extraordinarios de la administración central de la Nación (ministerios, departamentos administrativos).
                                     </p>
                                 </div>
-                                <div className="p-5 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-5 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 mb-1">Recursos Propios de Establecimientos Públicos</h4>
                                     <p className="text-xs text-slate-600 leading-relaxed">
                                         Rentas y recursos generados directamente por los establecimientos descentralizados del orden nacional que tengan personería y autonomía.
@@ -1705,7 +1705,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El Estatuto detalla que para la Nación, esta categoría comprende de manera exhaustiva las siguientes subdivisiones de ingresos:
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-3 text-sm text-slate-600">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-3 text-sm text-slate-600">
                             <div className="flex gap-3 py-2 border-b border-slate-100">
                                 <span className="font-bold text-primary shrink-0 w-32">1. Ingresos Corrientes</span>
                                 <span>Tributarios (directos, indirectos) y no tributarios (tasas, multas).</span>
@@ -1743,13 +1743,13 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El presupuesto de gastos o apropiaciones es la autorización de gasto que imparte el Congreso, las Asambleas o los Concejos sobre las erogaciones que puede realizar la administración en la vigencia fiscal respectiva. De acuerdo con el Estatuto Orgánico, sólo se pueden incluir apropiaciones que correspondan a créditos judicialmente reconocidos, gastos decretados conforme a las normas preexistentes y obras del Plan de Desarrollo.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Estructura por Secciones Presupuestales</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 El presupuesto de gastos debe especificar las ramas de la administración pública y, en cada una de ellas, el organismo o la entidad a la cual se le autoriza el gasto, lo que se conoce con el nombre de <strong>secciones del presupuesto</strong>.
                             </p>
 
-                            <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl text-xs space-y-2">
+                            <div className="p-4 bg-slate-50 border border-slate-200  text-xs space-y-2">
                                 <p><strong>En el Nivel Nacional las Secciones son:</strong> Rama Legislativa, Rama Judicial, Fiscalía General de la Nación, Procuraduría General, Defensoría del Pueblo, Contraloría General, Registraduría Nacional (incluye CNE), una por cada ministerio y departamento administrativo, la Policía Nacional y una sección especial para el servicio de la deuda pública.</p>
                                 <p><strong>En el Nivel Municipal las Secciones son:</strong> la Administración Central, el Concejo Municipal, la Personería, la Contraloría (si es del caso) y los establecimientos públicos descentralizados que tengan autonomía jurídica.</p>
                             </div>
@@ -1768,19 +1768,19 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         </p>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pt-2">
-                            <div className="p-5 border border-border bg-white rounded-2xl shadow-sm">
+                            <div className="p-5 border border-border bg-white  shadow-sm">
                                 <h4 className="font-bold text-slate-900 text-base mb-2">Gastos de Funcionamiento</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Destinados a la operación normal de la entidad (nómina de personal, servicios públicos, adquisición de bienes de oficina, mantenimientos y transferencias legales).
                                 </p>
                             </div>
-                            <div className="p-5 border border-border bg-white rounded-2xl shadow-sm">
+                            <div className="p-5 border border-border bg-white  shadow-sm">
                                 <h4 className="font-bold text-slate-900 text-base mb-2">Servicio de la Deuda Pública</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Rubros destinados a pagar el capital (amortización), intereses, comisiones y otros costos financieros de los créditos adquiridos.
                                 </p>
                             </div>
-                            <div className="p-5 border border-border bg-white rounded-2xl shadow-sm">
+                            <div className="p-5 border border-border bg-white  shadow-sm">
                                 <h4 className="font-bold text-slate-900 text-base mb-2">Gastos de Inversión</h4>
                                 <p className="text-xs text-slate-600 leading-relaxed">
                                     Recursos destinados a programas y proyectos sociales o productivos que generan desarrollo económico y social, clasificados por sectores y programas.
@@ -1800,7 +1800,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             El <strong>Servicio de la Deuda Pública</strong> comprende las apropiaciones destinadas a cumplir con las obligaciones y compromisos financieros adquiridos con entidades bancarias y de crédito nacionales o internacionales.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">¿Qué incluye el Servicio de la Deuda?</h3>
                             <p className="text-sm text-slate-600 leading-relaxed">
                                 En el orden nacional o territorial, comprende estrictamente:
@@ -1826,24 +1826,24 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                             Los <strong>Gastos de Inversión</strong> son aquellos recursos públicos que el Estado destina de forma estratégica a programas y proyectos que generan desarrollo económico, social e infraestructura pública.
                         </p>
 
-                        <div className="bg-white border border-border p-6 rounded-2xl shadow-sm space-y-4">
+                        <div className="bg-white border border-border p-6  shadow-sm space-y-4">
                             <h3 className="text-xl font-bold text-slate-900">Objetivo y Alcance de la Inversión</h3>
                             <p className="text-sm text-slate-600 leading-relaxed font-semibold text-slate-800">
                                 Su principal objetivo es mejorar de forma tangible la calidad de vida de la población y promover el desarrollo integral del territorio.
                             </p>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-4 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Infraestructura Física</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">Construcción y pavimentación de vías de comunicación, edificación de centros de salud, hospitales, colegios, acueductos y saneamiento básico.</p>
                                 </div>
-                                <div className="p-4 border border-border bg-slate-50 rounded-xl">
+                                <div className="p-4 border border-border bg-slate-50 ">
                                     <h4 className="font-bold text-slate-900 text-sm mb-1">Desarrollo Social y Humano</h4>
                                     <p className="text-xs text-slate-500 leading-relaxed">Programas sociales dirigidos a la superación de la pobreza extrema, proyectos productivos de fomento agrícola o comercial, y proyectos de desarrollo tecnológico.</p>
                                 </div>
                             </div>
 
-                            <div className="p-4 bg-primary/5 border border-primary/20 rounded-xl text-xs text-slate-700">
+                            <div className="p-4 bg-primary/5 border border-primary/20  text-xs text-slate-700">
                                 <strong>Ejemplo de Inversión Pública:</strong> La construcción y dotación tecnológica de una nueva sede educativa rural para beneficiar a comunidades de escasos recursos.
                             </div>
                         </div>
@@ -1867,7 +1867,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 <h4 className="font-bold text-sm text-slate-800 uppercase tracking-wider">Conceptos clave a repasar:</h4>
                                 <div className="flex flex-wrap gap-2">
                                     {currentItem.keywords.map((kw, i) => (
-                                        <span key={i} className="px-3 py-1 bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 rounded-full">
+                                        <span key={i} className="px-3 py-1 bg-slate-100 border border-slate-200 text-xs font-semibold text-slate-600 ">
                                             #{kw}
                                         </span>
                                     ))}
@@ -1882,7 +1882,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
     return (
         <div id="reader-scroll-top" className="flex flex-col lg:flex-row gap-8 min-h-[75vh]">
             {/* Left Sidebar: Table of Contents treeview with search filter */}
-            <div className="w-full lg:w-1/4 bg-white rounded-3xl border border-border/80 shadow-sm p-6 flex flex-col gap-6 self-start lg:sticky lg:top-28 max-h-[85vh] overflow-hidden">
+            <div className="w-full lg:w-1/4 bg-white  border border-border/80 shadow-sm p-6 flex flex-col gap-6 self-start lg:sticky lg:top-28 max-h-[85vh] overflow-hidden">
                 <div>
                     <h3 className="font-extrabold text-primary text-lg mb-1 flex items-center gap-2">
                         <BookOpen className="w-5 h-5 text-secondary" />
@@ -1897,9 +1897,9 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         <span className="text-slate-600">Progreso de Lectura</span>
                         <span className="text-primary">{readingProgress}%</span>
                     </div>
-                    <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden border border-slate-200/50 shadow-inner">
+                    <div className="h-2 w-full bg-slate-100  overflow-hidden border border-slate-200/50 shadow-inner">
                         <div 
-                            className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 rounded-full"
+                            className="h-full bg-gradient-to-r from-primary to-secondary transition-all duration-500 "
                             style={{ width: `${readingProgress}%` }}
                         />
                     </div>
@@ -1913,7 +1913,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         placeholder="Buscar tema del módulo..."
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
-                        className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-border rounded-xl text-xs placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white transition-all shadow-inner"
+                        className="w-full pl-9 pr-4 py-2.5 bg-slate-50 border border-border  text-xs placeholder:text-slate-400 focus:outline-none focus:ring-1 focus:ring-primary focus:bg-white transition-all shadow-inner"
                     />
                 </div>
 
@@ -1934,7 +1934,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                                 <button
                                     key={item.id}
                                     onClick={() => handleSelectSection(item.id)}
-                                    className={`w-full text-left py-2 px-3 rounded-xl transition-all flex items-center justify-between group ${pl} ${
+                                    className={`w-full text-left py-2 px-3  transition-all flex items-center justify-between group ${pl} ${
                                         isActive 
                                             ? "bg-primary text-white font-bold shadow-md shadow-primary/20" 
                                             : "hover:bg-slate-50 text-slate-600 hover:text-slate-900 font-medium text-xs"
@@ -1954,13 +1954,13 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
             </div>
 
             {/* Right Panel: Content reading container or iframe PDF fallback */}
-            <div className="flex-grow flex flex-col bg-white rounded-3xl border border-border/80 shadow-sm overflow-hidden">
+            <div className="flex-grow flex flex-col bg-white  border border-border/80 shadow-sm overflow-hidden">
                 {/* Panel Action Header */}
                 <div className="px-8 py-4 border-b border-border/60 bg-slate-50/50 flex flex-col sm:flex-row justify-between items-center gap-4">
                     <div className="flex items-center gap-2.5">
                         <Link 
                             href={`/diplomados/${courseId}`}
-                            className="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-500 hover:text-slate-900"
+                            className="p-2 hover:bg-slate-100  transition-colors text-slate-500 hover:text-slate-900"
                         >
                             <ArrowLeft className="w-4 h-4" />
                         </Link>
@@ -1982,7 +1982,7 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                         variant="outline"
                         onClick={handlePrev}
                         disabled={activeSectionIndex === 0}
-                        className="rounded-xl border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold px-4"
+                        className=" border-slate-200 text-slate-700 hover:bg-slate-100 text-xs font-bold px-4"
                     >
                         <ArrowLeft className="mr-2 w-3.5 h-3.5" /> Anterior
                     </Button>
@@ -1994,14 +1994,14 @@ export function ModuleContentReader({ courseId, filename }: ModuleContentReaderP
                     {activeSectionIndex < tocItems.length - 1 ? (
                         <Button
                             onClick={handleNext}
-                            className="rounded-xl bg-primary hover:bg-primary/95 text-white text-xs font-bold px-4 shadow-md shadow-primary/10"
+                            className=" bg-primary hover:bg-primary/95 text-white text-xs font-bold px-4 shadow-md shadow-primary/10"
                         >
                             Siguiente <ArrowRight className="ml-2 w-3.5 h-3.5" />
                         </Button>
                     ) : (
                         <Link
                             href={`/diplomados/${courseId}`}
-                            className="inline-flex items-center justify-center bg-green-600 hover:bg-green-600/95 text-white text-xs font-bold px-5 py-2.5 rounded-xl shadow-md shadow-green-600/10 transition-all"
+                            className="inline-flex items-center justify-center bg-green-600 hover:bg-green-600/95 text-white text-xs font-bold px-5 py-2.5  shadow-md shadow-green-600/10 transition-all"
                         >
                             <Award className="mr-2 w-4 h-4" /> Finalizar Lectura
                         </Link>

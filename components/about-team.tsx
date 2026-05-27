@@ -57,12 +57,12 @@ export function AboutTeam() {
                 >
                   <CardContent className="p-8 relative">
                     <div
-                      className={`absolute -right-8 -top-8 w-32 h-32 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${aspect.iconBg}`}
+                      className={`absolute -right-8 -top-8 w-32 h-32  opacity-0 group-hover:opacity-100 transition-opacity duration-500 ${aspect.iconBg}`}
                     />
 
                     <div className="flex flex-col items-center text-center gap-4 relative z-10">
                       <div
-                        className={`p-4 rounded-xl transition-all duration-500 ${aspect.iconBg} ${hoveredIndex === index ? "scale-110 -rotate-6" : "scale-100 rotate-0"}`}
+                        className={`p-4  transition-all duration-500 ${aspect.iconBg} ${hoveredIndex === index ? "scale-110 -rotate-6" : "scale-100 rotate-0"}`}
                       >
                         <Icon
                           className={`h-10 w-10 transition-all duration-500 ${aspect.iconColor} ${hoveredIndex === index ? "scale-110" : "scale-100"}`}
@@ -72,7 +72,7 @@ export function AboutTeam() {
                         <h3 className="text-xl font-semibold text-foreground mb-3 relative inline-block">
                           {aspect.title}
                           <span
-                            className={`absolute -bottom-1 left-0 h-1 bg-secondary rounded-full transition-all duration-500 ${hoveredIndex === index ? "w-full" : "w-0"}`}
+                            className={`absolute -bottom-1 left-0 h-1 bg-secondary  transition-all duration-500 ${hoveredIndex === index ? "w-full" : "w-0"}`}
                           />
                         </h3>
                         <p className="text-muted-foreground leading-relaxed">{aspect.description}</p>

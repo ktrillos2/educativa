@@ -72,7 +72,7 @@ function StatCard({
     >
       <CardContent className="p-6">
         <div className="flex flex-col items-center text-center gap-3">
-          <div className="p-3 bg-secondary/20 group-hover:bg-secondary/30 rounded-lg transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
+          <div className="p-3 bg-secondary/20 group-hover:bg-secondary/30  transition-all duration-500 group-hover:rotate-12 group-hover:scale-110">
             <Icon className="h-8 w-8 text-secondary group-hover:animate-pulse" />
           </div>
           <div>
