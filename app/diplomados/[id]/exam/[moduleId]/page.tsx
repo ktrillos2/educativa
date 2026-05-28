@@ -57,7 +57,7 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
 
     return (
         <main className="flex-grow bg-muted/30">
-            <section className="pb-12 bg-primary text-white">
+            <section className="pt-[calc(6rem+1cm)] pb-[1cm] bg-primary text-white">
                 <div className="container mx-auto px-4">
                     <Breadcrumb items={[
                         { label: "Inicio", href: "/" },

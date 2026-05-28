@@ -70,7 +70,7 @@ export default function ContactoPage() {
                                         </div>
                                         <div>
                                             <h4 className="font-semibold text-base">Nuestra Sede</h4>
-                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">Edificio Empresarial Centro<br />Oficina 402, Bogotá</p>
+                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">CL 19E 18C 112<br />Barrio Guatapurí, Valledupar</p>
                                         </div>
                                     </div>
 
@@ -90,7 +90,7 @@ export default function ContactoPage() {
                                         </div>
                                         <div>
                                             <h4 className="font-semibold text-base">Escríbenos</h4>
-                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">contacto@lideresdelmerito.edu.co<br />admisiones@lideresdelmerito.edu.co</p>
+                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">direccionacademica@lideresdelmerito.edu.co</p>
                                         </div>
                                     </div>
 
@@ -100,7 +100,7 @@ export default function ContactoPage() {
                                         </div>
                                         <div>
                                             <h4 className="font-semibold text-base">Horario de Atención</h4>
-                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">Lun - Vie: 8:00 AM - 6:00 PM<br />Sábados: 9:00 AM - 1:00 PM</p>
+                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">Lun - Vie: 8:00 am a 12:00 pm y de 2:00 pm a 6:00 pm</p>
                                         </div>
                                     </div>
                                 </div>

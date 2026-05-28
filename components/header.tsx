@@ -12,14 +12,7 @@ import { toast } from "sonner"
 const navItems = [
   { label: "Inicio", href: "/" },
   { label: "Nosotros", href: "/nosotros" },
-  {
-    label: "Oferta Académica",
-    href: "#oferta",
-    children: [
-      { label: "Diplomados", href: "/diplomados" },
-      { label: "Formación Académica", href: "/formacion-academica" },
-    ],
-  },
+  { label: "Diplomados", href: "/diplomados" },
   { label: "Contacto", href: "/contacto" },
 ]
 

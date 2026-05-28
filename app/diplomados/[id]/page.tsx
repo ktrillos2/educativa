@@ -228,7 +228,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                         <p className="text-muted-foreground text-lg">Estructura detallada diseñada para tu formación profesional.</p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                         {/* Column 1: Módulos de Estudio */}
                         <div className="space-y-6">
                             <div className="flex items-center gap-3 mb-6 p-4 bg-primary/5 border border-primary/10">
@@ -298,7 +298,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                 <div className="p-2 bg-secondary text-white shadow-lg shadow-secondary/20">
                                     <Award className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-xl font-bold text-secondary-dark">Cuestionarios</h3>
+                                <h3 className="text-xl font-bold text-secondary-dark">EXÁMENES</h3>
                             </div>
 
                             <div className="space-y-4">
@@ -346,23 +346,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             </div>
                         </div>
 
-                        {/* Column 3: Exámenes Finales */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-red-50 border border-red-100">
-                                <div className="p-2 bg-red-500 text-white shadow-lg shadow-red-200">
-                                    <GraduationCap className="w-5 h-5" />
-                                </div>
-                                <h3 className="text-xl font-bold text-red-900">Exámenes</h3>
-                            </div>
 
-                            <div className="flex flex-col items-center justify-center min-h-[300px] bg-red-50/30 border-2 border-dashed border-red-200 p-8 text-center">
-                                <div className="w-16 h-16 bg-red-100 flex items-center justify-center mb-4 text-red-400">
-                                    <Lock className="w-8 h-8" />
-                                </div>
-                                <h4 className="font-bold text-red-900 mb-2">Sección en Construcción</h4>
-                                <p className="text-[10px] text-red-700/70">Los exámenes finales se habilitarán una vez se complete el cargue total de los contenidos del programa.</p>
-                            </div>
-                        </div>
                     </div>
 
                     {/* Completion Section */}

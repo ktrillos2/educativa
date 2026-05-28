@@ -39,7 +39,7 @@ export function Footer() {
     <footer id="contacto" className="bg-foreground text-background">
       <div className="container mx-auto px-4 py-[1cm]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div>
+          <div className="lg:col-span-2">
             <div className="mb-6">
               <Image
                 src="/images/image.png"
@@ -85,45 +85,26 @@ export function Footer() {
               Enlaces Rápidos
             </h3>
             <ul className="space-y-3">
-              {["Inicio", "Nosotros", "Diplomados", "Cursos Cortos", "Certificaciones", "Blog"].map((item) => (
-                <li key={item}>
+              {[
+                { label: "Inicio", href: "/" },
+                { label: "Nosotros", href: "/nosotros" },
+                { label: "Diplomados", href: "/diplomados" },
+                { label: "Contacto", href: "/contacto" }
+              ].map((item) => (
+                <li key={item.label}>
                   <Link
-                    href="#"
+                    href={item.href}
                     className="text-background/70 hover:text-secondary transition-colors text-sm inline-flex items-center gap-1.5 group"
                   >
                     <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {item}
+                    {item.label}
                   </Link>
                 </li>
               ))}
             </ul>
           </div>
 
-          <div>
-            <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
-              <span className="w-6 h-0.5 bg-secondary" />
-              Programas Populares
-            </h3>
-            <ul className="space-y-3">
-              {[
-                "Gestión Empresarial",
-                "Seguridad y Salud en el Trabajo",
-                "Contratación Estatal",
-                "Gestión del Talento Humano",
-                "Marketing Digital",
-              ].map((item) => (
-                <li key={item}>
-                  <Link
-                    href="#"
-                    className="text-background/70 hover:text-secondary transition-colors text-sm inline-flex items-center gap-1.5 group"
-                  >
-                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
-                    {item}
-                  </Link>
-                </li>
-              ))}
-            </ul>
-          </div>
+
 
           <div>
             <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
@@ -132,10 +113,10 @@ export function Footer() {
             </h3>
             <ul className="space-y-4">
               {[
-                { icon: MapPin, text: "Calle 10 # 5-30, Centro\nBogotá, Colombia" },
+                { icon: MapPin, text: "CL 19E 18C 112\nBarrio Guatapurí, Valledupar" },
                 { icon: Phone, text: "+57 (1) 234 5678" },
-                { icon: Mail, text: "info@lideresdelmerito.edu.co" },
-                { icon: Clock, text: "Lun - Vie: 8:00 AM - 6:00 PM" },
+                { icon: Mail, text: "direccionacademica@lideresdelmerito.edu.co" },
+                { icon: Clock, text: "Lun - Vie: 8:00 am a 12:00 pm y de 2:00 pm a 6:00 pm" },
               ].map(({ icon: Icon, text }, index) => (
                 <li key={index} className="flex items-start gap-3 group">
                   <div className="p-2 bg-secondary/20 group-hover:bg-secondary transition-colors ">

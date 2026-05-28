@@ -99,7 +99,7 @@ export function CTASection() {
                   </div>
                   <div>
                     <p className="text-xs text-muted-foreground">Escríbenos</p>
-                    <p className="font-semibold text-foreground">info@lideresdelmerito.edu.co</p>
+                    <p className="font-semibold text-foreground">direccionacademica@lideresdelmerito.edu.co</p>
                   </div>
                 </div>
               </div>
