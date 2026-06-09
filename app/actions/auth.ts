@@ -1,8 +1,6 @@
 "use server"
 
-import { db } from "@/lib/db"
-import { createSession, endSession } from "@/lib/auth"
-import bcrypt from "bcryptjs"
+import { createClient } from "@/utils/supabase/server"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -22,46 +20,64 @@ const loginSchema = z.object({
 export async function registerAction(data: z.infer<typeof registerSchema>, courseId?: string) {
     try {
         const validatedData = registerSchema.parse(data)
+        const supabase = await createClient()
 
-        // Check if user already exists
-        const existingUser = await db.execute({
-            sql: "SELECT id FROM users WHERE email = ? OR document = ?",
-            args: [validatedData.email, validatedData.document],
+        // 1. Check if user with same document exists in our public.users table 
+        const { data: existingDoc } = await supabase
+            .from("users")
+            .select("id")
+            .eq("document", validatedData.document)
+            .single()
+
+        if (existingDoc) {
+            return { error: "Un usuario con este documento ya existe." }
+        }
+
+        // 2. Sign up with Supabase Auth
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+            email: validatedData.email,
+            password: validatedData.password,
         })
 
-        let userId: string
-
-        if (existingUser.rows.length > 0) {
-            return { error: "User with this email or document already exists." }
-        } else {
-            // Create new user
-            const hashedPassword = await bcrypt.hash(validatedData.password, 10)
-            userId = crypto.randomUUID()
-
-            await db.execute({
-                sql: "INSERT INTO users (id, name, document, phone, email, password) VALUES (?, ?, ?, ?, ?, ?)",
-                args: [
-                    userId,
-                    validatedData.name,
-                    validatedData.document,
-                    validatedData.phone,
-                    validatedData.email,
-                    hashedPassword,
-                ]
-            })
+        if (authError) {
+            return { error: authError.message }
         }
 
-        // Attempt to enroll if courseId provided
+        if (!authData.user) {
+            return { error: "No se pudo crear el usuario." }
+        }
+
+        const userId = authData.user.id
+
+        // 3. Insert extra data into public.users
+        const { error: profileError } = await supabase
+            .from("users")
+            .insert({
+                id: userId,
+                name: validatedData.name,
+                document: validatedData.document,
+                phone: validatedData.phone,
+                email: validatedData.email,
+                role: 'user'
+            })
+
+        if (profileError) {
+            console.error("Profile creation error:", profileError)
+            return { error: "Error al crear el perfil del usuario." }
+        }
+
+        // 4. Attempt to enroll if courseId provided
         if (courseId) {
-            await db.execute({
-                sql: "INSERT INTO enrollments (id, user_id, course_id, payment_verified) VALUES (?, ?, ?, 0)",
-                args: [crypto.randomUUID(), userId, courseId]
-            })
+            await supabase
+                .from("enrollments")
+                .insert({
+                    user_id: userId,
+                    course_id: courseId,
+                    payment_verified: false
+                })
         }
 
-        await createSession(userId)
         revalidatePath("/")
-
         return { success: true }
     } catch (error: any) {
         if (error instanceof z.ZodError) {
@@ -72,38 +88,40 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
 }
 
 export async function enrollAction(courseId: string, formData: FormData) {
-    // We can call this via form action if already logged in or from the dialog directly.
     return { error: "Not implemented. Use registerAction directly or login then enroll." }
 }
 
 export async function loginAction(data: z.infer<typeof loginSchema>) {
     try {
         const validatedData = loginSchema.parse(data)
-        const userResult = await db.execute({
-            sql: "SELECT id, password FROM users WHERE email = ?",
-            args: [validatedData.email]
+        const supabase = await createClient()
+
+        const { data: authData, error } = await supabase.auth.signInWithPassword({
+            email: validatedData.email,
+            password: validatedData.password,
         })
 
-        if (userResult.rows.length === 0) {
-            return { error: "Invalid credentials" }
+        if (error) {
+            return { error: "Credenciales inválidas" }
         }
 
-        const user = userResult.rows[0]
-        const validPassword = await bcrypt.compare(validatedData.password, user.password as string)
-        if (!validPassword) {
-            return { error: "Invalid credentials" }
-        }
+        // Fetch the role to allow client-side redirect to the correct dashboard
+        const { data: profile } = await supabase
+            .from("users")
+            .select("role")
+            .eq("id", authData.user.id)
+            .single()
 
-        await createSession(user.id as string)
         revalidatePath("/")
-        return { success: true }
+        return { success: true, role: profile?.role ?? "user" }
     } catch (error: any) {
         return { error: "Failed to login" }
     }
 }
 
 export async function logoutAction() {
-    await endSession()
+    const supabase = await createClient()
+    await supabase.auth.signOut()
     revalidatePath("/")
     return { success: true }
 }

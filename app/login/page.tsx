@@ -32,7 +32,11 @@ export default function LoginPage() {
         toast.error(res.error)
       } else if (res?.success) {
         toast.success("¡Inicio de sesión exitoso!")
-        router.push("/diplomados")
+        if (res.role === 'admin') {
+          router.push("/admin")
+        } else {
+          router.push("/estudiante")
+        }
         router.refresh()
       }
     } catch (error) {
