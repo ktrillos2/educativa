@@ -1,9 +1,46 @@
 import { DiplomadosList } from "@/components/diplomados-list"
 import { Breadcrumb } from "@/components/breadcrumb"
-import { GraduationCap, Clock, Users, Award, BookOpen } from "@/components/ui/icons"
+import { GraduationCap } from "@/components/ui/icons"
+import { createClient } from "@/utils/supabase/server"
 import Image from "next/image"
 
-export default function DiplomadosPage() {
+export default async function DiplomadosPage() {
+  const supabase = await createClient()
+  
+  const { data: coursesData } = await supabase
+    .from("courses")
+    .select("*")
+    .order("created_at", { ascending: true })
+
+  const initialCourses = await Promise.all((coursesData || []).map(async (course) => {
+    // Buscar conteo de inscritos
+    const { count: enrolledCount } = await supabase
+        .from("enrollments")
+        .select("*", { count: "exact", head: true })
+        .eq("course_id", course.id)
+
+    return {
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      duration: course.duration,
+      students: course.students,
+      badge: course.badge,
+      category: course.category,
+      image: course.image,
+      price: course.price,
+      startDate: course.start_date,
+      modules: course.modules,
+      minStudents: course.min_students ?? 5,
+      enrolledCount: enrolledCount ?? 0,
+    }
+  }))
+
+  const uniqueCategories = [
+    "Todos",
+    ...Array.from(new Set(initialCourses.map((c) => c.category).filter((cat): cat is string => Boolean(cat)))),
+  ]
+
   return (
     <main className="flex-grow">
 
@@ -55,7 +92,7 @@ export default function DiplomadosPage() {
         </div>
       </section>
 
-      <DiplomadosList />
+      <DiplomadosList initialCourses={initialCourses} initialCategories={uniqueCategories} />
     </main>
   )
 }

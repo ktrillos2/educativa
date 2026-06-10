@@ -1,13 +1,19 @@
 import { notFound, redirect } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { getSession } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { diplomados } from "@/lib/data"
+import { createClient } from "@/utils/supabase/server"
 import { ExamForm } from "./exam-form"
 
 export default async function ExamPage(props: { params: Promise<{ id: string; moduleId: string }> }) {
     const params = await props.params
-    const course = diplomados.find(d => d.id === params.id)
+    const supabase = await createClient()
+
+    // Obtener diplomado desde Supabase
+    const { data: course } = await supabase
+        .from("courses")
+        .select("*")
+        .eq("id", params.id)
+        .maybeSingle()
 
     if (!course) {
         notFound()
@@ -23,35 +29,42 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
             redirect(`/diplomados/${params.id}`)
         }
 
-        const enrollment = await db.execute({
-            sql: "SELECT user_id FROM enrollments WHERE user_id = ? AND course_id = ?",
-            args: [session.userId, course.id]
-        })
+        const { data: enrollment } = await supabase
+            .from("enrollments")
+            .select("user_id")
+            .eq("user_id", session.userId)
+            .eq("course_id", course.id)
+            .maybeSingle()
 
-        if (enrollment.rows.length === 0) {
+        if (!enrollment) {
             redirect(`/diplomados/${params.id}`)
         }
     }
 
     // Get current progress or create if doesn't exist
-    let progressStrId = ""
     let currentScore = 0
 
     if (!isMockPaid && session?.userId) {
-        const progressCheck = await db.execute({
-            sql: "SELECT id, score, completed FROM progress WHERE user_id = ? AND course_id = ? AND module_id = ?",
-            args: [session.userId, course.id, params.moduleId]
-        })
+        const { data: progressCheck } = await supabase
+            .from("progress")
+            .select("score")
+            .eq("user_id", session.userId)
+            .eq("course_id", course.id)
+            .eq("module_id", params.moduleId)
+            .maybeSingle()
 
-        if (progressCheck.rows.length > 0) {
-            progressStrId = String(progressCheck.rows[0].id)
-            currentScore = Number(progressCheck.rows[0].score)
+        if (progressCheck) {
+            currentScore = Number(progressCheck.score)
         } else {
-            progressStrId = crypto.randomUUID()
-            await db.execute({
-                sql: "INSERT INTO progress (id, user_id, course_id, module_id) VALUES (?, ?, ?, ?)",
-                args: [progressStrId, session.userId, course.id, params.moduleId]
-            })
+            await supabase
+                .from("progress")
+                .insert({
+                    user_id: session.userId,
+                    course_id: course.id,
+                    module_id: params.moduleId,
+                    score: 0,
+                    completed: false
+                })
         }
     }
 

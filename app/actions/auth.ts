@@ -1,6 +1,7 @@
 "use server"
 
 import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 import { revalidatePath } from "next/cache"
 import { z } from "zod"
 
@@ -21,13 +22,14 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
     try {
         const validatedData = registerSchema.parse(data)
         const supabase = await createClient()
+        const supabaseAdmin = createAdminClient()
 
-        // 1. Check if user with same document exists in our public.users table 
-        const { data: existingDoc } = await supabase
+        // 1. Check if user with same document exists in our public.users table
+        const { data: existingDoc } = await supabaseAdmin
             .from("users")
             .select("id")
             .eq("document", validatedData.document)
-            .single()
+            .maybeSingle()
 
         if (existingDoc) {
             return { error: "Un usuario con este documento ya existe." }
@@ -49,8 +51,8 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
 
         const userId = authData.user.id
 
-        // 3. Insert extra data into public.users
-        const { error: profileError } = await supabase
+        // 3. Insert extra data into public.users (using admin client to bypass RLS)
+        const { error: profileError } = await supabaseAdmin
             .from("users")
             .insert({
                 id: userId,

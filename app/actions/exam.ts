@@ -1,6 +1,6 @@
 "use server"
 
-import { db } from "@/lib/db"
+import { createClient } from "@/utils/supabase/server"
 import { getSession } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 
@@ -17,28 +17,56 @@ export async function submitExam(courseId: string, moduleId: string, score: numb
             return { success: true }
         }
 
-        const isCompleted = score >= 60 ? 1 : 0
+        const isCompleted = score >= 60
+        const supabase = await createClient()
 
         // Check if progress exists
-        const existing = await db.execute({
-            sql: "SELECT id, score FROM progress WHERE user_id = ? AND course_id = ? AND module_id = ?",
-            args: [session.userId, courseId, moduleId]
-        })
+        const { data: existingProgress, error: fetchError } = await supabase
+            .from("progress")
+            .select("id, score")
+            .eq("user_id", session.userId)
+            .eq("course_id", courseId)
+            .eq("module_id", moduleId)
+            .maybeSingle()
 
-        if (existing.rows.length > 0) {
+        if (fetchError) {
+            console.error("Error fetching progress:", fetchError)
+            return { error: "Error al verificar el progreso existente." }
+        }
+
+        if (existingProgress) {
             // Only keep the highest score
-            const oldScore = Number(existing.rows[0].score)
+            const oldScore = Number(existingProgress.score)
             if (score > oldScore) {
-                await db.execute({
-                    sql: "UPDATE progress SET score = ?, completed = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?",
-                    args: [score, isCompleted, existing.rows[0].id]
-                })
+                const { error: updateError } = await supabase
+                    .from("progress")
+                    .update({
+                        score: score,
+                        completed: isCompleted,
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq("id", existingProgress.id)
+
+                if (updateError) {
+                    console.error("Error updating progress:", updateError)
+                    return { error: "Error al actualizar la calificación." }
+                }
             }
         } else {
-            await db.execute({
-                sql: "INSERT INTO progress (id, user_id, course_id, module_id, score, completed) VALUES (?, ?, ?, ?, ?, ?)",
-                args: [crypto.randomUUID(), session.userId, courseId, moduleId, score, isCompleted]
-            })
+            const { error: insertError } = await supabase
+                .from("progress")
+                .insert({
+                    user_id: session.userId,
+                    course_id: courseId,
+                    module_id: moduleId,
+                    score: score,
+                    completed: isCompleted
+                })
+
+            if (insertError) {
+                console.error("Error inserting progress:", insertError)
+                return { error: "Error al guardar la calificación." }
+            }
         }
 
         revalidatePath(`/diplomados/${courseId}`)

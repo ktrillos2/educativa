@@ -52,8 +52,8 @@ export default function RegisterPage() {
       if (res?.error) {
         toast.error(res.error)
       } else if (res?.success) {
-        toast.success("¡Registro completado con éxito!")
-        router.push("/diplomados")
+        toast.success("¡Registro exitoso! Bienvenido a la plataforma.")
+        router.push("/estudiante")
         router.refresh()
       }
     } catch (error) {

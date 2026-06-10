@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/auth"
-import { db } from "@/lib/db"
 import fs from "fs"
 import path from "path"
 

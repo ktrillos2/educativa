@@ -1,16 +1,12 @@
 import { NextResponse } from 'next/server'
-import crypto from 'crypto'
-import { client } from '@/sanity/lib/client'
 import { Resend } from 'resend'
-import { db } from '@/lib/db'
+import { createAdminClient } from '@/utils/supabase/admin'
 
 const resend = new Resend(process.env.RESEND_API_KEY)
-const WOMPI_EVENTS_SECRET = process.env.WOMPI_EVENTS_SECRET || ''
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    // const signature = request.headers.get('x-event-checksum') // Checksum integration omitted for simplicity in this template
 
     if (!body || !body.data || !body.data.transaction) {
       return NextResponse.json({ error: 'Invalid payload' }, { status: 400 })
@@ -21,29 +17,49 @@ export async function POST(request: Request) {
     const status = transaction.status // 'APPROVED', 'DECLINED', 'ERROR'
     const transactionId = transaction.id
 
-    // 1. Find the order in Sanity by reference
-    const query = `*[_type == "order" && reference == $reference][0]`
-    const order = await client.fetch(query, { reference })
+    // Usar cliente admin para poder actualizar RLS si es un webhook externo
+    const supabase = createAdminClient()
 
-    if (!order) {
+    // 1. Buscar la orden en Supabase por referencia
+    const { data: order, error: orderError } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("reference", reference)
+      .maybeSingle()
+
+    if (orderError || !order) {
+      console.error('Order search error or order not found:', orderError)
       return NextResponse.json({ error: 'Order not found' }, { status: 404 })
     }
 
-    // 2. Update Order in Sanity
-    await client
-      .patch(order._id)
-      .set({ status, wompiTransactionId: transactionId })
-      .commit()
+    // 2. Actualizar Orden en Supabase
+    const { error: updateOrderError } = await supabase
+      .from("orders")
+      .update({
+        status,
+        wompi_transaction_id: transactionId
+      })
+      .eq("id", order.id)
 
-    // 3. If APPROVED, unlock the certificate in SQLite and send Email
+    if (updateOrderError) {
+      console.error('Error updating order status:', updateOrderError)
+    }
+
+    // 3. Si es APPROVED, desbloquear el certificado en Supabase y enviar email
     if (status === 'APPROVED') {
-      const { userId, courseId } = order
+      const userId = order.user_id
+      const courseId = order.course_id
 
       if (userId && courseId) {
-        await db.execute({
-          sql: "UPDATE enrollments SET payment_verified = 1 WHERE user_id = ? AND course_id = ?",
-          args: [userId, courseId]
-        })
+        const { error: updateEnrollmentError } = await supabase
+          .from("enrollments")
+          .update({ payment_verified: true })
+          .eq("user_id", userId)
+          .eq("course_id", courseId)
+
+        if (updateEnrollmentError) {
+          console.error('Error updating enrollment payment status:', updateEnrollmentError)
+        }
       }
 
       if (order.email) {
@@ -53,13 +69,13 @@ export async function POST(request: Request) {
         await resend.emails.send({
           from: 'Academia Lideres del Merito <pagos@lideresdelmerito.edu.co>',
           to: order.email,
-          subject: `¡Certificado Desbloqueado! - ${order.programName}`,
+          subject: `¡Certificado Desbloqueado! - ${order.program_name}`,
           html: `
             <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-              <h2 style="color: #006838;">¡Felicidades ${order.studentName}!</h2>
+              <h2 style="color: #006838;">¡Felicidades ${order.student_name}!</h2>
               <p>Hemos recibido el pago de tu certificado exitosamente.</p>
               <div style="background-color: #f8fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>Programa:</strong> ${order.programName}</p>
+                <p style="margin: 5px 0;"><strong>Programa:</strong> ${order.program_name}</p>
                 <p style="margin: 5px 0;"><strong>Referencia de Pago:</strong> ${reference}</p>
                 <p style="margin: 5px 0;"><strong>Total Pagado:</strong> $${(order.amount / 100).toLocaleString('es-CO')}</p>
               </div>

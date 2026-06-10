@@ -1,14 +1,21 @@
 import { notFound, redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { diplomados } from "@/lib/data"
+import { createClient } from "@/utils/supabase/server"
 import { Award, Download, ArrowLeft, FileSpreadsheet } from "@/components/ui/icons"
 import Link from "next/link"
 import { CertificatePayment } from "@/components/certificate-payment"
+import { DownloadCertificateButton } from "@/components/download-certificate-button"
 
 export default async function CertificatePage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
-  const course = diplomados.find(d => d.id === params.id)
+  const supabase = await createClient()
+
+  // Obtener diplomado desde Supabase
+  const { data: course } = await supabase
+    .from("courses")
+    .select("*")
+    .eq("id", params.id)
+    .maybeSingle()
 
   if (!course) {
     notFound()
@@ -16,38 +23,41 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
 
   const session = await getSession()
   if (!session?.userId) {
-    redirect(`/diplomados/\${params.id}`)
+    redirect(`/diplomados/${params.id}`)
   }
 
   // Get User details
-  const userResult = await db.execute({
-    sql: "SELECT name, document FROM users WHERE id = ?",
-    args: [session.userId]
-  })
+  const { data: userProfile } = await supabase
+    .from("users")
+    .select("name, document")
+    .eq("id", session.userId)
+    .maybeSingle()
   
-  if (userResult.rows.length === 0) {
-    redirect(`/diplomados/\${params.id}`)
+  if (!userProfile) {
+    redirect(`/diplomados/${params.id}`)
   }
 
-  const user = userResult.rows[0]
-
   // Check enrollment and payment
-  const enrollment = await db.execute({
-    sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
-    args: [session.userId, course.id]
-  })
+  const { data: enrollment } = await supabase
+    .from("enrollments")
+    .select("payment_verified")
+    .eq("user_id", session.userId)
+    .eq("course_id", course.id)
+    .maybeSingle()
 
   // Removed strict payment_verified redirect. Now it decides UI.
-  const hasPaid = enrollment.rows.length > 0 && enrollment.rows[0].payment_verified
+  const hasPaid = enrollment && enrollment.payment_verified
 
   // Check progress
-  const progressCheck = await db.execute({
-    sql: "SELECT module_id FROM progress WHERE user_id = ? AND course_id = ? AND completed = 1",
-    args: [session.userId, course.id]
-  })
+  const { data: progressCheck } = await supabase
+    .from("progress")
+    .select("module_id")
+    .eq("user_id", session.userId)
+    .eq("course_id", course.id)
+    .eq("completed", true)
 
   // Para obtener el certificado, el usuario debe completar al menos 4 módulos o el 80%
-  const completedModules = progressCheck.rows.length
+  const completedModules = progressCheck?.length || 0
   const totalModules = course.modules || 1
   const isEligible = completedModules >= 4 || (completedModules / totalModules) >= 0.8
 
@@ -91,13 +101,12 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                         <FileSpreadsheet className="w-5 h-5" />
                         Ver Acta Académica
                     </Link>
-                    <button 
-                        onClick={() => typeof window !== 'undefined' && window.print()}
-                        className="bg-secondary text-white px-6 py-2.5 font-bold hover:bg-secondary/90 flex items-center gap-2 transition-all shadow-lg shadow-secondary/20"
-                    >
-                        <Download className="w-5 h-5" />
-                        Descargar Certificado
-                    </button>
+                    <DownloadCertificateButton 
+                        courseId={course.id} 
+                        type="CERTIFICATE" 
+                        label="Descargar Certificado"
+                        className="bg-secondary text-white px-6 py-2.5 font-bold hover:bg-secondary/90 shadow-lg shadow-secondary/20"
+                    />
                 </div>
               </div>
 
@@ -138,10 +147,10 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   <p className="text-xl md:text-2xl font-bold uppercase text-black mt-2">HACE CONSTAR QUE</p>
                   
                   <h2 className="text-4xl md:text-5xl lg:text-[3.5rem] font-serif font-bold text-black uppercase mt-6 mb-2 tracking-wide">
-                    {String(user.name)}
+                    {String(userProfile.name)}
                   </h2>
                   <p className="text-base md:text-lg text-black">
-                    Identificado(a) con documento de identidad N° <span className="border-b border-black inline-block px-8 font-medium pb-0.5">{String(user.document)}</span>
+                    Identificado(a) con documento de identidad N° <span className="border-b border-black inline-block px-8 font-medium pb-0.5">{String(userProfile.document)}</span>
                   </p>
                   
                   <p className="text-xl md:text-2xl font-bold text-black mt-8">CURSÓ Y APROBÓ EL</p>

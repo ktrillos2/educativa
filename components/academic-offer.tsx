@@ -18,7 +18,6 @@ import {
   Sparkles,
   ChevronRight,
 } from "@/components/ui/icons"
-import { diplomados as allDiplomados } from "@/lib/data"
 import Link from "next/link"
 
 const categories = ["Todos", "Gestión", "Legal", "Tecnología", "Salud"]
@@ -36,7 +35,8 @@ const badgeIcons: Record<string, React.ElementType> = {
   Certificado: BadgeCheck,
 }
 
-const programs = allDiplomados.slice(0, 6)
+// Import de data estático removido. Ahora acepta los programas mediante props o usa un array vacío.
+const programs: any[] = []
 
 // Animation variants
 const containerVariants = {

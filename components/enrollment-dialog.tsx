@@ -50,9 +50,9 @@ export function EnrollmentDialog({ courseId, courseName }: { courseId: string; c
         if (result.error) {
             toast.error(result.error)
         } else {
-            toast.success("Inscripción exitosa")
+            toast.success("¡Registro exitoso! Bienvenido a la plataforma.")
             setOpen(false)
-            router.refresh()
+            router.push("/estudiante")
         }
     }
 
@@ -75,7 +75,7 @@ export function EnrollmentDialog({ courseId, courseName }: { courseId: string; c
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="lg" className="w-full sm:w-auto font-bold text-lg bg-secondary hover:bg-secondary/90 text-white">
+                <Button size="lg" onClick={() => router.prefetch('/estudiante')} className="w-full sm:w-auto font-bold text-lg bg-secondary hover:bg-secondary/90 text-white">
                     Inscribirse al Diplomado
                 </Button>
             </DialogTrigger>

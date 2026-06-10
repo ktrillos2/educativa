@@ -22,7 +22,26 @@ import {
   SlidersHorizontal,
 } from "@/components/ui/icons"
 import Link from "next/link"
-import { categories, diplomados } from "@/lib/data"
+import { useState } from "react"
+import { Card, CardContent } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
+import {
+  Clock,
+  Users,
+  ArrowRight,
+  Building2,
+  Landmark,
+  Cpu,
+  HeartPulse,
+  Banknote,
+  CalendarDays,
+  BadgeCheck,
+  Flame,
+  Sparkles,
+  Search,
+  SlidersHorizontal,
+} from "@/components/ui/icons"
+import Link from "next/link"
 
 const categoryIcons: Record<string, React.ElementType> = {
   Gestión: Building2,
@@ -37,13 +56,32 @@ const badgeIcons: Record<string, React.ElementType> = {
   Certificado: BadgeCheck,
 }
 
+interface Course {
+  id: string
+  title: string
+  description: string
+  duration: string
+  students: string
+  badge: string | null
+  category: string
+  image: string
+  price: string
+  startDate: string
+  modules: number
+  minStudents?: number
+  enrolledCount?: number
+}
 
+interface DiplomadosListProps {
+  initialCourses: Course[]
+  initialCategories: string[]
+}
 
-export function DiplomadosList() {
+export function DiplomadosList({ initialCourses, initialCategories }: DiplomadosListProps) {
   const [activeCategory, setActiveCategory] = useState("Todos")
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredDiplomados = diplomados.filter((d) => {
+  const filteredDiplomados = initialCourses.filter((d) => {
     const matchesCategory = activeCategory === "Todos" || d.category === activeCategory
     const matchesSearch =
       d.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -69,7 +107,7 @@ export function DiplomadosList() {
 
           <div className="flex items-center gap-2 flex-wrap justify-center md:justify-start">
             <SlidersHorizontal className="h-4 w-4 text-muted-foreground hidden md:block" />
-            {categories.map((category) => {
+            {initialCategories.map((category) => {
               const Icon = categoryIcons[category]
               return (
                 <button
@@ -101,7 +139,7 @@ export function DiplomadosList() {
             return (
               <Card
                 key={diplomado.id}
-                className="group overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-200  hover:shadow-lg p-0"
+                className="group overflow-hidden bg-card border border-border hover:border-primary/50 transition-all duration-200  hover:shadow-lg p-0 flex flex-col"
               >
                 <div className="relative h-40 overflow-hidden">
                   <img
@@ -142,18 +180,45 @@ export function DiplomadosList() {
                   </h3>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{diplomado.description}</p>
 
-                  <div className="flex items-center gap-3 text-xs text-muted-foreground mb-3 pb-3 border-b border-border">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-4 pb-3 border-b border-border">
                     <div className="flex items-center gap-1">
-                      <Clock className="h-3 w-3 text-primary" />
+                      <Clock className="h-3.5 w-3.5 text-primary" />
                       <span>{diplomado.duration}</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <Users className="h-3 w-3 text-primary" />
+                      <Users className="h-3.5 w-3.5 text-primary" />
                       <span>{diplomado.students}</span>
                     </div>
                   </div>
 
-                  <Link href={`/diplomados/${diplomado.id}`}>
+                  {/* ── Indicador de cupos persuasivo ── */}
+                  {(() => {
+                    const min = diplomado.minStudents ?? 5
+                    const enrolled = diplomado.enrolledCount ?? 0
+                    const ready = enrolled >= min
+                    const pct = Math.min(100, Math.round((enrolled / min) * 100))
+                    return (
+                      <div className="mb-4">
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className={`text-[10px] font-bold uppercase tracking-wide ${ready ? 'text-green-600' : 'text-amber-600'}`}>
+                            {ready ? '✓ Grupo confirmado' : 'Últimos cupos'}
+                          </span>
+                          <span className={`text-[10px] font-bold ${ready ? 'text-green-600' : 'text-amber-600'}`}>
+                            {enrolled}/{min}
+                          </span>
+                        </div>
+                        <div className="w-full bg-secondary/20 rounded-full h-1.5 overflow-hidden">
+                          <div
+                            className={`h-1.5 rounded-full transition-all duration-700 ${ready ? 'bg-green-500' : 'bg-amber-400'}`}
+                            style={{ width: `${pct}%` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })()}
+
+                  <div className="mt-auto">
+                    <Link href={`/diplomados/${diplomado.id}`}>
                     <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground  text-sm h-9">
                       Ver Detalles
                       <ArrowRight className="ml-1.5 h-3.5 w-3.5" />

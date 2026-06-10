@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/auth"
-import { db } from "@/lib/db"
+import { createClient } from "@/utils/supabase/server"
 import fs from "fs"
 import path from "path"
 
@@ -22,17 +22,28 @@ export async function GET(
 
         const { searchParams } = new URL(request.url)
         const courseId = searchParams.get("courseId")
+        const supabase = await createClient()
 
         // Material is free for enrolled users
-        const sql = courseId 
-            ? "SELECT user_id FROM enrollments WHERE user_id = ? AND course_id = ?"
-            : "SELECT user_id FROM enrollments WHERE user_id = ?"
-        
-        const args = courseId ? [session.userId, courseId] : [session.userId]
+        let isEnrolled = false
+        if (courseId) {
+            const { data } = await supabase
+                .from("enrollments")
+                .select("user_id")
+                .eq("user_id", session.userId)
+                .eq("course_id", courseId)
+                .maybeSingle()
+            if (data) isEnrolled = true
+        } else {
+            const { data } = await supabase
+                .from("enrollments")
+                .select("user_id")
+                .eq("user_id", session.userId)
+                .limit(1)
+            if (data && data.length > 0) isEnrolled = true
+        }
 
-        const userEnrollments = await db.execute({ sql, args })
-
-        if (userEnrollments.rows.length === 0) {
+        if (!isEnrolled) {
             return new NextResponse("Enrollment Required", { status: 403 })
         }
     }

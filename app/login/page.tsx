@@ -18,6 +18,12 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false)
   const router = useRouter()
 
+  // Precarga ambas rutas en cuanto el usuario empieza a escribir
+  const handlePrefetch = () => {
+    router.prefetch("/admin")
+    router.prefetch("/estudiante")
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!email || !password) {
@@ -30,18 +36,17 @@ export default function LoginPage() {
       const res = await loginAction({ email, password })
       if (res?.error) {
         toast.error(res.error)
+        setIsLoading(false)
       } else if (res?.success) {
-        toast.success("¡Inicio de sesión exitoso!")
+        // Navegar de inmediato sin esperar toast para máxima velocidad
         if (res.role === 'admin') {
           router.push("/admin")
         } else {
           router.push("/estudiante")
         }
-        router.refresh()
       }
     } catch (error) {
       toast.error("Ocurrió un error inesperado. Inténtalo de nuevo.")
-    } finally {
       setIsLoading(false)
     }
   }
@@ -68,6 +73,7 @@ export default function LoginPage() {
                   className="pl-9"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  onFocus={handlePrefetch}
                   disabled={isLoading}
                   required
                 />
@@ -91,6 +97,7 @@ export default function LoginPage() {
                   className="pl-9"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  onFocus={handlePrefetch}
                   disabled={isLoading}
                   required
                 />

@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
 import { v4 as uuidv4 } from 'uuid'
-import { client } from '@/sanity/lib/client'
 import { getSession } from '@/lib/auth'
-import { db } from '@/lib/db'
+import { createClient } from '@/utils/supabase/server'
 
 export async function POST(request: Request) {
   try {
@@ -18,47 +17,54 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Faltan datos requeridos del curso' }, { status: 400 })
     }
 
-    // Obtener datos del usuario desde SQLite
-    const userResult = await db.execute({
-      sql: "SELECT name, email, document, phone FROM users WHERE id = ?",
-      args: [session.userId]
-    })
+    const supabase = await createClient()
 
-    if (userResult.rows.length === 0) {
+    // Obtener datos del usuario desde Supabase
+    const { data: user, error: userError } = await supabase
+      .from("users")
+      .select("name, email, document, phone")
+      .eq("id", session.userId)
+      .maybeSingle()
+
+    if (userError || !user) {
       return NextResponse.json({ error: 'Usuario no encontrado' }, { status: 404 })
     }
 
-    const user = userResult.rows[0]
-
     // Validar si ya pagó
-    const enrollment = await db.execute({
-      sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
-      args: [session.userId, courseId]
-    })
+    const { data: enrollment } = await supabase
+      .from("enrollments")
+      .select("payment_verified")
+      .eq("user_id", session.userId)
+      .eq("course_id", courseId)
+      .maybeSingle()
 
-    if (enrollment.rows.length > 0 && enrollment.rows[0].payment_verified) {
+    if (enrollment && enrollment.payment_verified) {
       return NextResponse.json({ error: 'El certificado ya se encuentra pagado y desbloqueado' }, { status: 400 })
     }
 
-    // Generate unique reference
+    // Generar referencia única
     const reference = `CERT-${uuidv4().substring(0, 8).toUpperCase()}-${Date.now()}`
 
-    // Create Sanity Document
-    const newOrder = {
-      _type: 'order',
-      reference,
-      userId: session.userId,
-      courseId,
-      studentName: String(user.name),
-      email: String(user.email),
-      documentId: String(user.document),
-      phone: String(user.phone || ''), // Teléfono puede ser opcional
-      programName,
-      amount: parseInt(amount, 10), // in cents for Wompi
-      status: 'PENDING',
-    }
+    // Crear la orden en la tabla orders de Supabase
+    const { error: orderError } = await supabase
+      .from("orders")
+      .insert({
+        reference,
+        user_id: session.userId,
+        course_id: courseId,
+        student_name: user.name,
+        email: user.email,
+        document_id: user.document,
+        phone: user.phone || '',
+        program_name: programName,
+        amount: parseInt(amount, 10),
+        status: 'PENDING'
+      })
 
-    await client.create(newOrder)
+    if (orderError) {
+      console.error('Error creating order in database:', orderError)
+      return NextResponse.json({ error: 'Error al registrar la orden de pago' }, { status: 500 })
+    }
 
     return NextResponse.json({ reference, success: true })
   } catch (error) {

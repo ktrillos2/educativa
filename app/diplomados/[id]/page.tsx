@@ -3,7 +3,7 @@ import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { EnrollmentDialog } from "@/components/enrollment-dialog"
 import { getSession } from "@/lib/auth"
-import { db } from "@/lib/db"
+import { createClient } from "@/utils/supabase/server"
 import {
     Clock,
     Users,
@@ -12,13 +12,10 @@ import {
     BookOpen,
     CheckCircle,
     ChevronRight,
-    Download,
     AlertCircle,
-    Lock,
-    GraduationCap,
-    Award
+    Award,
+    Flame
 } from "@/components/ui/icons"
-import { diplomados } from "@/lib/data"
 import Link from "next/link"
 import * as motion from "framer-motion/client"
 import fs from "fs"
@@ -26,7 +23,14 @@ import path from "path"
 
 export default async function DiplomadoDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
-    const course = diplomados.find(d => d.id === params.id)
+    const supabase = await createClient()
+
+    // Buscar curso en Supabase
+    const { data: course } = await supabase
+        .from("courses")
+        .select("*")
+        .eq("id", params.id)
+        .maybeSingle()
 
     if (!course) {
         notFound()
@@ -44,24 +48,44 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
         isEnrolled = true
         paymentVerified = true
     } else if (session?.userId) {
-        const enrollment = await db.execute({
-            sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
-            args: [session.userId, course.id]
-        })
-        if (enrollment.rows.length > 0) {
+        // Consultar inscripción en Supabase
+        const { data: enrollment } = await supabase
+            .from("enrollments")
+            .select("payment_verified")
+            .eq("user_id", session.userId)
+            .eq("course_id", course.id)
+            .maybeSingle()
+
+        if (enrollment) {
             isEnrolled = true
-            paymentVerified = Boolean(enrollment.rows[0].payment_verified)
+            paymentVerified = Boolean(enrollment.payment_verified)
         }
     }
 
     let completedModules = 0;
     if (session?.userId && isEnrolled) {
-        const progressCheck = await db.execute({
-            sql: "SELECT module_id FROM progress WHERE user_id = ? AND course_id = ? AND completed = 1",
-            args: [session.userId, course.id]
-        });
-        completedModules = progressCheck.rows.length;
+        // Consultar progreso en Supabase
+        const { data: progressCheck } = await supabase
+            .from("progress")
+            .select("module_id")
+            .eq("user_id", session.userId)
+            .eq("course_id", course.id)
+            .eq("completed", true)
+
+        completedModules = progressCheck?.length || 0;
     }
+
+    // Contar inscritos reales al curso
+    const { count: currentEnrollments } = await supabase
+        .from("enrollments")
+        .select("*", { count: "exact", head: true })
+        .eq("course_id", course.id)
+
+    const minStudents = course.min_students ?? 5
+    const enrolledCount = currentEnrollments ?? 0
+    const spotsNeeded = Math.max(0, minStudents - enrolledCount)
+    const progressPercent = Math.min(100, Math.round((enrolledCount / minStudents) * 100))
+    const isReadyToStart = enrolledCount >= minStudents
 
     const totalModules = course.modules || 1;
     const isEligibleForCert = completedModules >= 4 || (completedModules / totalModules) >= 0.8;
@@ -190,7 +214,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                     <div className="p-2 bg-primary/10"><CalendarDays className="w-4 h-4 text-primary" /></div>
                                                     <span className="text-sm font-medium">Inicia</span>
                                                 </div>
-                                                <span className="font-bold">{course.startDate}</span>
+                                                <span className="font-bold">{course.start_date}</span>
                                             </div>
                                             <div className="flex items-center justify-between bg-muted/50 p-4">
                                                 <div className="flex items-center gap-3">
@@ -202,6 +226,38 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         </div>
 
                                         <EnrollmentDialog courseId={course.id} courseName={course.title} />
+
+                                        {/* ── Indicador de cupos persuasivo ── */}
+                                        <div className={`my-6 p-4 border-2 ${isReadyToStart ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
+                                            <div className="flex items-center justify-between mb-2">
+                                                <div className="flex items-center gap-2">
+                                                    <Flame className={`w-4 h-4 ${isReadyToStart ? 'text-green-600' : 'text-amber-600'}`} />
+                                                    <span className={`text-xs font-bold uppercase tracking-wider ${isReadyToStart ? 'text-green-700' : 'text-amber-700'}`}>
+                                                        {isReadyToStart ? '¡Cupos completos! Inicia pronto' : 'Grupo formándose'}
+                                                    </span>
+                                                </div>
+                                                <span className={`text-xs font-bold ${isReadyToStart ? 'text-green-700' : 'text-amber-700'}`}>
+                                                    {enrolledCount}/{minStudents}
+                                                </span>
+                                            </div>
+
+                                            {/* Barra de progreso */}
+                                            <div className="w-full bg-white/80 rounded-full h-2.5 mb-2 overflow-hidden border border-black/5">
+                                                <div
+                                                    className={`h-2.5 rounded-full transition-all duration-700 ${isReadyToStart ? 'bg-green-500' : 'bg-amber-500'}`}
+                                                    style={{ width: `${progressPercent}%` }}
+                                                />
+                                            </div>
+
+                                            <p className={`text-xs ${isReadyToStart ? 'text-green-700' : 'text-amber-700'}`}>
+                                                {isReadyToStart
+                                                    ? `✓ El grupo ya tiene los cupos mínimos. ¡Asegura tu lugar antes de que arranque!`
+                                                    : spotsNeeded === 1
+                                                        ? `¡Solo falta 1 persona más para arrancar! Sé quien completa el grupo.`
+                                                        : `Faltan ${spotsNeeded} estudiantes para que el grupo comience. ¡Sé parte de los primeros!`
+                                                }
+                                            </p>
+                                        </div>
 
                                         <p className="text-xs text-center text-muted-foreground mt-4 flex items-center justify-center gap-1.5">
                                             <CheckCircle className="w-3.5 h-3.5 opacity-70" /> Proceso de matrícula seguro y en línea

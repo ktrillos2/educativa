@@ -1,13 +1,20 @@
 import { notFound, redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
-import { db } from "@/lib/db"
-import { diplomados } from "@/lib/data"
+import { createClient } from "@/utils/supabase/server"
 import { FileSpreadsheet, Download, ArrowLeft, CheckCircle } from "@/components/ui/icons"
 import Link from "next/link"
+import { DownloadCertificateButton } from "@/components/download-certificate-button"
 
 export default async function ActaPage(props: { params: Promise<{ id: string }> }) {
   const params = await props.params
-  const course = diplomados.find(d => d.id === params.id)
+  const supabase = await createClient()
+
+  // Obtener diplomado desde Supabase
+  const { data: course } = await supabase
+    .from("courses")
+    .select("*")
+    .eq("id", params.id)
+    .maybeSingle()
 
   if (!course) {
     notFound()
@@ -19,35 +26,37 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
   }
 
   // Get User details
-  const userResult = await db.execute({
-    sql: "SELECT name, document FROM users WHERE id = ?",
-    args: [session.userId]
-  })
+  const { data: userProfile } = await supabase
+    .from("users")
+    .select("name, document")
+    .eq("id", session.userId)
+    .maybeSingle()
   
-  if (userResult.rows.length === 0) {
+  if (!userProfile) {
     redirect(`/diplomados/${params.id}`)
   }
 
-  const user = userResult.rows[0]
-
   // Check enrollment and payment
-  const enrollment = await db.execute({
-    sql: "SELECT payment_verified FROM enrollments WHERE user_id = ? AND course_id = ?",
-    args: [session.userId, course.id]
-  })
+  const { data: enrollment } = await supabase
+    .from("enrollments")
+    .select("payment_verified")
+    .eq("user_id", session.userId)
+    .eq("course_id", course.id)
+    .maybeSingle()
 
-  if (enrollment.rows.length === 0 || !enrollment.rows[0].payment_verified) {
-    redirect(`/diplomados/${params.id}/certificado`)
+  if (!enrollment || !enrollment.payment_verified) {
+    redirect(`/diplomados/${course.id}/certificado`)
   }
 
   // Get all module progress
-  const progressResult = await db.execute({
-    sql: "SELECT module_id, score, completed FROM progress WHERE user_id = ? AND course_id = ?",
-    args: [session.userId, course.id]
-  })
+  const { data: progressResult } = await supabase
+    .from("progress")
+    .select("module_id, score, completed")
+    .eq("user_id", session.userId)
+    .eq("course_id", course.id)
 
   const progressMap = new Map(
-    progressResult.rows.map(row => [row.module_id, { score: Number(row.score), completed: Boolean(row.completed) }])
+    (progressResult || []).map(row => [row.module_id, { score: Number(row.score), completed: Boolean(row.completed) }])
   )
 
   const modulesData = Array.from({ length: course.modules }).map((_, i) => {
@@ -62,7 +71,6 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
   })
 
   const averageScore = modulesData.reduce((acc, mod) => acc + mod.score, 0) / modulesData.length
-  const allCompleted = modulesData.every(m => m.completed)
 
   return (
     <main className="flex-grow bg-muted/20 pb-20">
@@ -72,13 +80,13 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
             <Link href={`/diplomados/${course.id}/certificado`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary transition-colors">
               <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Certificado
             </Link>
-            <button 
-              onClick={() => typeof window !== 'undefined' && window.print()}
+            <DownloadCertificateButton 
+              courseId={course.id} 
+              type="ACTA" 
+              label="Imprimir Acta"
               className="bg-primary text-white px-4 py-2 font-medium hover:bg-primary/90 flex items-center gap-2 print:hidden shadow-lg shadow-primary/20"
-            >
-              <Download className="w-4 h-4" />
-              Imprimir Acta
-            </button>
+              iconClassName="w-4 h-4"
+            />
           </div>
 
           <div id="academic-record" className="bg-white border shadow-2xl p-12 md:p-16 print:shadow-none print:border-none relative overflow-hidden">
@@ -96,8 +104,8 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
               <div className="space-y-4">
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Estudiante</p>
-                  <p className="text-xl font-bold">{String(user.name)}</p>
-                  <p className="text-sm text-muted-foreground">ID: {String(user.document)}</p>
+                  <p className="text-xl font-bold">{String(userProfile.name)}</p>
+                  <p className="text-sm text-muted-foreground">ID: {String(userProfile.document)}</p>
                 </div>
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Programa</p>
