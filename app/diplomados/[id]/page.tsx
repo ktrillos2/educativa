@@ -2,12 +2,13 @@
 import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { EnrollmentDialog } from "@/components/enrollment-dialog"
+import { EnrollButton } from "@/components/enroll-button"
 import { getSession } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 import {
     Clock,
     Users,
-    CalendarDays,
     Banknote,
     BookOpen,
     CheckCircle,
@@ -75,20 +76,21 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
         completedModules = progressCheck?.length || 0;
     }
 
-    // Contar inscritos reales al curso
-    const { count: currentEnrollments } = await supabase
+    // Contar inscritos reales al curso usando admin client (bypass RLS para conteo público)
+    const adminSupabase = createAdminClient()
+    const { count: currentEnrollments } = await adminSupabase
         .from("enrollments")
         .select("*", { count: "exact", head: true })
         .eq("course_id", course.id)
 
-    const minStudents = course.min_students ?? 5
+    const minStudents = course.min_students ?? 15
     const enrolledCount = currentEnrollments ?? 0
     const spotsNeeded = Math.max(0, minStudents - enrolledCount)
     const progressPercent = Math.min(100, Math.round((enrolledCount / minStudents) * 100))
     const isReadyToStart = enrolledCount >= minStudents
 
     const totalModules = course.modules || 1;
-    const isEligibleForCert = completedModules >= 4 || (completedModules / totalModules) >= 0.8;
+    const isEligibleForCert = totalModules > 0 && (completedModules / totalModules) >= 0.8;
 
     // Generate an array of modules based on course.modules length for visualization
     const courseModules = Array.from({ length: course.modules }).map((_, i) => {
@@ -203,19 +205,12 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                     <>
                                         <div className="flex items-center justify-between mb-8 pb-6 border-b border-border/60">
                                             <div>
-                                                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Inversión Total</p>
+                                                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Valor del Certificado</p>
                                                 <span className="text-4xl font-extrabold text-primary">{course.price}</span>
                                             </div>
                                         </div>
 
                                         <div className="space-y-4 mb-8">
-                                            <div className="flex items-center justify-between bg-muted/50 p-4">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="p-2 bg-primary/10"><CalendarDays className="w-4 h-4 text-primary" /></div>
-                                                    <span className="text-sm font-medium">Inicia</span>
-                                                </div>
-                                                <span className="font-bold">{course.start_date}</span>
-                                            </div>
                                             <div className="flex items-center justify-between bg-muted/50 p-4">
                                                 <div className="flex items-center gap-3">
                                                     <div className="p-2 bg-primary/10"><Banknote className="w-4 h-4 text-primary" /></div>
@@ -225,7 +220,11 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                             </div>
                                         </div>
 
-                                        <EnrollmentDialog courseId={course.id} courseName={course.title} />
+                                        {session?.userId ? (
+                                            <EnrollButton courseId={course.id} />
+                                        ) : (
+                                            <EnrollmentDialog courseId={course.id} courseName={course.title} />
+                                        )}
 
                                         {/* ── Indicador de cupos persuasivo ── */}
                                         <div className={`my-6 p-4 border-2 ${isReadyToStart ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>

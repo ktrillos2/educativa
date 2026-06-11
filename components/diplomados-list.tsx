@@ -22,26 +22,7 @@ import {
   SlidersHorizontal,
 } from "@/components/ui/icons"
 import Link from "next/link"
-import { useState } from "react"
-import { Card, CardContent } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import {
-  Clock,
-  Users,
-  ArrowRight,
-  Building2,
-  Landmark,
-  Cpu,
-  HeartPulse,
-  Banknote,
-  CalendarDays,
-  BadgeCheck,
-  Flame,
-  Sparkles,
-  Search,
-  SlidersHorizontal,
-} from "@/components/ui/icons"
-import Link from "next/link"
+
 
 const categoryIcons: Record<string, React.ElementType> = {
   Gestión: Building2,
@@ -219,11 +200,12 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
 
                   <div className="mt-auto">
                     <Link href={`/diplomados/${diplomado.id}`}>
-                    <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground  text-sm h-9">
-                      Ver Detalles
-                      <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
-                    </Button>
-                  </Link>
+                      <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground  text-sm h-9">
+                        Ver Detalles
+                        <ArrowRight className="ml-1.5 h-3.5 w-3.5" />
+                      </Button>
+                    </Link>
+                  </div>
                 </CardContent>
               </Card>
             )

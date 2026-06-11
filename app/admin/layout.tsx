@@ -1,16 +1,8 @@
 import type React from "react"
 import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
-import Link from "next/link"
-import { LayoutDashboard, Users, BookOpen, BarChart2, Settings, ShieldCheck } from "lucide-react"
-
-const navItems = [
-  { label: "Dashboard",    href: "/admin",              icon: LayoutDashboard },
-  { label: "Usuarios",     href: "/admin/usuarios",     icon: Users },
-  { label: "Cursos",       href: "/admin/cursos",       icon: BookOpen },
-  { label: "Reportes",     href: "/admin/reportes",     icon: BarChart2 },
-  { label: "Configuración",href: "/admin/configuracion",icon: Settings },
-]
+import { ShieldCheck } from "lucide-react"
+import { SidebarNav } from "@/components/sidebar-nav"
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const session = await getSession()
@@ -38,18 +30,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
             </div>
 
             {/* Nav items */}
-            <nav className="bg-white p-3 space-y-1">
-              {navItems.map(({ label, href, icon: Icon }) => (
-                <Link
-                  key={href}
-                  href={href}
-                  className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-[oklch(0.35_0.06_145)] hover:bg-[oklch(0.35_0.10_145)] hover:text-white transition-all duration-200 group"
-                >
-                  <Icon className="w-4 h-4 opacity-70 group-hover:opacity-100 transition-opacity" />
-                  {label}
-                </Link>
-              ))}
-            </nav>
+            <SidebarNav variant="admin" />
 
             {/* Sidebar footer accent */}
             <div className="bg-[oklch(0.30_0.10_145)]/8 px-5 py-3 border-t border-[oklch(0.88_0.04_145)]">

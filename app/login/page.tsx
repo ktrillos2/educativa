@@ -40,7 +40,8 @@ export default function LoginPage() {
       } else if (res?.success) {
         // Navegar de inmediato sin esperar toast para máxima velocidad
         if (res.role === 'admin') {
-          router.push("/admin")
+          window.open("/admin", "_blank")
+          router.push("/")
         } else {
           router.push("/estudiante")
         }

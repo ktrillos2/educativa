@@ -89,8 +89,46 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
     }
 }
 
-export async function enrollAction(courseId: string, formData: FormData) {
-    return { error: "Not implemented. Use registerAction directly or login then enroll." }
+export async function enrollAction(courseId: string) {
+    try {
+        const supabase = await createClient()
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+
+        if (sessionError || !session?.user) {
+            return { error: "Debes iniciar sesión para inscribirte." }
+        }
+
+        const userId = session.user.id
+
+        // Check if already enrolled
+        const { data: existing } = await supabase
+            .from("enrollments")
+            .select("id")
+            .eq("user_id", userId)
+            .eq("course_id", courseId)
+            .maybeSingle()
+
+        if (existing) {
+            return { error: "Ya estás inscrito en este diplomado." }
+        }
+
+        const { error } = await supabase
+            .from("enrollments")
+            .insert({
+                user_id: userId,
+                course_id: courseId,
+                payment_verified: false
+            })
+
+        if (error) {
+            return { error: "Error al realizar la inscripción." }
+        }
+
+        revalidatePath("/")
+        return { success: true }
+    } catch (error: any) {
+        return { error: "Ocurrió un error inesperado al inscribirse." }
+    }
 }
 
 export async function loginAction(data: z.infer<typeof loginSchema>) {

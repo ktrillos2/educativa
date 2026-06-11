@@ -145,7 +145,7 @@ export default async function AdminPage() {
           <div className="divide-y divide-[oklch(0.94_0.01_145)]">
             {courses && courses.length > 0 ? courses.map((c) => {
               const enrolled = courseEnrollmentCounts[c.id] ?? 0
-              const min = c.min_students ?? 5
+              const min = c.min_students ?? 15
               const pct = Math.min(100, Math.round((enrolled / min) * 100))
               const ready = enrolled >= min
               return (

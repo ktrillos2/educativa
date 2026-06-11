@@ -17,7 +17,7 @@ const navItems = [
 ]
 
 interface HeaderProps {
-  session?: { userId: string } | null
+  session?: { userId: string; role: string; name: string } | null
 }
 
 export function Header({ session }: HeaderProps) {
@@ -104,6 +104,13 @@ export function Header({ session }: HeaderProps) {
           <div className="hidden lg:flex items-center gap-2">
             {session ? (
               <>
+                {session.role !== 'admin' && (
+                  <Link href="/estudiante">
+                    <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white font-medium">
+                      Mi Aula
+                    </Button>
+                  </Link>
+                )}
                 <Button 
                   variant="outline"
                   size="sm" 
@@ -179,6 +186,13 @@ export function Header({ session }: HeaderProps) {
             <div className="flex flex-col gap-2 mt-4 px-4">
               {session ? (
                 <>
+                  {session.role !== 'admin' && (
+                    <Link href="/estudiante" onClick={() => setMobileMenuOpen(false)}>
+                      <Button variant="outline" size="sm" className="w-full bg-transparent font-medium mb-1">
+                        Mi Aula
+                      </Button>
+                    </Link>
+                  )}
                   <Button 
                     variant="outline"
                     size="sm" 
