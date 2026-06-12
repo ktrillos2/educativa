@@ -120,7 +120,7 @@ export function Header({ session }: HeaderProps) {
                 >
                   {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                 </Button>
-                <Link href="/diplomados">
+                <Link href="/register">
                   <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90  font-bold">
                     Inscribirse
                   </Button>
@@ -205,7 +205,7 @@ export function Header({ session }: HeaderProps) {
                   >
                     {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                   </Button>
-                  <Link href="/diplomados" onClick={() => setMobileMenuOpen(false)}>
+                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
                     <Button size="sm" className="w-full bg-secondary text-secondary-foreground  font-bold">
                       Inscribirse
                     </Button>

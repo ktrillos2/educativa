@@ -2,7 +2,9 @@ import { notFound, redirect } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { getSession } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 import { ExamForm } from "./exam-form"
+import { GroupWaiting } from "@/components/group-waiting"
 
 export default async function ExamPage(props: { params: Promise<{ id: string; moduleId: string }> }) {
     const params = await props.params
@@ -17,6 +19,44 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
 
     if (!course) {
         notFound()
+    }
+
+    const adminSupabase = createAdminClient()
+    const { count: currentEnrollments } = await adminSupabase
+        .from("enrollments")
+        .select("*", { count: "exact", head: true })
+        .eq("course_id", course.id)
+
+    const minStudents = course.min_students ?? 15
+    const enrolledCount = currentEnrollments ?? 0
+    const isReadyToStart = enrolledCount >= minStudents
+
+    if (!isReadyToStart) {
+        return (
+            <main className="flex-grow bg-muted/30">
+                <section className="pt-[calc(6rem+1cm)] pb-[1cm] bg-primary text-white">
+                    <div className="container mx-auto px-4">
+                        <Breadcrumb items={[
+                            { label: "Inicio", href: "/" },
+                            { label: "Diplomados", href: "/diplomados" },
+                            { label: course.title, href: `/diplomados/${course.id}` },
+                            { label: "Examen" }
+                        ]} />
+                        <h1 className="text-3xl md:text-4xl font-bold mt-6">Cuestionario: {params.moduleId.replace("-", " ")}</h1>
+                    </div>
+                </section>
+                <section className="py-12">
+                    <div className="container mx-auto px-4">
+                        <GroupWaiting 
+                            courseId={course.id}
+                            courseTitle={course.title}
+                            minStudents={minStudents}
+                            enrolledCount={enrolledCount}
+                        />
+                    </div>
+                </section>
+            </main>
+        )
     }
 
     const session = await getSession()
