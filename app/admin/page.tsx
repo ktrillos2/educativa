@@ -2,6 +2,9 @@ import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { Users, BookOpen, GraduationCap, TrendingUp, UserPlus, Activity, Flame, CheckCircle } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function AdminPage() {
   const session = await getSession()
   const supabase = createAdminClient()

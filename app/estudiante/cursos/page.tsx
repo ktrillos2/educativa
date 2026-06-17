@@ -1,8 +1,10 @@
 import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
-import { diplomados } from "@/lib/data"
-import { BookOpen, ChevronRight, GraduationCap } from "lucide-react"
+import { BookOpen, ChevronRight, GraduationCap, Trophy } from "lucide-react"
 import Link from "next/link"
+
+export const dynamic = "force-dynamic"
+export const revalidate = 0
 
 export default async function CursosPage() {
   const session = await getSession()
@@ -14,10 +16,38 @@ export default async function CursosPage() {
     .select("*")
     .eq("user_id", session?.userId ?? "")
 
-  // Enriquecer inscripciones con datos del diplomado estático
+  // Cursos desde la base de datos
+  const { data: courses } = await supabase
+    .from("courses")
+    .select("id, title, category, modules")
+
+  // Progreso del estudiante
+  const { data: progress } = await supabase
+    .from("progress")
+    .select("*")
+    .eq("user_id", session?.userId ?? "")
+    .eq("completed", true)
+
+  // Enriquecer inscripciones con progreso y datos del diplomado
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
-    const course = diplomados.find((d) => d.id === e.course_id)
-    return { ...e, courseTitle: course?.title ?? `Diplomado (${e.course_id})`, courseCategory: course?.category ?? "" }
+    const course = courses?.find((d) => d.id === e.course_id)
+    const courseProgress = progress?.filter(p => p.course_id === e.course_id) || []
+    const completedModules = courseProgress.length
+    const totalModules = course?.modules || 1
+    const progressPercent = Math.min(100, Math.round((completedModules / totalModules) * 100))
+
+    const nextModuleIndex = Math.min(completedModules, totalModules - 1)
+    const nextDocName = `Modulo ${nextModuleIndex + 1} - ${e.course_id}.pdf`
+
+    return { 
+      ...e, 
+      courseTitle: course?.title ?? `Diplomado (${e.course_id})`, 
+      courseCategory: course?.category ?? "",
+      completedModules,
+      totalModules,
+      progressPercent,
+      nextDocName
+    }
   })
 
   return (
@@ -35,26 +65,49 @@ export default async function CursosPage() {
         {enrichedEnrollments.length > 0 ? (
           <div className="divide-y divide-[oklch(0.94_0.01_145)]">
             {enrichedEnrollments.map((e) => (
-              <div key={e.id} className="px-5 py-4 flex items-center justify-between hover:bg-[oklch(0.97_0.01_145)] transition-colors">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-lg bg-[oklch(0.30_0.10_145)]/10 flex items-center justify-center flex-shrink-0">
-                    <BookOpen className="w-5 h-5 text-[oklch(0.30_0.10_145)]" />
+              <div key={e.id} className="px-5 py-5 flex flex-col md:flex-row md:items-center justify-between hover:bg-[oklch(0.97_0.01_145)] transition-colors gap-4">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className="w-12 h-12 rounded-lg bg-[oklch(0.30_0.10_145)]/10 flex items-center justify-center flex-shrink-0 mt-1">
+                    <BookOpen className="w-6 h-6 text-[oklch(0.30_0.10_145)]" />
                   </div>
-                  <div>
-                    <p className="text-sm font-medium text-[oklch(0.30_0.10_145)]">{e.courseTitle}</p>
-                    <div className="flex items-center gap-2 mt-0.5">
+                  <div className="flex-1">
+                    <p className="text-base font-bold text-[oklch(0.30_0.10_145)]">{e.courseTitle}</p>
+                    
+                    <div className="flex flex-wrap items-center gap-2 mt-1 mb-3">
                       {e.courseCategory && (
-                        <span className="text-xs text-[oklch(0.55_0.04_145)]">{e.courseCategory}</span>
+                        <span className="text-xs text-[oklch(0.55_0.04_145)] font-medium bg-gray-100 px-2 py-0.5 rounded-sm">{e.courseCategory}</span>
                       )}
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${e.payment_verified ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)]" : "bg-[oklch(0.72_0.14_85)]/15 text-[oklch(0.50_0.14_85)]"}`}>
+                      <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${e.payment_verified ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)]" : "bg-[oklch(0.72_0.14_85)]/15 text-[oklch(0.50_0.14_85)]"}`}>
                         {e.payment_verified ? "✓ Pago verificado" : "⏳ Pendiente de pago"}
                       </span>
                     </div>
+
+                    {/* Barra de progreso */}
+                    <div className="w-full max-w-sm mt-2">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-xs font-bold text-[oklch(0.35_0.10_145)] flex items-center gap-1">
+                          <Trophy className="w-3 h-3 text-amber-500" /> Progreso del estudiante
+                        </span>
+                        <span className="text-xs font-bold text-[oklch(0.40_0.10_145)]">{e.progressPercent}% ({e.completedModules}/{e.totalModules} módulos)</span>
+                      </div>
+                      <div className="w-full bg-gray-200 rounded-full h-2 overflow-hidden">
+                        <div 
+                          className="h-2 rounded-full bg-[oklch(0.30_0.10_145)] transition-all duration-1000" 
+                          style={{ width: `${e.progressPercent}%` }}
+                        ></div>
+                      </div>
+                    </div>
+
                   </div>
                 </div>
-                <Link href={`/diplomados/${e.course_id}`} className="text-[oklch(0.30_0.10_145)] hover:underline flex items-center gap-1 text-sm font-medium">
-                  Ir al curso <ChevronRight className="w-4 h-4" />
-                </Link>
+                <div className="flex-shrink-0 md:ml-4">
+                  <Link 
+                    href={`/diplomados/${e.course_id}/vista/${e.nextDocName}`} 
+                    className="inline-flex items-center gap-2 bg-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.25_0.10_145)] text-white text-sm font-bold px-6 py-3 rounded-md transition-colors"
+                  >
+                    Ir al Material <ChevronRight className="w-4 h-4" />
+                  </Link>
+                </div>
               </div>
             ))}
           </div>

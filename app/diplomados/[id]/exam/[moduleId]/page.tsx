@@ -6,6 +6,9 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { ExamForm } from "./exam-form"
 import { GroupWaiting } from "@/components/group-waiting"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function ExamPage(props: { params: Promise<{ id: string; moduleId: string }> }) {
     const params = await props.params
     const supabase = await createClient()

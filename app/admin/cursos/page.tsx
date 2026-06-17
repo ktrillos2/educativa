@@ -2,6 +2,9 @@ import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { BookOpen, GraduationCap, Clock, Banknote, Flame, CheckCircle } from "lucide-react"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function AdminCursosPage() {
   const session = await getSession()
   const supabase = createAdminClient()

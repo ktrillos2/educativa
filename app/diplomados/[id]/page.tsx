@@ -22,6 +22,9 @@ import * as motion from "framer-motion/client"
 import fs from "fs"
 import path from "path"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function DiplomadoDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
     const supabase = await createClient()

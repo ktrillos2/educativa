@@ -5,6 +5,9 @@ import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { GroupWaiting } from "@/components/group-waiting"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function DocumentViewerPage(props: { params: Promise<{ id: string, filename: string }> }) {
     const params = await props.params
     const session = await getSession()

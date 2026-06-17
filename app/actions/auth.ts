@@ -70,7 +70,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
 
         // 4. Attempt to enroll if courseId provided
         if (courseId) {
-            await supabase
+            await supabaseAdmin
                 .from("enrollments")
                 .insert({
                     user_id: userId,
