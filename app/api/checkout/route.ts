@@ -66,7 +66,54 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Error al registrar la orden de pago' }, { status: 500 })
     }
 
-    return NextResponse.json({ reference, success: true })
+    // Configuración de Openpay
+    const merchantId = process.env.OPENPAY_MERCHANT_ID
+    const privateKey = process.env.OPENPAY_PRIVATE_KEY
+
+    if (!merchantId || !privateKey) {
+      console.error('Faltan las credenciales de Openpay en el entorno')
+      return NextResponse.json({ error: 'Configuración de pagos incompleta' }, { status: 500 })
+    }
+
+    const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+    const redirectUrl = `${origin}/estudiante/certificados`
+
+    const openpayPayload = {
+      amount: parseInt(amount, 10) / 100, // Openpay espera decimales, Wompi usaba centavos. Si es 150000000 cents -> 1500000 COP
+      description: `Certificado Académico: ${programName}`,
+      order_id: reference,
+      redirect_url: redirectUrl,
+      customer: {
+        name: user.name.substring(0, 250),
+        email: user.email,
+        phone_number: user.phone || "0000000000"
+      },
+      send_email: false // Openpay enviará recibo si es true
+    }
+
+    // Llamada a la API de Openpay Checkout (Colombia usa api.openpay.co)
+    const openpayRes = await fetch(`https://api.openpay.co/v1/${merchantId}/checkouts`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`
+      },
+      body: JSON.stringify(openpayPayload)
+    })
+
+    const openpayData = await openpayRes.json()
+
+    if (!openpayRes.ok) {
+      console.error('Error desde Openpay:', openpayData)
+      return NextResponse.json({ error: 'Error al comunicarse con la pasarela de pagos' }, { status: 502 })
+    }
+
+    // Retornamos el link de checkout para redirigir al usuario
+    return NextResponse.json({ 
+      reference, 
+      success: true,
+      checkoutUrl: openpayData.checkout_link 
+    })
   } catch (error) {
     console.error('Error creating checkout order:', error)
     return NextResponse.json({ error: 'Error al procesar la solicitud de pago' }, { status: 500 })

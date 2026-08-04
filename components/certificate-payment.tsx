@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import Script from 'next/script'
 import { useRouter } from 'next/navigation'
 import { Award, CreditCard, ShieldCheck } from '@/components/ui/icons'
 import { toast } from 'sonner'
@@ -14,16 +13,11 @@ interface CertificatePaymentProps {
 export function CertificatePayment({ courseId, programName }: CertificatePaymentProps) {
   const router = useRouter()
   const [loading, setLoading] = useState(false)
-  const [wompiLoaded, setWompiLoaded] = useState(false)
 
   const price = 1500000 // 1,500,000 COP
   const amountInCents = 150000000
 
   const handlePaymentClick = async () => {
-    if (!wompiLoaded) {
-      toast.error('La pasarela de pagos aún se está cargando. Intenta de nuevo.')
-      return
-    }
 
     setLoading(true)
     try {
@@ -40,50 +34,12 @@ export function CertificatePayment({ courseId, programName }: CertificatePayment
 
       const data = await res.json()
 
-      if (!data.success) {
-        throw new Error(data.error || 'Error al procesar la orden')
+      if (!data.success || !data.checkoutUrl) {
+        throw new Error(data.error || 'Error al procesar la orden con la pasarela de pagos')
       }
 
-      // 2. Open Wompi Widget
-      const checkout = new window.WidgetCheckout({
-        currency: 'COP',
-        amountInCents,
-        reference: data.reference,
-        publicKey: process.env.NEXT_PUBLIC_WOMPI_PUB_KEY || 'pub_test_dummy',
-      })
-
-      checkout.open(async (result: any) => {
-        const transaction = result.transaction
-        if (transaction.status === 'APPROVED') {
-          // Solo en desarrollo: Simulamos el webhook porque Wompi no puede enviar peticiones a localhost
-          if (process.env.NODE_ENV === 'development') {
-            try {
-              await fetch('/api/webhooks/wompi', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  data: {
-                    transaction: {
-                      id: transaction.id,
-                      status: transaction.status,
-                      reference: transaction.reference
-                    }
-                  }
-                })
-              })
-            } catch (e) {
-              console.error('Error simulando webhook local', e)
-            }
-          }
-
-          toast.success('¡Pago aprobado! Desbloqueando certificado...')
-          // El webhook actualizará la DB. Hacemos refresh para que el componente de servidor lea payment_verified = true
-          router.refresh()
-        } else {
-          toast.error(`Pago no aprobado. Estado: ${transaction.status}`)
-        }
-        setLoading(false)
-      })
+      // 2. Redirigir al Checkout de Openpay
+      window.location.href = data.checkoutUrl
 
     } catch (error: any) {
       toast.error(error.message)
@@ -93,11 +49,6 @@ export function CertificatePayment({ courseId, programName }: CertificatePayment
 
   return (
     <div className="bg-white shadow-sm border p-8 md:p-12 text-center max-w-2xl mx-auto">
-      <Script 
-        src="https://checkout.wompi.co/widget.js" 
-        strategy="lazyOnload"
-        onLoad={() => setWompiLoaded(true)}
-      />
 
       <div className="w-20 h-20 bg-secondary/10 text-secondary flex items-center justify-center mx-auto mb-6">
         <Award className="w-10 h-10" />
@@ -125,7 +76,7 @@ export function CertificatePayment({ courseId, programName }: CertificatePayment
 
       <div className="flex items-center justify-center gap-2 mt-6 text-sm text-muted-foreground">
         <ShieldCheck className="h-5 w-5 text-green-600" />
-        Pagos 100% seguros procesados por Wompi Bancolombia
+        Pagos 100% seguros procesados por Openpay BBVA
       </div>
     </div>
   )

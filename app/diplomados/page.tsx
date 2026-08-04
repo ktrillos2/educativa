@@ -3,9 +3,11 @@ import { Breadcrumb } from "@/components/breadcrumb"
 import { GraduationCap } from "@/components/ui/icons"
 import { createClient } from "@/utils/supabase/server"
 import Image from "next/image"
+import { createAdminClient } from "@/utils/supabase/admin"
 
 export default async function DiplomadosPage() {
   const supabase = await createClient()
+  const supabaseAdmin = createAdminClient()
   
   const { data: coursesData } = await supabase
     .from("courses")
@@ -13,8 +15,8 @@ export default async function DiplomadosPage() {
     .order("created_at", { ascending: true })
 
   const initialCourses = await Promise.all((coursesData || []).map(async (course) => {
-    // Buscar conteo de inscritos
-    const { count: enrolledCount } = await supabase
+    // Buscar conteo de inscritos (bypassing RLS para obtener el total real)
+    const { count: enrolledCount } = await supabaseAdmin
         .from("enrollments")
         .select("*", { count: "exact", head: true })
         .eq("course_id", course.id)

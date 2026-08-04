@@ -12,18 +12,21 @@ const slides = [
     title: "Transforma tu Futuro Profesional",
     subtitle: "Diplomados y certificaciones que abren puertas en el mercado laboral con un enfoque práctico y actualizado.",
     cta: "Explorar Programas",
+    href: "/formacion-academica",
     image: "/modern-university-campus-with-students-walking--pr.jpg",
   },
   {
     title: "Aprende de los Mejores Expertos",
     subtitle: "Docentes con amplia trayectoria y experiencia real en los sectores empresarial y público.",
     cta: "Conocer Docentes",
+    href: "/nosotros",
     image: "/professional-business-meeting-with-diverse-people-.jpg",
   },
   {
     title: "Certificaciones que Impulsan tu Carrera",
     subtitle: "Programas de alto nivel avalados con reconocimiento nacional para destacar tu currículum.",
     cta: "Ver Certificaciones",
+    href: "/diplomados",
     image: "/graduation-ceremony-celebration--happy-graduates-t.jpg",
   },
 ]
@@ -96,8 +99,8 @@ export function HeroBanner() {
                 <div className="inline-flex relative">
                   <div className="absolute -inset-1 bg-secondary/20 blur-xl  z-0"></div>
                   <Button size="lg" asChild className="relative z-10 h-12 sm:h-14 px-8 sm:px-10 text-xs sm:text-sm w-full sm:w-auto shadow-[4px_4px_0_0_#C5A059] hover:shadow-[2px_2px_0_0_#C5A059]">
-                    <Link href="/diplomados">
-                      VER CERTIFICACIONES
+                    <Link href={slides[currentSlide].href}>
+                      {slides[currentSlide].cta.toUpperCase()}
                       <Icon icon="solar:arrow-right-line-duotone" className="ml-2 sm:ml-3 w-4 h-4 sm:w-5 sm:h-5" />
                     </Link>
                   </Button>

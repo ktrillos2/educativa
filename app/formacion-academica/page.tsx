@@ -15,7 +15,7 @@ export default function FormacionAcademicaPage() {
                 <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')] bg-repeat" />
                 <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-between flex-grow">
                     <div>
-                        <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Oferta Académica", href: "/#oferta" }, { label: "Formación Académica" }]} />
+                        <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Oferta Académica", href: "/#oferta" }, { label: "ETDH Formación Académica" }]} />
 
                         <div className="max-w-3xl mt-10">
                         <div className="flex items-center gap-3 mb-6">
@@ -25,7 +25,7 @@ export default function FormacionAcademicaPage() {
                             <span className="text-white/90 text-sm font-semibold tracking-wider uppercase">Excelencia Educativa</span>
                         </div>
                         <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-                            Formación Académica
+                            ETDH Formación Académica
                         </h1>
                         <p className="text-white/80 text-xl max-w-2xl leading-relaxed">
                             Programas diseñados para forjar los líderes del mañana, ofreciendo conocimientos profundos y habilidades clave para el éxito profesional en un entorno competitivo.

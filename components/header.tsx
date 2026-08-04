@@ -12,7 +12,14 @@ import { toast } from "sonner"
 const navItems = [
   { label: "Inicio", href: "/" },
   { label: "Nosotros", href: "/nosotros" },
-  { label: "Diplomados", href: "/diplomados" },
+  { 
+    label: "Oferta Académica", 
+    href: "#",
+    children: [
+      { label: "ETDH Formación Académica", href: "/formacion-academica" },
+      { label: "Diplomados", href: "/diplomados" }
+    ]
+  },
   { label: "Contacto", href: "/contacto" },
 ]
 

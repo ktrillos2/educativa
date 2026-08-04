@@ -182,7 +182,7 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
                       <div className="mb-4">
                         <div className="flex items-center justify-between mb-1.5">
                           <span className={`text-[10px] font-bold uppercase tracking-wide ${ready ? 'text-green-600' : 'text-amber-600'}`}>
-                            {ready ? '✓ Grupo confirmado' : 'Últimos cupos'}
+                            {ready ? '✓ Grupo confirmado' : 'Inscritos para iniciar'}
                           </span>
                           <span className={`text-[10px] font-bold ${ready ? 'text-green-600' : 'text-amber-600'}`}>
                             {enrolled}/{min}
