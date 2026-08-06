@@ -29,10 +29,14 @@ export default async function RootLayout({
   return (
     <html lang="es">
       <body className={`font-sans antialiased`}>
-        <Header session={session} />
+        <div className="print:hidden">
+          <Header session={session} />
+        </div>
         {children}
-        <Footer />
-        <WhatsAppButton />
+        <div className="print:hidden">
+          <Footer />
+          <WhatsAppButton />
+        </div>
         <Toaster />
         <Analytics />
       </body>

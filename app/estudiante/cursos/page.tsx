@@ -100,10 +100,24 @@ export default async function CursosPage() {
 
                   </div>
                 </div>
-                <div className="flex-shrink-0 md:ml-4">
+                <div className="flex-shrink-0 md:ml-4 flex flex-col sm:flex-row gap-3">
+                  {/* Mostrar botón de Certificado si cumple requisitos (>=80% o 4 módulos) */}
+                  {(e.progressPercent >= 80 || e.completedModules >= 4) && (
+                    <Link
+                      href={`/diplomados/${e.course_id}/certificado`}
+                      className={`inline-flex items-center justify-center gap-2 text-sm font-bold px-6 py-3 rounded-md transition-colors ${
+                        e.payment_verified
+                          ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.30_0.10_145)]/20"
+                          : "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                      }`}
+                    >
+                      <GraduationCap className="w-4 h-4" />
+                      {e.payment_verified ? "Ver Certificado" : "Pagar Certificado"}
+                    </Link>
+                  )}
                   <Link 
                     href={`/diplomados/${e.course_id}/vista/${e.nextDocName}`} 
-                    className="inline-flex items-center gap-2 bg-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.25_0.10_145)] text-white text-sm font-bold px-6 py-3 rounded-md transition-colors"
+                    className="inline-flex items-center justify-center gap-2 bg-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.25_0.10_145)] text-white text-sm font-bold px-6 py-3 rounded-md transition-colors"
                   >
                     Ir al Material <ChevronRight className="w-4 h-4" />
                   </Link>

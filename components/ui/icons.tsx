@@ -16,6 +16,7 @@ const iconMap: Record<string, string> = {
   "CalendarDays": "solar:calendar-date-bold-duotone",
   "CheckCircle": "solar:check-circle-bold-duotone",
   "CheckCircle2": "solar:check-circle-bold-duotone",
+  "CreditCard": "lucide:credit-card",
   "ChevronDown": "solar:alt-arrow-down-bold-duotone",
   "ChevronLeft": "solar:alt-arrow-left-bold-duotone",
   "ChevronRight": "solar:alt-arrow-right-bold-duotone",
@@ -97,6 +98,7 @@ export const CheckCircle = createIcon("CheckCircle")
 export const GraduationCap = createIcon("GraduationCap")
 export const Lock = createIcon("Lock")
 export const Mail = createIcon("Mail")
+export const CreditCard = createIcon("CreditCard")
 export const User = createIcon("User")
 export const Briefcase = createIcon("Briefcase")
 export const Star = createIcon("Star")

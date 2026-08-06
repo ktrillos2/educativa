@@ -1,13 +1,24 @@
 import { notFound, redirect } from "next/navigation"
 import { getSession } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 import { FileSpreadsheet, Download, ArrowLeft, CheckCircle } from "@/components/ui/icons"
 import Link from "next/link"
 import { DownloadCertificateButton } from "@/components/download-certificate-button"
 
-export default async function ActaPage(props: { params: Promise<{ id: string }> }) {
+export default async function ActaPage(props: { params: Promise<{ id: string }>, searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const params = await props.params
-  const supabase = await createClient()
+  const searchParams = await props.searchParams
+  const studentIdParam = searchParams?.studentId as string | undefined
+  const supabaseUser = await createClient()
+
+  const session = await getSession()
+  if (!session?.userId) {
+    redirect(`/diplomados/${params.id}`)
+  }
+
+  const isAdmin = session.role === "admin"
+  const supabase = isAdmin ? createAdminClient() : supabaseUser
 
   // Obtener diplomado desde Supabase
   const { data: course } = await supabase
@@ -20,16 +31,17 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
     notFound()
   }
 
-  const session = await getSession()
-  if (!session?.userId) {
-    redirect(`/diplomados/${params.id}`)
+  // Permitir al admin ver el acta de un estudiante específico
+  let targetUserId = session.userId
+  if (studentIdParam && isAdmin) {
+    targetUserId = studentIdParam
   }
 
   // Get User details
   const { data: userProfile } = await supabase
     .from("users")
     .select("name, document")
-    .eq("id", session.userId)
+    .eq("id", targetUserId)
     .maybeSingle()
   
   if (!userProfile) {
@@ -40,7 +52,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
   const { data: enrollment } = await supabase
     .from("enrollments")
     .select("payment_verified")
-    .eq("user_id", session.userId)
+    .eq("user_id", targetUserId)
     .eq("course_id", course.id)
     .maybeSingle()
 
@@ -52,7 +64,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }> 
   const { data: progressResult } = await supabase
     .from("progress")
     .select("module_id, score, completed")
-    .eq("user_id", session.userId)
+    .eq("user_id", targetUserId)
     .eq("course_id", course.id)
 
   const progressMap = new Map(

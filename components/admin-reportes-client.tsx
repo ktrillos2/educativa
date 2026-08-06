@@ -21,6 +21,7 @@ interface User {
   email: string
   phone?: string | null
   document: string
+  role?: string
   created_at: string
 }
 

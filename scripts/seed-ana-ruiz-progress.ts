@@ -53,11 +53,11 @@ async function seedProgress() {
         })
   }
 
-  // Calcular exactamente el 80%
-  const targetModules = Math.round(totalModules * 0.8)
-  console.log(`Generando progreso (${targetModules} módulos completados de ${totalModules} para alcanzar el 80%)...`)
+  // Calcular exactamente el 100%
+  const targetModules = totalModules
+  console.log(`Generando progreso (${targetModules} módulos completados de ${totalModules} para alcanzar el 100%)...`)
   
-  // Limpiar progresos anteriores para evitar que tenga el 100%
+  // Limpiar progresos anteriores para evitar que tenga menos
   await supabaseAdmin
       .from('progress')
       .delete()
@@ -66,20 +66,19 @@ async function seedProgress() {
 
   // Módulos a completar (mod-1 a mod-N)
   for (let i = 1; i <= targetModules; i++) {
-      const modId = `mod-${i}`
-      
       await supabaseAdmin
           .from('progress')
           .insert({
               user_id: user.id,
               course_id: courseId,
-              module_id: modId,
-              score: 95,
+              module_id: `mod-${i}`,
+              score: 100,
               completed: true
           })
   }
 
-  console.log(`\n¡Listo! Ana Ruiz ahora tiene exactamente el 80% completado (${targetModules}/${totalModules} módulos).`)
+  console.log(`\n¡Listo! Ana Ruiz ahora tiene exactamente el 100% completado (${targetModules}/${totalModules} módulos) con calificación de 100.`)
+  process.exit(0)
 }
 
 seedProgress()

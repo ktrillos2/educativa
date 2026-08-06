@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { v4 as uuidv4 } from 'uuid'
+
 import { getSession } from '@/lib/auth'
 import { createClient } from '@/utils/supabase/server'
 
@@ -43,7 +43,7 @@ export async function POST(request: Request) {
     }
 
     // Generar referencia única
-    const reference = `CERT-${uuidv4().substring(0, 8).toUpperCase()}-${Date.now()}`
+    const reference = `CERT-${crypto.randomUUID().substring(0, 8).toUpperCase()}-${Date.now()}`
 
     // Crear la orden en la tabla orders de Supabase
     const { error: orderError } = await supabase
@@ -78,21 +78,27 @@ export async function POST(request: Request) {
     const origin = request.headers.get('origin') || process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
     const redirectUrl = `${origin}/estudiante/certificados`
 
+    const cleanProgramName = programName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s-]/g, "")
+    
     const openpayPayload = {
+      method: "card",
+      confirm: false,
       amount: parseInt(amount, 10) / 100, // Openpay espera decimales, Wompi usaba centavos. Si es 150000000 cents -> 1500000 COP
-      description: `Certificado Académico: ${programName}`,
+      currency: "COP",
+      description: `Certificado Academico - ${cleanProgramName}`.substring(0, 250),
       order_id: reference,
       redirect_url: redirectUrl,
       customer: {
         name: user.name.substring(0, 250),
+        last_name: ".", // Required field for some regions
         email: user.email,
         phone_number: user.phone || "0000000000"
       },
       send_email: false // Openpay enviará recibo si es true
     }
 
-    // Llamada a la API de Openpay Checkout (Colombia usa api.openpay.co)
-    const openpayRes = await fetch(`https://api.openpay.co/v1/${merchantId}/checkouts`, {
+    // Llamada a la API de Openpay (Colombia usa /charges para Hosted Checkout)
+    const openpayRes = await fetch(`https://sandbox-api.openpay.co/v1/${merchantId}/charges`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -109,10 +115,17 @@ export async function POST(request: Request) {
     }
 
     // Retornamos el link de checkout para redirigir al usuario
+    const checkoutLink = openpayData.payment_method?.url || openpayData.checkout_link
+    
+    if (!checkoutLink) {
+      console.error('URL de redirección no encontrada en la respuesta de Openpay:', openpayData)
+      return NextResponse.json({ error: 'La pasarela no retornó el link de pago' }, { status: 502 })
+    }
+
     return NextResponse.json({ 
       reference, 
       success: true,
-      checkoutUrl: openpayData.checkout_link 
+      checkoutUrl: checkoutLink
     })
   } catch (error) {
     console.error('Error creating checkout order:', error)
