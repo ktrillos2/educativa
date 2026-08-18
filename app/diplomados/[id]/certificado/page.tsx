@@ -131,18 +131,18 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </div>
 
               {/* Certificate UI designed for printing and responsive display */}
-              <div id="certificate" className="bg-white text-black font-serif p-6 md:p-12 text-center relative shadow-lg min-h-[500px] flex flex-col justify-between print:fixed print:top-0 print:left-0 print:w-[297mm] print:h-[209mm] print:p-8 print:shadow-none print:m-0 print:z-50" style={{ border: '12px solid #C5A059', boxSizing: 'border-box' }}>
+              <div id="certificate" className="bg-white text-black font-serif p-6 md:p-12 text-center relative shadow-lg min-h-[500px] flex flex-col justify-between" style={{ border: '12px solid #C5A059', boxSizing: 'border-box' }}>
                 <div className="absolute inset-0 m-1 md:m-2 pointer-events-none" style={{ border: '2px solid #C5A059' }}></div>
                 
                 {/* Cabecera */}
-                <div className="relative w-full pt-3 md:pt-6 print:pt-4 z-10">
+                <div className="relative w-full pt-3 md:pt-6 z-10 flex justify-between items-start px-2 md:px-8">
                   {/* Escudo/Mención (Izquierda) */}
-                  <div className="absolute top-[10px] left-[-0.6cm] md:top-[10px] print:top-[10px] print:left-[-0.6cm] w-16 h-16 md:w-24 md:h-24 print:w-20 print:h-20">
+                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0">
                     <img src="/mencion.svg" alt="Mención" className="w-full h-full object-contain" />
                   </div>
                   
                   {/* Texto Central */}
-                  <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto text-center px-2">
+                  <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto text-center px-2 mt-2">
                     <h1 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-[#006838] uppercase tracking-normal leading-tight whitespace-nowrap">
                       ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
                     </h1>
@@ -153,28 +153,28 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   </div>
 
                   {/* Logo Academia (Derecha) */}
-                  <div className="absolute top-3 right-[-0.8cm] md:top-4 print:top-3 print:right-[-0.8cm] w-16 h-16 md:w-24 md:h-24 print:w-20 print:h-20">
+                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0">
                     <img src="/logo.svg" alt="Logo Academia" className="w-full h-full object-contain" />
                   </div>
                 </div>
 
                 {/* Cuerpo Central */}
-                <div className="flex-1 flex flex-col items-center justify-center space-y-2 md:space-y-3 relative z-10 my-2 md:my-3 print:my-2 print:space-y-1.5">
-                  <p className="text-base md:text-xl font-bold uppercase text-black print:text-lg mt-2">HACE CONSTAR QUE</p>
+                <div className="flex-1 flex flex-col items-center justify-center space-y-2 md:space-y-3 relative z-10 my-4 md:my-6">
+                  <p className="text-base md:text-xl font-bold uppercase text-black mt-2">HACE CONSTAR QUE</p>
                   
-                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-bold text-black uppercase tracking-wide leading-tight print:text-2xl my-1">
+                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-bold text-black uppercase tracking-wide leading-tight my-1">
                     {String(userProfile.name)}
                   </h2>
                   
-                  <p className="text-xs sm:text-sm md:text-base text-black print:text-sm whitespace-nowrap">
+                  <p className="text-xs sm:text-sm md:text-base text-black whitespace-nowrap">
                     Identificado(a) con documento de identidad N° <span className="border-b border-black inline-block px-3 md:px-6 font-medium pb-0.5">{String(userProfile.document)}</span>
                   </p>
                   
-                  <p className="text-base md:text-xl font-bold text-black mt-2 print:text-lg">ASISTIÓ AL</p>
+                  <p className="text-base md:text-xl font-bold text-black mt-2">ASISTIÓ AL</p>
                   
-                  <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-black uppercase px-2 md:px-8 tracking-wide leading-snug print:text-lg">{course.title}</h3>
+                  <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-black uppercase px-2 md:px-8 tracking-wide leading-snug">{course.title}</h3>
                   
-                  <div className="text-xs sm:text-sm md:text-base text-black mt-2 max-w-4xl leading-normal px-2 md:px-0 print:text-sm space-y-2 md:space-y-3">
+                  <div className="text-xs sm:text-sm md:text-base text-black mt-2 max-w-4xl leading-normal px-2 md:px-0 space-y-2 md:space-y-3">
                     <p className="whitespace-nowrap">
                       Modalidad virtual asincrónica a los <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().getDate()}</span> días del mes de <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().getFullYear()}</span>.
                     </p>
@@ -188,22 +188,22 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 </div>
 
                 {/* Pie / Footer */}
-                <div className="flex flex-col w-full relative z-10 mt-2 print:mt-0">
-                  <div className="flex justify-between items-end w-full px-2 md:px-12 mb-2 md:mb-4 flex-wrap gap-2 print:mb-2">
+                <div className="flex flex-col w-full relative z-10 mt-2">
+                  <div className="flex justify-between items-end w-full px-2 md:px-12 mb-2 md:mb-4 flex-nowrap gap-2">
                     {/* QR */}
-                    <div className="text-center w-32 md:w-36 flex flex-col items-center order-2 md:order-1 hidden md:flex print:flex">
+                    <div className="text-center w-28 md:w-36 flex flex-col items-center shrink-0">
                       <p className="text-[9px] md:text-xs font-bold text-black mb-1">QR DE VERIFICACIÓN</p>
-                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center text-[9px] md:text-xs text-gray-400 rounded print:w-16 print:h-16">
+                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center text-[9px] md:text-xs text-gray-400 rounded">
                         [QR]
                       </div>
                       <p className="text-[9px] md:text-xs text-black mt-1">(Insertar aquí)</p>
                     </div>
                     
                     {/* Signature */}
-                    <div className="text-center flex-1 max-w-xs flex flex-col items-center order-1 md:order-2 mx-auto">
+                    <div className="text-center flex-1 max-w-xs flex flex-col items-center mx-auto shrink-0">
                       {/* Firma */}
-                      <div className="h-24 md:h-28 w-56 md:w-72 bg-transparent mt-[calc(1rem-1cm)] mb-1 relative print:h-20 print:w-64">
-                        <img src="/firma.svg" alt="Firma Director" className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[1cm] max-h-full w-auto mix-blend-multiply" />
+                      <div className="h-24 md:h-28 w-56 md:w-72 bg-transparent mt-[calc(1rem-1cm)] mb-1 relative">
+                        <img src="/firma.svg" alt="Firma Director" className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[1cm] scale-[1.3] max-h-full w-auto" />
                       </div>
                       <div className="border-t border-black w-full pt-1">
                         <p className="font-bold text-xs md:text-sm text-black uppercase whitespace-nowrap">AUDEN VILORIA TORRES</p>
@@ -212,16 +212,16 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     </div>
                     
                     {/* Unique Code */}
-                    <div className="text-center w-32 md:w-36 flex flex-col items-center justify-end h-full mb-1 order-3 hidden md:flex print:flex">
+                    <div className="text-center w-28 md:w-36 flex flex-col items-center justify-end h-full mb-1 shrink-0">
                       <p className="text-[10px] md:text-xs text-black mb-0.5">Código único:</p>
                       <p className="text-[10px] md:text-xs text-black font-medium border-b-2 border-red-800 border-dotted pb-0.5 whitespace-nowrap">AFLM-2026-00001</p>
                     </div>
                   </div>
                   
                   {/* Additional Footer Texts */}
-                  <div className="w-full text-center space-y-1 mt-2 print:mt-1">
+                  <div className="w-full text-center space-y-1 mt-2">
                     <p className="font-bold text-xs md:text-sm text-black uppercase">WWW.ACADEMIADEFORMACIONLIDERESDELMERITO.EDU.CO</p>
-                    <p className="text-[8px] md:text-[10px] text-black px-4 md:px-8 print:text-[9px]">
+                    <p className="text-[8px] md:text-[10px] text-black px-4 md:px-8">
                       La autenticidad de este diploma puede verificarse escaneando el código QR o escribiendo al correo academiadeformacion@lideresdelmerito.edu.co indicando el número de acta.
                     </p>
                   </div>
