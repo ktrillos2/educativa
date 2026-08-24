@@ -54,7 +54,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   // Check enrollment and payment
   const { data: enrollment } = await supabase
     .from("enrollments")
-    .select("payment_verified")
+    .select("id, payment_verified")
     .eq("user_id", targetUserId)
     .eq("course_id", course.id)
     .maybeSingle()
@@ -74,6 +74,11 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   const completedModules = progressCheck?.length || 0
   const totalModules = course.modules || 1
   const isEligible = completedModules >= 4 || (completedModules / totalModules) >= 0.8
+
+  // Base URL for QR
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kytcode.lat' // default fallback or your domain
+  const verificationUrl = enrollment ? `${baseUrl}/verify/${enrollment.id}` : baseUrl;
+  const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verificationUrl)}&format=svg`;
 
   return (
     <main className="flex-grow bg-muted/20 print:bg-white">
@@ -193,10 +198,10 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     {/* QR */}
                     <div className="text-center w-28 md:w-36 flex flex-col items-center shrink-0">
                       <p className="text-[9px] md:text-xs font-bold text-black mb-1">QR DE VERIFICACIÓN</p>
-                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center text-[9px] md:text-xs text-gray-400 rounded">
-                        [QR]
+                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center rounded overflow-hidden p-1">
+                        <img src={qrImageUrl} alt="QR Code" className="w-full h-full object-contain mix-blend-multiply" />
                       </div>
-                      <p className="text-[9px] md:text-xs text-black mt-1">(Insertar aquí)</p>
+                      <p className="text-[9px] md:text-xs text-black mt-1">Escanea para verificar</p>
                     </div>
                     
                     {/* Signature */}

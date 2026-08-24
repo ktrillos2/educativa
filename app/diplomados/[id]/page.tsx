@@ -43,6 +43,8 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
     const session = await getSession()
     let isEnrolled = false
     let paymentVerified = false
+    let whatsappLink: string | null = null;
+    let liveClasses: any[] = [];
 
     const { cookies } = await import("next/headers")
     const cookieStore = await cookies()
@@ -55,7 +57,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
         // Consultar inscripción en Supabase
         const { data: enrollment } = await supabase
             .from("enrollments")
-            .select("payment_verified")
+            .select("payment_verified, group_id")
             .eq("user_id", session.userId)
             .eq("course_id", course.id)
             .maybeSingle()
@@ -63,6 +65,25 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
         if (enrollment) {
             isEnrolled = true
             paymentVerified = Boolean(enrollment.payment_verified)
+            
+            if (enrollment.group_id) {
+                const { data: group } = await supabase
+                    .from("course_groups")
+                    .select("whatsapp_link")
+                    .eq("id", enrollment.group_id)
+                    .maybeSingle()
+                if (group?.whatsapp_link) {
+                    whatsappLink = group.whatsapp_link
+                }
+
+                const { data: classesData } = await supabase
+                    .from("live_classes")
+                    .select("*")
+                    .eq("group_id", enrollment.group_id)
+                    .order("scheduled_at", { ascending: true })
+                
+                if (classesData) liveClasses = classesData;
+            }
         }
     }
 
@@ -200,9 +221,16 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                             </div>
                                         )}
 
-                                        <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 font-bold hover:bg-primary/20 transition-colors">
-                                            Ir al Programa <ChevronRight className="w-4 h-4" />
-                                        </a>
+                                        <div className="space-y-3">
+                                            {whatsappLink && (
+                                                <a href={whatsappLink} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-3 font-bold hover:bg-green-600 transition-colors shadow-lg shadow-green-500/30">
+                                                    Unirse al grupo de WhatsApp
+                                                </a>
+                                            )}
+                                            <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 font-bold hover:bg-primary/20 transition-colors">
+                                                Ir al Programa <ChevronRight className="w-4 h-4" />
+                                            </a>
+                                        </div>
                                     </div>
                                 ) : (
                                     <>
@@ -271,6 +299,56 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                     </div>
                 </div>
             </section>
+
+            {/* Live Classes Section */}
+            {isEnrolled && liveClasses.length > 0 && (
+                <section className="py-12 bg-muted/10 border-t border-border">
+                    <div className="container mx-auto px-4 max-w-7xl">
+                        <div className="mb-8">
+                            <h2 className="text-3xl font-extrabold text-primary mb-2 flex items-center gap-3">
+                                <span className="p-2 bg-red-100 text-red-600 rounded-full animate-pulse"><Flame className="w-5 h-5" /></span>
+                                Clases en Vivo
+                            </h2>
+                            <p className="text-muted-foreground">Únete a las sesiones en tiempo real programadas para tu grupo.</p>
+                        </div>
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                            {liveClasses.map((cls) => {
+                                const dateObj = new Date(cls.scheduled_at)
+                                const isPast = new Date() > new Date(dateObj.getTime() + 2 * 60 * 60 * 1000) // 2 hours after start
+                                return (
+                                    <div key={cls.id} className="bg-white border border-border p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
+                                        <div className="flex justify-between items-start mb-3">
+                                            <h3 className="font-bold text-lg leading-tight">{cls.title}</h3>
+                                            {cls.status === 'in_progress' ? (
+                                                <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider animate-pulse rounded">En Vivo</span>
+                                            ) : isPast ? (
+                                                <span className="bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">Finalizada</span>
+                                            ) : (
+                                                <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">Programada</span>
+                                            )}
+                                        </div>
+                                        <div className="space-y-1.5 text-sm text-muted-foreground mb-5 flex-grow">
+                                            <div className="flex items-center gap-2">
+                                                <Clock className="w-4 h-4" />
+                                                <span>{dateObj.toLocaleDateString('es-CO')} a las {dateObj.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+                                            </div>
+                                            {cls.description && <p className="text-xs mt-2 line-clamp-2">{cls.description}</p>}
+                                        </div>
+                                        <Link 
+                                            href={`/diplomados/${course.id}/clase/${cls.id}`} 
+                                            className={`w-full text-center py-2 text-sm font-bold transition-colors ${
+                                                isPast ? 'bg-secondary text-white hover:bg-secondary/90' : 'bg-primary text-white hover:bg-primary/90'
+                                            }`}
+                                        >
+                                            {isPast ? 'Ver Grabación / Asistencia' : 'Entrar a la Sala'}
+                                        </Link>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    </div>
+                </section>
+            )}
 
             {/* Programa Académico Section */}
             <section id="programa" className="py-20 bg-white">

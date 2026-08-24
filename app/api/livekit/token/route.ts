@@ -1,0 +1,51 @@
+import { AccessToken } from "livekit-server-sdk";
+import { NextResponse } from "next/server";
+import { getSession } from "@/lib/auth";
+
+export const dynamic = "force-dynamic";
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const room = searchParams.get("room");
+
+    if (!room) {
+      return NextResponse.json({ error: 'Falta el parámetro "room"' }, { status: 400 });
+    }
+
+    const session = await getSession();
+    if (!session) {
+        return NextResponse.json({ error: 'No autorizado' }, { status: 401 });
+    }
+
+    const apiKey = process.env.LIVEKIT_API_KEY;
+    const apiSecret = process.env.LIVEKIT_API_SECRET;
+    const wsUrl = process.env.LIVEKIT_URL;
+
+    if (!apiKey || !apiSecret || !wsUrl) {
+      return NextResponse.json({ error: "Servidor mal configurado" }, { status: 500 });
+    }
+
+    const at = new AccessToken(apiKey, apiSecret, {
+      identity: session.userId,
+      name: session.name || "Estudiante",
+    });
+
+    const isAdmin = session.role === "admin";
+
+    at.addGrant({ 
+      roomJoin: true, 
+      room, 
+      canPublish: true, 
+      canSubscribe: true,
+      roomAdmin: isAdmin, // allows them to mute others, etc
+    });
+
+    const token = await at.toJwt();
+
+    return NextResponse.json({ token });
+  } catch (error) {
+    console.error("LiveKit Token Error:", error);
+    return NextResponse.json({ error: "Error generando token" }, { status: 500 });
+  }
+}

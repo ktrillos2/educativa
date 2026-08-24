@@ -5,6 +5,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { FileSpreadsheet, Download, ArrowLeft, CheckCircle } from "@/components/ui/icons"
 import Link from "next/link"
 import { DownloadCertificateButton } from "@/components/download-certificate-button"
+import { getQualitativeEquivalence } from "@/lib/utils"
 
 export default async function ActaPage(props: { params: Promise<{ id: string }>, searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }) {
   const params = await props.params
@@ -128,9 +129,9 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               <div className="flex flex-col items-start md:items-end justify-center text-left md:text-right">
                 <div className="bg-primary/5 p-4 border border-primary/10">
                     <p className="text-xs font-bold text-primary uppercase tracking-wider mb-1">Promedio General</p>
-                    <p className="text-4xl font-black text-primary">{averageScore.toFixed(1)}%</p>
-                    <p className="text-xs text-green-600 font-bold mt-1 flex items-center justify-end gap-1">
-                        <CheckCircle className="w-3 h-3" /> APROBADO
+                    <p className="text-4xl font-black text-primary">{getQualitativeEquivalence(averageScore).grade.toFixed(1)}</p>
+                    <p className={`text-xs font-bold mt-1 flex items-center justify-end gap-1 ${getQualitativeEquivalence(averageScore).grade >= 3.0 ? 'text-green-600' : 'text-red-600'}`}>
+                        {getQualitativeEquivalence(averageScore).grade >= 3.0 && <CheckCircle className="w-3 h-3" />} {getQualitativeEquivalence(averageScore).label.toUpperCase()}
                     </p>
                 </div>
               </div>
@@ -152,18 +153,21 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {modulesData.map((mod) => (
-                      <tr key={mod.id} className="hover:bg-muted/20 transition-colors">
-                        <td className="px-6 py-4 font-bold text-sm whitespace-nowrap">{mod.id.replace('mod-', 'Módulo ')}</td>
-                        <td className="px-6 py-4 text-sm text-muted-foreground">{mod.title}</td>
-                        <td className="px-6 py-4 text-center font-mono font-bold">{mod.score}%</td>
-                        <td className="px-6 py-4 text-right">
-                          <span className={`text-[10px] font-black uppercase px-2 py-1 ${mod.score >= 60 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                            {mod.score >= 60 ? 'Aprobado' : 'Reprobado'}
-                          </span>
-                        </td>
-                      </tr>
-                    ))}
+                    {modulesData.map((mod) => {
+                      const equivalence = getQualitativeEquivalence(mod.score);
+                      return (
+                        <tr key={mod.id} className="hover:bg-muted/20 transition-colors">
+                          <td className="px-6 py-4 font-bold text-sm whitespace-nowrap">{mod.id.replace('mod-', 'Módulo ')}</td>
+                          <td className="px-6 py-4 text-sm text-muted-foreground">{mod.title}</td>
+                          <td className="px-6 py-4 text-center font-mono font-bold">{equivalence.grade.toFixed(1)}</td>
+                          <td className="px-6 py-4 text-right">
+                            <span className={`text-[10px] font-black uppercase px-2 py-1 ${equivalence.grade >= 3.0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
+                              {equivalence.label}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
                   </tbody>
                 </table>
               </div>

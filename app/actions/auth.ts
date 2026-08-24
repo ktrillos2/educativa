@@ -70,11 +70,21 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
 
         // 4. Attempt to enroll if courseId provided
         if (courseId) {
+            // Find active group for this course
+            const { data: activeGroup } = await supabaseAdmin
+                .from("course_groups")
+                .select("id")
+                .eq("course_id", courseId)
+                .lte("registration_start", new Date().toISOString())
+                .gte("registration_end", new Date().toISOString())
+                .maybeSingle()
+
             await supabaseAdmin
                 .from("enrollments")
                 .insert({
                     user_id: userId,
                     course_id: courseId,
+                    group_id: activeGroup?.id || null,
                     payment_verified: false
                 })
         }
@@ -112,11 +122,21 @@ export async function enrollAction(courseId: string) {
             return { error: "Ya estás inscrito en este diplomado." }
         }
 
+        // Find active group for this course
+        const { data: activeGroup } = await supabase
+            .from("course_groups")
+            .select("id")
+            .eq("course_id", courseId)
+            .lte("registration_start", new Date().toISOString())
+            .gte("registration_end", new Date().toISOString())
+            .maybeSingle()
+
         const { error } = await supabase
             .from("enrollments")
             .insert({
                 user_id: userId,
                 course_id: courseId,
+                group_id: activeGroup?.id || null,
                 payment_verified: false
             })
 

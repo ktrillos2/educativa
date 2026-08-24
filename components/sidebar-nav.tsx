@@ -9,6 +9,7 @@ import {
   BarChart2,
   Settings,
   Award,
+  Video,
   type LucideIcon,
 } from "lucide-react"
 
@@ -24,6 +25,8 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Dashboard", href: "/admin",           icon: LayoutDashboard },
   { label: "Usuarios",  href: "/admin/usuarios",  icon: Users },
   { label: "Cursos",    href: "/admin/cursos",     icon: BookOpen },
+  { label: "Grupos",    href: "/admin/grupos",     icon: Users },
+  { label: "Clases",    href: "/admin/clases",     icon: Video },
   { label: "Reportes",  href: "/admin/reportes",   icon: BarChart2 },
 ]
 
