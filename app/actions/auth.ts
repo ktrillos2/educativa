@@ -70,22 +70,23 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
 
         // 4. Attempt to enroll if courseId provided
         if (courseId) {
-            // Find active group for this course
-            const { data: activeGroup } = await supabaseAdmin
+            // Find active group for this course (always take the most recently created one)
+            const { data: activeGroups, error: grpErr } = await supabaseAdmin
                 .from("course_groups")
                 .select("id")
                 .eq("course_id", courseId)
-                .lte("registration_start", new Date().toISOString())
-                .gte("registration_end", new Date().toISOString())
-                .maybeSingle()
+                .order("created_at", { ascending: false })
+                .limit(1)
+            
+            if (grpErr) console.error("Error finding group:", grpErr);
 
             await supabaseAdmin
                 .from("enrollments")
                 .insert({
                     user_id: userId,
                     course_id: courseId,
-                    group_id: activeGroup?.id || null,
-                    payment_verified: false
+                    group_id: activeGroups?.[0]?.id || null,
+                    payment_verified: false // Reverted: payment is only for the diploma
                 })
         }
 
@@ -122,22 +123,23 @@ export async function enrollAction(courseId: string) {
             return { error: "Ya estás inscrito en este diplomado." }
         }
 
-        // Find active group for this course
-        const { data: activeGroup } = await supabase
+        // Find active group for this course (always take the most recently created one)
+        const { data: activeGroups, error: grpErr } = await supabase
             .from("course_groups")
             .select("id")
             .eq("course_id", courseId)
-            .lte("registration_start", new Date().toISOString())
-            .gte("registration_end", new Date().toISOString())
-            .maybeSingle()
+            .order("created_at", { ascending: false })
+            .limit(1)
+            
+        if (grpErr) console.error("Error finding group:", grpErr);
 
         const { error } = await supabase
             .from("enrollments")
             .insert({
                 user_id: userId,
                 course_id: courseId,
-                group_id: activeGroup?.id || null,
-                payment_verified: false
+                group_id: activeGroups?.[0]?.id || null,
+                payment_verified: false // Reverted: payment is only for the diploma
             })
 
         if (error) {

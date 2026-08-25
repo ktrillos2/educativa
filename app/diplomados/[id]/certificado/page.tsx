@@ -76,7 +76,9 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   const isEligible = completedModules >= 4 || (completedModules / totalModules) >= 0.8
 
   // Base URL for QR
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://www.kytcode.lat' // default fallback or your domain
+  // Usamos localhost:3000 por defecto para que las pruebas locales funcionen, pero en producción 
+  // se debe configurar NEXT_PUBLIC_APP_URL en el archivo .env
+  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
   const verificationUrl = enrollment ? `${baseUrl}/verify/${enrollment.id}` : baseUrl;
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verificationUrl)}&format=svg`;
 
@@ -140,15 +142,15 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 <div className="absolute inset-0 m-1 md:m-2 pointer-events-none" style={{ border: '2px solid #C5A059' }}></div>
                 
                 {/* Cabecera */}
-                <div className="relative w-full pt-3 md:pt-6 z-10 flex justify-between items-start px-2 md:px-8">
+                <div className="relative w-full pt-3 md:pt-6 z-10 flex items-center justify-between px-2 md:px-8">
                   {/* Escudo/Mención (Izquierda) */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0">
-                    <img src="/mencion.svg" alt="Mención" className="w-full h-full object-contain" />
+                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0 flex items-center justify-start">
+                    <img src="/mencion.svg" alt="Mención" className="w-full h-full object-contain object-left" />
                   </div>
                   
                   {/* Texto Central */}
-                  <div className="w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl mx-auto text-center px-2 mt-2">
-                    <h1 className="text-xs sm:text-sm md:text-base lg:text-lg font-bold text-[#006838] uppercase tracking-normal leading-tight whitespace-nowrap">
+                  <div className="flex-1 text-center px-2">
+                    <h1 className="text-[10px] sm:text-sm md:text-base lg:text-lg font-bold text-[#006838] uppercase tracking-normal leading-tight whitespace-nowrap">
                       ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
                     </h1>
                     <div className="flex gap-4 md:gap-8 text-[#006838] text-[9px] sm:text-[11px] md:text-xs lg:text-sm font-bold mt-1.5 justify-center whitespace-nowrap">
@@ -158,8 +160,8 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   </div>
 
                   {/* Logo Academia (Derecha) */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0">
-                    <img src="/logo.svg" alt="Logo Academia" className="w-full h-full object-contain" />
+                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0 flex items-center justify-end">
+                    <img src="/logo.svg" alt="Logo Academia" className="w-full h-full object-contain object-right" />
                   </div>
                 </div>
 
@@ -198,8 +200,18 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     {/* QR */}
                     <div className="text-center w-28 md:w-36 flex flex-col items-center shrink-0">
                       <p className="text-[9px] md:text-xs font-bold text-black mb-1">QR DE VERIFICACIÓN</p>
-                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center rounded overflow-hidden p-1">
+                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center rounded overflow-hidden p-1 relative group">
                         <img src={qrImageUrl} alt="QR Code" className="w-full h-full object-contain mix-blend-multiply" />
+                        
+                        {/* Enlace de prueba visible al pasar el mouse por encima del QR (solo para entorno de desarrollo) */}
+                        <a 
+                          href={verificationUrl} 
+                          target="_blank" 
+                          rel="noreferrer"
+                          className="absolute inset-0 bg-black/80 text-white text-[10px] flex items-center justify-center text-center p-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
+                        >
+                          Probar <br/> Link
+                        </a>
                       </div>
                       <p className="text-[9px] md:text-xs text-black mt-1">Escanea para verificar</p>
                     </div>

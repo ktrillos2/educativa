@@ -14,8 +14,7 @@ export default async function VerifyPage(props: { params: Promise<{ id: string }
     .select(`
       id, payment_verified, created_at,
       course_id,
-      users (name, document),
-      courses (title, duration, modules)
+      users (id, name, document)
     `)
     .eq("id", params.id)
     .maybeSingle()
@@ -35,7 +34,13 @@ export default async function VerifyPage(props: { params: Promise<{ id: string }
 
   // Handle nested joins from postgrest correctly (arrays or single objects)
   const user = Array.isArray(enrollment.users) ? enrollment.users[0] : enrollment.users
-  const course = Array.isArray(enrollment.courses) ? enrollment.courses[0] : enrollment.courses
+  
+  // Fetch course info separately since there is no FK constraint
+  const { data: course } = await supabase
+    .from("courses")
+    .select("title, duration, modules")
+    .eq("id", enrollment.course_id)
+    .maybeSingle()
 
   // Verify progress
   const { data: progress } = await supabase
@@ -53,7 +58,7 @@ export default async function VerifyPage(props: { params: Promise<{ id: string }
   const isValid = enrollment.payment_verified && isEligible
 
   return (
-    <div className="min-h-screen bg-muted/10 py-12 px-4 flex flex-col items-center">
+    <div className="min-h-screen bg-muted/10 pt-32 pb-12 px-4 flex flex-col items-center">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-border overflow-hidden">
         
         {/* Header */}

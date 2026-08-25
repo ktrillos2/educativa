@@ -16,20 +16,24 @@ export default async function AdminClasesPage() {
 
   const supabase = createAdminClient()
 
-  // Fetch groups with their course info to populate the dropdown
+  // Get all courses for mapping
+  const { data: coursesData } = await supabase
+    .from("courses")
+    .select("id, title")
+
+  const coursesMap = new Map((coursesData || []).map(c => [c.id, c.title]))
+
+  // Fetch groups to populate the dropdown
   const { data: rawGroups } = await supabase
     .from("course_groups")
-    .select(`
-      id, name,
-      courses!inner (id, title)
-    `)
+    .select("id, name, course_id")
     .order("created_at", { ascending: false })
   
-  // Format the response because postgrest inner join shape can be awkward
+  // Format the response
   const groups = rawGroups?.map(g => ({
       id: g.id,
       name: g.name,
-      course: Array.isArray(g.courses) ? g.courses[0] : g.courses
+      course: { id: g.course_id, title: coursesMap.get(g.course_id) || "Curso Desconocido" }
   })) || [];
 
   // Fetch scheduled classes
@@ -61,8 +65,8 @@ export default async function AdminClasesPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {classes.map(cls => {
-              const groupName = Array.isArray(cls.course_groups) ? cls.course_groups[0]?.name : cls.course_groups?.name;
-              const courseId = Array.isArray(cls.course_groups) ? cls.course_groups[0]?.course_id : cls.course_groups?.course_id;
+              const groupName = cls.course_groups?.name || "Grupo Desconocido";
+              const courseId = cls.course_groups?.course_id || "";
               
               const dateObj = new Date(cls.scheduled_at)
               const dateStr = dateObj.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -97,12 +101,20 @@ export default async function AdminClasesPage() {
                     </div>
                   </div>
 
-                  <Link 
-                    href={`/diplomados/${courseId}/clase/${cls.id}`}
-                    className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                  >
-                    <PlayCircle className="w-4 h-4" /> Entrar a la Sala (Modo Admin)
-                  </Link>
+                  <div className="flex flex-col gap-2">
+                    <Link 
+                      href={`/diplomados/${courseId}/clase/${cls.id}`}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                    >
+                      <PlayCircle className="w-4 h-4" /> Entrar a la Sala
+                    </Link>
+                    <Link 
+                      href={`/admin/clases/${cls.id}`}
+                      className="w-full inline-flex items-center justify-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 py-2 rounded-lg font-medium hover:bg-secondary/20 transition-colors"
+                    >
+                      Ver Asistencia y Finalizar
+                    </Link>
+                  </div>
                 </div>
               )
             })}
