@@ -14,9 +14,17 @@ export async function createLiveClass(formData: FormData) {
   const title = formData.get("title") as string
   const description = formData.get("description") as string
   const scheduledAt = formData.get("scheduled_at") as string
+  const scheduledEndAt = formData.get("scheduled_end_at") as string
 
-  if (!groupId || !title || !scheduledAt) {
+  if (!groupId || !title || !scheduledAt || !scheduledEndAt) {
     return { error: "Faltan campos obligatorios" }
+  }
+
+  const startDate = new Date(scheduledAt)
+  const endDate = new Date(scheduledEndAt)
+  
+  if (endDate <= startDate) {
+    return { error: "La hora de finalización debe ser mayor a la hora de inicio" }
   }
 
   const supabase = createAdminClient()
@@ -25,7 +33,8 @@ export async function createLiveClass(formData: FormData) {
     group_id: groupId,
     title,
     description: description || null,
-    scheduled_at: new Date(scheduledAt).toISOString(),
+    scheduled_at: startDate.toISOString(),
+    scheduled_end_at: endDate.toISOString(),
     status: 'scheduled'
   })
 

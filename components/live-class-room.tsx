@@ -42,6 +42,12 @@ export function LiveClassRoom({
         console.error("Error fetching token", e)
       }
     })()
+
+    // Cleanup: registrar salida cuando el componente se desmonta (ej: cambian de pestaña)
+    return () => {
+      // Usamos sendBeacon para garantizar que se envíe incluso al cerrar la pestaña
+      navigator.sendBeacon('/api/attendance/leave', JSON.stringify({ classId: roomName }))
+    }
   }, [roomName, username])
 
   if (token === "") {
@@ -61,7 +67,14 @@ export function LiveClassRoom({
       serverUrl={process.env.NEXT_PUBLIC_LIVEKIT_URL}
       data-lk-theme="default"
       style={{ height: 'calc(100vh - 100px)' }}
-      onDisconnected={() => router.push(`/diplomados/${courseId}`)}
+      onDisconnected={() => {
+        fetch('/api/attendance/leave', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ classId: roomName })
+        }).catch(console.error)
+        router.push(`/diplomados/${courseId}`)
+      }}
     >
       <VideoConference />
       <RoomAudioRenderer />

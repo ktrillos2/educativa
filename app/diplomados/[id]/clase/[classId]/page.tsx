@@ -5,6 +5,9 @@ import { LiveClassRoom } from "@/components/live-class-room"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { CheckCircle, Video } from "lucide-react"
 import { notFound } from "next/navigation"
+import { ScreenRecorder } from "@/components/screen-recorder"
+
+import { createAdminClient } from "@/utils/supabase/admin"
 
 export default async function LiveClassPage(props: { params: Promise<{ id: string, classId: string }> }) {
   const params = await props.params
@@ -15,13 +18,16 @@ export default async function LiveClassPage(props: { params: Promise<{ id: strin
   }
 
   const supabase = await createClient()
+  const adminSupabase = createAdminClient()
 
   // Fetch class
-  const { data: liveClass } = await supabase
+  const { data: liveClass, error } = await adminSupabase
     .from("live_classes")
     .select("*")
     .eq("id", params.classId)
     .maybeSingle()
+
+  console.log("Fetching live class:", params.classId, liveClass, error)
 
   if (!liveClass) notFound()
 
@@ -103,11 +109,16 @@ export default async function LiveClassPage(props: { params: Promise<{ id: strin
                 )}
               </div>
             ) : (
-              <LiveClassRoom 
-                roomName={liveClass.id} 
-                username={session.name || "Estudiante"}
-                courseId={params.id}
-              />
+              <>
+                {session.role === "admin" && (
+                  <ScreenRecorder classId={liveClass.id} courseId={params.id} />
+                )}
+                <LiveClassRoom 
+                  roomName={liveClass.id} 
+                  username={session.name || "Estudiante"}
+                  courseId={params.id}
+                />
+              </>
             )}
           </div>
         </div>

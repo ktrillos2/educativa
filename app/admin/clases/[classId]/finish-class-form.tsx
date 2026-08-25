@@ -1,3 +1,5 @@
+"use client"
+
 import { useState } from "react"
 import { finishClassWithRecording } from "@/app/actions/class-management"
 import { UploadCloud, Loader2, CheckCircle2, Video } from "lucide-react"

@@ -314,14 +314,18 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                             {liveClasses.map((cls) => {
                                 const dateObj = new Date(cls.scheduled_at)
-                                const isPast = new Date() > new Date(dateObj.getTime() + 2 * 60 * 60 * 1000) // 2 hours after start
+                                const timeStr = dateObj.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })
+                                const endTimeStr = cls.scheduled_end_at ? new Date(cls.scheduled_end_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : null
+                                
+                                const isFinished = cls.status === 'finished'
+                                
                                 return (
                                     <div key={cls.id} className="bg-white border border-border p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
                                         <div className="flex justify-between items-start mb-3">
                                             <h3 className="font-bold text-lg leading-tight">{cls.title}</h3>
                                             {cls.status === 'in_progress' ? (
                                                 <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider animate-pulse rounded">En Vivo</span>
-                                            ) : isPast ? (
+                                            ) : isFinished ? (
                                                 <span className="bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">Finalizada</span>
                                             ) : (
                                                 <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">Programada</span>
@@ -330,17 +334,17 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         <div className="space-y-1.5 text-sm text-muted-foreground mb-5 flex-grow">
                                             <div className="flex items-center gap-2">
                                                 <Clock className="w-4 h-4" />
-                                                <span>{dateObj.toLocaleDateString('es-CO')} a las {dateObj.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}</span>
+                                                <span>{dateObj.toLocaleDateString('es-CO')} a las {timeStr}{endTimeStr ? ` a ${endTimeStr}` : ''}</span>
                                             </div>
                                             {cls.description && <p className="text-xs mt-2 line-clamp-2">{cls.description}</p>}
                                         </div>
                                         <Link 
                                             href={`/diplomados/${course.id}/clase/${cls.id}`} 
                                             className={`w-full text-center py-2 text-sm font-bold transition-colors ${
-                                                isPast ? 'bg-secondary text-white hover:bg-secondary/90' : 'bg-primary text-white hover:bg-primary/90'
+                                                isFinished ? 'bg-secondary text-white hover:bg-secondary/90' : 'bg-primary text-white hover:bg-primary/90'
                                             }`}
                                         >
-                                            {isPast ? 'Ver Grabación / Asistencia' : 'Entrar a la Sala'}
+                                            {isFinished ? 'Ver Grabación' : 'Entrar a la Sala'}
                                         </Link>
                                     </div>
                                 )

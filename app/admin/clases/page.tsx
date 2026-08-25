@@ -65,12 +65,14 @@ export default async function AdminClasesPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {classes.map(cls => {
-              const groupName = cls.course_groups?.name || "Grupo Desconocido";
-              const courseId = cls.course_groups?.course_id || "";
+              const groupName = Array.isArray(cls.course_groups) ? cls.course_groups[0]?.name : (cls.course_groups?.name || "Grupo Desconocido");
+              const courseId = Array.isArray(cls.course_groups) ? cls.course_groups[0]?.course_id : (cls.course_groups?.course_id || "");
               
               const dateObj = new Date(cls.scheduled_at)
               const dateStr = dateObj.toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
               const timeStr = dateObj.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })
+              const endTimeStr = cls.scheduled_end_at ? new Date(cls.scheduled_end_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : null
+
               
               return (
                 <div key={cls.id} className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] p-5 shadow-sm relative overflow-hidden group">
@@ -97,7 +99,7 @@ export default async function AdminClasesPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      <span>{timeStr}</span>
+                      <span>{timeStr}{endTimeStr ? ` a ${endTimeStr}` : ''}</span>
                     </div>
                   </div>
 

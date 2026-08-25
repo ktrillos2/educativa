@@ -144,12 +144,12 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 {/* Cabecera */}
                 <div className="relative w-full pt-3 md:pt-6 z-10 flex items-center justify-between px-2 md:px-8">
                   {/* Escudo/Mención (Izquierda) */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0 flex items-center justify-start">
+                  <div className="w-20 h-20 md:w-28 md:h-28 shrink-0 flex items-center justify-start -ml-4 md:-ml-12">
                     <img src="/mencion.svg" alt="Mención" className="w-full h-full object-contain object-left" />
                   </div>
                   
                   {/* Texto Central */}
-                  <div className="flex-1 text-center px-2">
+                  <div className="flex-1 text-center px-2 -translate-x-1 md:-translate-x-2">
                     <h1 className="text-[10px] sm:text-sm md:text-base lg:text-lg font-bold text-[#006838] uppercase tracking-normal leading-tight whitespace-nowrap">
                       ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
                     </h1>
@@ -160,7 +160,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   </div>
 
                   {/* Logo Academia (Derecha) */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0 flex items-center justify-end">
+                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0 flex items-center justify-end -mr-6 md:-mr-12">
                     <img src="/logo.svg" alt="Logo Academia" className="w-full h-full object-contain object-right" />
                   </div>
                 </div>
