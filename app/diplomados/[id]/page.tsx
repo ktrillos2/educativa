@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/icons"
 import Link from "next/link"
 import * as motion from "framer-motion/client"
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import fs from "fs"
 import path from "path"
 
@@ -98,6 +99,19 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
             .eq("completed", true)
 
         completedModules = progressCheck?.length || 0;
+    }
+
+    // Build a set of approved module IDs for sequential locking
+    let approvedModuleIds = new Set<string>();
+    if (session?.userId && isEnrolled) {
+        const { data: approvedProgress } = await supabase
+            .from("progress")
+            .select("module_id")
+            .eq("user_id", session.userId)
+            .eq("course_id", course.id)
+            .eq("completed", true)
+        
+        approvedProgress?.forEach(p => approvedModuleIds.add(p.module_id))
     }
 
     // Contar inscritos reales al curso usando admin client (bypass RLS para conteo público)
@@ -300,59 +314,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                 </div>
             </section>
 
-            {/* Live Classes Section */}
-            {isEnrolled && liveClasses.length > 0 && (
-                <section className="py-12 bg-muted/10 border-t border-border">
-                    <div className="container mx-auto px-4 max-w-7xl">
-                        <div className="mb-8">
-                            <h2 className="text-3xl font-extrabold text-primary mb-2 flex items-center gap-3">
-                                <span className="p-2 bg-red-100 text-red-600 rounded-full animate-pulse"><Flame className="w-5 h-5" /></span>
-                                Clases en Vivo
-                            </h2>
-                            <p className="text-muted-foreground">Únete a las sesiones en tiempo real programadas para tu grupo.</p>
-                        </div>
-                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                            {liveClasses.map((cls) => {
-                                const dateObj = new Date(cls.scheduled_at)
-                                const timeStr = dateObj.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })
-                                const endTimeStr = cls.scheduled_end_at ? new Date(cls.scheduled_end_at).toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' }) : null
-                                
-                                const isFinished = cls.status === 'finished'
-                                
-                                return (
-                                    <div key={cls.id} className="bg-white border border-border p-5 shadow-sm hover:shadow-md transition-shadow flex flex-col">
-                                        <div className="flex justify-between items-start mb-3">
-                                            <h3 className="font-bold text-lg leading-tight">{cls.title}</h3>
-                                            {cls.status === 'in_progress' ? (
-                                                <span className="bg-red-100 text-red-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider animate-pulse rounded">En Vivo</span>
-                                            ) : isFinished ? (
-                                                <span className="bg-gray-100 text-gray-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">Finalizada</span>
-                                            ) : (
-                                                <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 uppercase tracking-wider rounded">Programada</span>
-                                            )}
-                                        </div>
-                                        <div className="space-y-1.5 text-sm text-muted-foreground mb-5 flex-grow">
-                                            <div className="flex items-center gap-2">
-                                                <Clock className="w-4 h-4" />
-                                                <span>{dateObj.toLocaleDateString('es-CO')} a las {timeStr}{endTimeStr ? ` a ${endTimeStr}` : ''}</span>
-                                            </div>
-                                            {cls.description && <p className="text-xs mt-2 line-clamp-2">{cls.description}</p>}
-                                        </div>
-                                        <Link 
-                                            href={`/diplomados/${course.id}/clase/${cls.id}`} 
-                                            className={`w-full text-center py-2 text-sm font-bold transition-colors ${
-                                                isFinished ? 'bg-secondary text-white hover:bg-secondary/90' : 'bg-primary text-white hover:bg-primary/90'
-                                            }`}
-                                        >
-                                            {isFinished ? 'Ver Grabación' : 'Entrar a la Sala'}
-                                        </Link>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                    </div>
-                </section>
-            )}
+
 
             {/* Programa Académico Section */}
             <section id="programa" className="py-20 bg-white">
@@ -368,17 +330,19 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                         <p className="text-muted-foreground text-lg">Estructura detallada diseñada para tu formación profesional.</p>
                     </motion.div>
 
-                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                        {/* Column 1: Módulos de Estudio */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-primary/5 border border-primary/10">
-                                <div className="p-2 bg-primary text-white shadow-lg shadow-primary/20">
-                                    <BookOpen className="w-5 h-5" />
+                    <Accordion type="multiple" className="w-full space-y-6">
+                        {/* Accordion Item: Módulos de Estudio */}
+                        <AccordionItem value="modulos" className="border border-border/50 bg-white">
+                            <AccordionTrigger className="hover:no-underline py-4 px-6 bg-primary/5">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-primary text-white shadow-lg shadow-primary/20">
+                                        <BookOpen className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="text-xl font-bold">Módulos de Estudio</h3>
                                 </div>
-                                <h3 className="text-xl font-bold">Módulos de Estudio</h3>
-                            </div>
-                            
-                            <div className="space-y-4">
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-4 pt-6 pb-2 px-6">
                                 {courseModules.map((mod, index) => (
                                     <motion.div
                                         key={`mod-${mod.id}`}
@@ -399,16 +363,12 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         <h4 className="font-bold mb-3 group-hover:text-primary transition-colors">{mod.title}</h4>
                                         
                                         {isEnrolled ? (
-                                            mod.fileExists ? (
-                                                <Link 
-                                                    href={`/diplomados/${course.id}/vista/${mod.docName}`}
-                                                    className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
-                                                >
-                                                    <BookOpen className="w-3 h-3" /> Ver Material
-                                                </Link>
-                                            ) : (
-                                                <span className="text-xs text-muted-foreground italic">Próximamente</span>
-                                            )
+                                            <Link 
+                                                href={`/estudiante/cursos/${course.id}`}
+                                                className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
+                                            >
+                                                <BookOpen className="w-3 h-3" /> Ir al Aula Virtual
+                                            </Link>
                                         ) : !session ? (
                                             <div className="text-[10px] text-muted-foreground space-y-1">
                                                 <p>
@@ -429,19 +389,22 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         )}
                                     </motion.div>
                                 ))}
-                            </div>
-                        </div>
-
-                        {/* Column 2: Cuestionarios */}
-                        <div className="space-y-6">
-                            <div className="flex items-center gap-3 mb-6 p-4 bg-secondary/5 border border-secondary/10">
-                                <div className="p-2 bg-secondary text-white shadow-lg shadow-secondary/20">
-                                    <Award className="w-5 h-5" />
                                 </div>
-                                <h3 className="text-xl font-bold text-secondary-dark">EXÁMENES</h3>
-                            </div>
+                            </AccordionContent>
+                        </AccordionItem>
 
-                            <div className="space-y-4">
+                        {/* Accordion Item: Cuestionarios */}
+                        <AccordionItem value="examenes" className="border border-border/50 bg-white">
+                            <AccordionTrigger className="hover:no-underline py-4 px-6 bg-secondary/5">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-secondary text-white shadow-lg shadow-secondary/20">
+                                        <Award className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-secondary-dark">EXÁMENES</h3>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-4 pt-6 pb-2 px-6">
                                 {courseModules.map((mod, index) => (
                                     <motion.div
                                         key={`ques-${mod.id}`}
@@ -458,10 +421,10 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         
                                         {isEnrolled ? (
                                             <Link 
-                                                href={`/diplomados/${course.id}/exam/${mod.id}`}
+                                                href={`/estudiante/cursos/${course.id}`}
                                                 className="inline-flex items-center gap-2 text-xs font-bold text-secondary hover:underline"
                                             >
-                                                <Award className="w-3 h-3" /> Iniciar Test
+                                                <Award className="w-3 h-3" /> Ir al Aula Virtual
                                             </Link>
                                         ) : !session ? (
                                             <div className="text-[10px] text-muted-foreground space-y-1">
@@ -483,11 +446,10 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                         )}
                                     </motion.div>
                                 ))}
-                            </div>
-                        </div>
-
-
-                    </div>
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+                    </Accordion>
 
                     {/* Completion Section */}
                     {isEnrolled && paymentVerified && isEligibleForCert && (

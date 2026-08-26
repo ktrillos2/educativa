@@ -85,7 +85,11 @@ export default async function AdminClasesPage() {
                         {groupName}
                       </p>
                     </div>
-                    <span className="bg-blue-100 text-blue-700 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
+                    <span className={`text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider ${
+                      cls.status === 'finished' ? 'bg-gray-100 text-gray-600' :
+                      cls.status === 'in_progress' ? 'bg-red-100 text-red-700 animate-pulse' :
+                      'bg-blue-100 text-blue-700'
+                    }`}>
                       {cls.status === 'scheduled' ? 'Programada' : cls.status === 'in_progress' ? 'En Vivo' : 'Finalizada'}
                     </span>
                   </div>
@@ -104,17 +108,19 @@ export default async function AdminClasesPage() {
                   </div>
 
                   <div className="flex flex-col gap-2">
-                    <Link 
-                      href={`/diplomados/${courseId}/clase/${cls.id}`}
-                      className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
-                    >
-                      <PlayCircle className="w-4 h-4" /> Entrar a la Sala
-                    </Link>
+                    {cls.status !== 'finished' && (
+                      <Link 
+                        href={`/diplomados/${courseId}/clase/${cls.id}`}
+                        className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
+                      >
+                        <PlayCircle className="w-4 h-4" /> Entrar a la Sala
+                      </Link>
+                    )}
                     <Link 
                       href={`/admin/clases/${cls.id}`}
                       className="w-full inline-flex items-center justify-center gap-2 bg-secondary/10 text-secondary border border-secondary/20 py-2 rounded-lg font-medium hover:bg-secondary/20 transition-colors"
                     >
-                      Ver Asistencia y Finalizar
+                      {cls.status === 'finished' ? 'Ver Asistencia y Grabación' : 'Ver Asistencia y Finalizar'}
                     </Link>
                   </div>
                 </div>

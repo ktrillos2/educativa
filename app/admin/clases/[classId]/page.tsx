@@ -56,7 +56,7 @@ export default async function AdminClassDetailPage(props: { params: Promise<{ cl
   const courseId = Array.isArray(liveClass.course_groups) ? liveClass.course_groups[0]?.course_id : liveClass.course_groups?.course_id;
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pt-6">
       <div className="flex items-center justify-between">
         <div>
           <div className="flex items-center gap-3 mb-2">

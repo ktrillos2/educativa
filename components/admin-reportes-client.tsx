@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useEffect } from "react"
 import { 
   BarChart2, 
   Download, 
@@ -12,7 +12,11 @@ import {
   DollarSign, 
   CheckCircle, 
   AlertCircle,
-  FileText
+  FileText,
+  Video,
+  Wifi,
+  Clock,
+  TrendingUp
 } from "lucide-react"
 
 interface User {
@@ -46,11 +50,43 @@ interface Props {
   courses: Course[]
 }
 
+interface LiveKitStats {
+  livekit: {
+    activeRooms: number
+    totalLiveParticipants: number
+    totalMinutesThisMonth: number
+    usagePercent: number
+    planLimitMinutes: number
+  }
+  classes: {
+    scheduled: number
+    inProgress: number
+    finished: number
+    total: number
+    thisMonth: number
+  }
+  attendance: {
+    uniqueStudentsThisMonth: number
+  }
+}
+
 export function AdminReportesClient({ users, enrollments, courses }: Props) {
   const [activeTab, setActiveTab] = useState<"general" | "detalles">("general")
   const [searchQuery, setSearchQuery] = useState("")
   const [courseFilter, setCourseFilter] = useState("all")
   const [paymentFilter, setPaymentFilter] = useState("all")
+  const [livekitStats, setLivekitStats] = useState<LiveKitStats | null>(null)
+  const [statsLoading, setStatsLoading] = useState(true)
+
+  useEffect(() => {
+    fetch("/api/livekit/stats")
+      .then(r => r.json())
+      .then(data => {
+        if (!data.error) setLivekitStats(data)
+      })
+      .catch(console.error)
+      .finally(() => setStatsLoading(false))
+  }, [])
 
   // Map courses for fast lookup
   const courseMap = useMemo(() => {
@@ -290,6 +326,113 @@ export function AdminReportesClient({ users, enrollments, courses }: Props) {
             />
           </div>
         </div>
+      </div>
+
+      {/* ── LiveKit & Clases Panel ── */}
+      <div className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm overflow-hidden">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-[oklch(0.88_0.04_145)] bg-[oklch(0.97_0.01_145)]">
+          <div className="flex items-center gap-2">
+            <Video className="w-4 h-4 text-[oklch(0.30_0.10_145)]" />
+            <h2 className="text-sm font-bold text-[oklch(0.25_0.10_145)]">Clases en Vivo — LiveKit</h2>
+          </div>
+          <span className="text-[10px] text-[oklch(0.55_0.04_145)] bg-white border border-[oklch(0.88_0.04_145)] px-2 py-1 rounded-full font-medium">
+            Plan Gratuito · 50,000 min/mes
+          </span>
+        </div>
+
+        {statsLoading ? (
+          <div className="p-8 text-center text-[oklch(0.55_0.04_145)] text-sm animate-pulse">Cargando estadísticas...</div>
+        ) : livekitStats ? (
+          <div className="p-6 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+
+            {/* Card: Active Rooms */}
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-[oklch(0.97_0.01_145)] border border-[oklch(0.92_0.02_145)]">
+              <div className="p-2 bg-red-100 rounded-lg flex-shrink-0">
+                <Wifi className="w-4 h-4 text-red-600" />
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-[oklch(0.50_0.04_145)] uppercase tracking-wide">Salas Activas Ahora</p>
+                <p className="text-2xl font-bold text-[oklch(0.25_0.10_145)] leading-tight">
+                  {livekitStats.livekit.activeRooms}
+                </p>
+                <p className="text-[10px] text-[oklch(0.55_0.04_145)]">
+                  {livekitStats.livekit.totalLiveParticipants} participante(s) en vivo
+                </p>
+              </div>
+            </div>
+
+            {/* Card: Minutes used this month */}
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-[oklch(0.97_0.01_145)] border border-[oklch(0.92_0.02_145)]">
+              <div className="p-2 bg-blue-100 rounded-lg flex-shrink-0">
+                <Clock className="w-4 h-4 text-blue-600" />
+              </div>
+              <div className="flex-1">
+                <p className="text-[10px] font-semibold text-[oklch(0.50_0.04_145)] uppercase tracking-wide">Minutos usados este mes</p>
+                <p className="text-2xl font-bold text-[oklch(0.25_0.10_145)] leading-tight">
+                  {livekitStats.livekit.totalMinutesThisMonth.toLocaleString('es-CO')}
+                </p>
+                <div className="mt-2">
+                  <div className="flex justify-between text-[10px] text-[oklch(0.55_0.04_145)] mb-1">
+                    <span>Uso del plan gratuito</span>
+                    <span className={livekitStats.livekit.usagePercent >= 80 ? 'text-red-600 font-bold' : ''}>
+                      {livekitStats.livekit.usagePercent}%
+                    </span>
+                  </div>
+                  <div className="w-full bg-[oklch(0.92_0.02_145)] rounded-full h-1.5 overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-700 ${
+                        livekitStats.livekit.usagePercent >= 80 ? 'bg-red-500' :
+                        livekitStats.livekit.usagePercent >= 50 ? 'bg-amber-400' :
+                        'bg-blue-500'
+                      }`}
+                      style={{ width: `${livekitStats.livekit.usagePercent}%` }}
+                    />
+                  </div>
+                  <p className="text-[10px] text-[oklch(0.55_0.04_145)] mt-1">
+                    de {livekitStats.livekit.planLimitMinutes.toLocaleString('es-CO')} min gratis
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Classes summary */}
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-[oklch(0.97_0.01_145)] border border-[oklch(0.92_0.02_145)]">
+              <div className="p-2 bg-green-100 rounded-lg flex-shrink-0">
+                <BookOpen className="w-4 h-4 text-green-700" />
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-[oklch(0.50_0.04_145)] uppercase tracking-wide">Clases Totales</p>
+                <p className="text-2xl font-bold text-[oklch(0.25_0.10_145)] leading-tight">
+                  {livekitStats.classes.total}
+                </p>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  <span className="text-[10px] bg-blue-50 text-blue-700 px-1.5 py-0.5 rounded font-medium">Prog: {livekitStats.classes.scheduled}</span>
+                  {livekitStats.classes.inProgress > 0 && (
+                    <span className="text-[10px] bg-red-50 text-red-700 px-1.5 py-0.5 rounded font-medium animate-pulse">Vivo: {livekitStats.classes.inProgress}</span>
+                  )}
+                  <span className="text-[10px] bg-gray-50 text-gray-600 px-1.5 py-0.5 rounded font-medium">Fin: {livekitStats.classes.finished}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Card: Students who attended */}
+            <div className="flex items-start gap-3 p-4 rounded-xl bg-[oklch(0.97_0.01_145)] border border-[oklch(0.92_0.02_145)]">
+              <div className="p-2 bg-[oklch(0.30_0.10_145)]/10 rounded-lg flex-shrink-0">
+                <TrendingUp className="w-4 h-4 text-[oklch(0.30_0.10_145)]" />
+              </div>
+              <div>
+                <p className="text-[10px] font-semibold text-[oklch(0.50_0.04_145)] uppercase tracking-wide">Estudiantes Activos este mes</p>
+                <p className="text-2xl font-bold text-[oklch(0.25_0.10_145)] leading-tight">
+                  {livekitStats.attendance.uniqueStudentsThisMonth}
+                </p>
+                <p className="text-[10px] text-[oklch(0.55_0.04_145)]">asistentes únicos en clases</p>
+              </div>
+            </div>
+
+          </div>
+        ) : (
+          <div className="p-8 text-center text-[oklch(0.55_0.04_145)] text-sm">No se pudieron cargar las estadísticas de LiveKit.</div>
+        )}
       </div>
 
       {/* ── Tabs selector ── */}

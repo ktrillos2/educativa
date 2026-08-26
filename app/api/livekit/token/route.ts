@@ -44,25 +44,26 @@ export async function GET(request: Request) {
     const token = await at.toJwt();
 
     // -- INICIO MÓDULO DE ASISTENCIA (SIN WEBHOOKS) --
-    // Registramos la entrada a la clase inmediatamente después de darle el token
-    const { createAdminClient } = await import("@/utils/supabase/admin");
-    const supabase = createAdminClient();
-    
-    // Solo registrar si no está admin o si quieres registrar a todos
-    // Verificamos si ya hay un registro de asistencia abierto
-    const { data: existing } = await supabase
-      .from("class_attendance")
-      .select("id")
-      .eq("class_id", room)
-      .eq("user_id", session.userId)
-      .is("left_at", null)
-      .maybeSingle();
+    if (session.role !== "admin") {
+      // Registramos la entrada a la clase inmediatamente después de darle el token
+      const { createAdminClient } = await import("@/utils/supabase/admin");
+      const supabase = createAdminClient();
+      
+      // Verificamos si ya hay un registro de asistencia abierto
+      const { data: existing } = await supabase
+        .from("class_attendance")
+        .select("id")
+        .eq("class_id", room)
+        .eq("user_id", session.userId)
+        .is("left_at", null)
+        .maybeSingle();
 
-    if (!existing) {
-       await supabase.from("class_attendance").insert({
-         class_id: room,
-         user_id: session.userId,
-       });
+      if (!existing) {
+         await supabase.from("class_attendance").insert({
+           class_id: room,
+           user_id: session.userId,
+         });
+      }
     }
     // -- FIN MÓDULO DE ASISTENCIA --
 

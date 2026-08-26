@@ -50,6 +50,12 @@ export default async function CursosPage() {
     }
   })
 
+  // Auto-redirect to the course classroom if the student is only enrolled in 1 course
+  if (enrichedEnrollments.length === 1) {
+    const { redirect } = await import("next/navigation")
+    redirect(`/estudiante/cursos/${enrichedEnrollments[0].course_id}`)
+  }
+
   return (
     <div className="space-y-8 animate-fade-up">
       <div className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm p-6 flex flex-col sm:flex-row sm:items-center gap-4">
@@ -65,13 +71,16 @@ export default async function CursosPage() {
         {enrichedEnrollments.length > 0 ? (
           <div className="divide-y divide-[oklch(0.94_0.01_145)]">
             {enrichedEnrollments.map((e) => (
-              <div key={e.id} className="px-5 py-5 flex flex-col md:flex-row md:items-center justify-between hover:bg-[oklch(0.97_0.01_145)] transition-colors gap-4">
+              <div
+                key={e.id}
+                className="px-5 py-5 flex flex-col md:flex-row md:items-center justify-between hover:bg-[oklch(0.97_0.01_145)] transition-colors gap-4 group"
+              >
                 <div className="flex items-start gap-4 flex-1">
-                  <div className="w-12 h-12 rounded-lg bg-[oklch(0.30_0.10_145)]/10 flex items-center justify-center flex-shrink-0 mt-1">
+                  <div className="w-12 h-12 rounded-lg bg-[oklch(0.30_0.10_145)]/10 flex items-center justify-center flex-shrink-0 mt-1 group-hover:bg-[oklch(0.30_0.10_145)]/20 transition-colors">
                     <BookOpen className="w-6 h-6 text-[oklch(0.30_0.10_145)]" />
                   </div>
                   <div className="flex-1">
-                    <p className="text-base font-bold text-[oklch(0.30_0.10_145)]">{e.courseTitle}</p>
+                    <p className="text-base font-bold text-[oklch(0.30_0.10_145)] group-hover:text-[oklch(0.25_0.10_145)] transition-colors">{e.courseTitle}</p>
                     
                     <div className="flex flex-wrap items-center gap-2 mt-1 mb-3">
                       {e.courseCategory && (
@@ -82,11 +91,10 @@ export default async function CursosPage() {
                       </span>
                     </div>
 
-                    {/* Barra de progreso */}
-                    <div className="w-full max-w-sm mt-2">
+                    <div className="w-full max-w-sm">
                       <div className="flex justify-between items-center mb-1">
                         <span className="text-xs font-bold text-[oklch(0.35_0.10_145)] flex items-center gap-1">
-                          <Trophy className="w-3 h-3 text-amber-500" /> Progreso del estudiante
+                          <Trophy className="w-3 h-3 text-amber-500" /> Progreso
                         </span>
                         <span className="text-xs font-bold text-[oklch(0.40_0.10_145)]">{e.progressPercent}% ({e.completedModules}/{e.totalModules} módulos)</span>
                       </div>
@@ -97,29 +105,30 @@ export default async function CursosPage() {
                         ></div>
                       </div>
                     </div>
-
                   </div>
                 </div>
                 <div className="flex-shrink-0 md:ml-4 flex flex-col sm:flex-row gap-3">
-                  {/* Mostrar botón de Certificado si cumple requisitos (>=80% o 4 módulos) */}
                   {(e.progressPercent >= 80 || e.completedModules >= 4) && (
-                    <Link
-                      href={`/diplomados/${e.course_id}/certificado`}
-                      className={`inline-flex items-center justify-center gap-2 text-sm font-bold px-6 py-3 rounded-md transition-colors ${
-                        e.payment_verified
-                          ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.30_0.10_145)]/20"
-                          : "bg-amber-100 text-amber-800 hover:bg-amber-200"
-                      }`}
+                    <span
+                      onClick={(ev) => ev.stopPropagation()}
+                      className="inline-flex"
                     >
-                      <GraduationCap className="w-4 h-4" />
-                      {e.payment_verified ? "Ver Certificado" : "Pagar Certificado"}
-                    </Link>
+                      <a
+                        href={`/diplomados/${e.course_id}/certificado`}
+                        onClick={(ev) => ev.stopPropagation()}
+                        className={`inline-flex items-center justify-center gap-2 text-sm font-bold px-5 py-2.5 rounded-md transition-colors ${
+                          e.payment_verified
+                            ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.30_0.10_145)]/20"
+                            : "bg-amber-100 text-amber-800 hover:bg-amber-200"
+                        }`}
+                      >
+                        <GraduationCap className="w-4 h-4" />
+                        {e.payment_verified ? "Ver Certificado" : "Pagar Certificado"}
+                      </a>
+                    </span>
                   )}
-                  <Link 
-                    href={`/diplomados/${e.course_id}/vista/${e.nextDocName}`} 
-                    className="inline-flex items-center justify-center gap-2 bg-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.25_0.10_145)] text-white text-sm font-bold px-6 py-3 rounded-md transition-colors"
-                  >
-                    Ir al Material <ChevronRight className="w-4 h-4" />
+                  <Link href={`/estudiante/cursos/${e.course_id}`} className="inline-flex items-center justify-center gap-2 bg-[oklch(0.30_0.10_145)] text-white text-sm font-bold px-5 py-2.5 rounded-md group-hover:bg-[oklch(0.25_0.10_145)] transition-colors">
+                    Ir al Aula <ChevronRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>

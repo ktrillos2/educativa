@@ -112,7 +112,7 @@ export function Header({ session }: HeaderProps) {
             {session ? (
               <>
                 {session.role !== 'admin' && (
-                  <Link href="/estudiante">
+                  <Link href="/estudiante/cursos">
                     <Button variant="outline" size="sm" className="border-primary text-primary hover:bg-primary hover:text-white font-medium">
                       Mi Aula
                     </Button>
@@ -127,11 +127,7 @@ export function Header({ session }: HeaderProps) {
                 >
                   {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                 </Button>
-                <Link href="/register">
-                  <Button size="sm" className="bg-secondary text-secondary-foreground hover:bg-secondary/90  font-bold">
-                    Inscribirse
-                  </Button>
-                </Link>
+
               </>
             ) : (
               <>
@@ -194,7 +190,7 @@ export function Header({ session }: HeaderProps) {
               {session ? (
                 <>
                   {session.role !== 'admin' && (
-                    <Link href="/estudiante" onClick={() => setMobileMenuOpen(false)}>
+                    <Link href="/estudiante/cursos" onClick={() => setMobileMenuOpen(false)}>
                       <Button variant="outline" size="sm" className="w-full bg-transparent font-medium mb-1">
                         Mi Aula
                       </Button>
@@ -212,11 +208,7 @@ export function Header({ session }: HeaderProps) {
                   >
                     {isLoggingOut ? "Cerrando..." : "Cerrar Sesión"}
                   </Button>
-                  <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                    <Button size="sm" className="w-full bg-secondary text-secondary-foreground  font-bold">
-                      Inscribirse
-                    </Button>
-                  </Link>
+
                 </>
               ) : (
                 <>

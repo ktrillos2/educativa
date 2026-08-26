@@ -3,9 +3,10 @@ import { createClient } from "@/utils/supabase/server"
 import { redirect } from "next/navigation"
 import { LiveClassRoom } from "@/components/live-class-room"
 import { Breadcrumb } from "@/components/breadcrumb"
-import { CheckCircle, Video } from "lucide-react"
+import { CheckCircle, Video, Clock } from "lucide-react"
 import { notFound } from "next/navigation"
 import { ScreenRecorder } from "@/components/screen-recorder"
+import Link from "next/link"
 
 import { createAdminClient } from "@/utils/supabase/admin"
 
@@ -55,6 +56,34 @@ export default async function LiveClassPage(props: { params: Promise<{ id: strin
       
     if (!enrollment || enrollment.group_id !== liveClass.group_id) {
       return <div className="p-20 text-center text-red-600 font-bold">No tienes permiso para entrar a esta clase.</div>
+    }
+
+    // Check if they are trying to enter too early (more than 15 minutes before start)
+    if (liveClass.scheduled_at && liveClass.status === 'scheduled') {
+      const now = new Date();
+      const scheduledAt = new Date(liveClass.scheduled_at);
+      const fifteenMinsBefore = new Date(scheduledAt.getTime() - 15 * 60000);
+
+      if (now < fifteenMinsBefore) {
+        return (
+          <div className="p-20 text-center flex flex-col items-center justify-center min-h-[60vh]">
+            <div className="w-16 h-16 bg-blue-100 text-blue-600 flex items-center justify-center rounded-full mb-6">
+              <Clock className="w-8 h-8" />
+            </div>
+            <h2 className="text-3xl font-bold mb-4">La sala aún no está abierta</h2>
+            <p className="text-gray-600 mb-8 max-w-md">
+              Esta clase está programada para las {scheduledAt.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}.
+              Podrás ingresar a la sala a partir de las {fifteenMinsBefore.toLocaleTimeString('es-CO', { hour: '2-digit', minute: '2-digit' })}.
+            </p>
+            <Link 
+              href={`/diplomados/${params.id}`}
+              className="bg-primary text-white px-6 py-3 rounded-lg font-bold"
+            >
+              Volver al Diplomado
+            </Link>
+          </div>
+        )
+      }
     }
   }
 

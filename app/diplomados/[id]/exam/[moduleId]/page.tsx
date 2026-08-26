@@ -82,6 +82,38 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
         if (!enrollment) {
             redirect(`/diplomados/${params.id}`)
         }
+
+        // Sequential locking: verify previous module is approved
+        // Extract module index from moduleId format "mod-X"
+        const moduleIndex = parseInt(params.moduleId.replace("mod-", ""), 10) - 1;
+        if (moduleIndex > 0) {
+            const previousModId = `mod-${moduleIndex}`; // mod-1 for module 2, etc.
+            const { data: previousProgress } = await supabase
+                .from("progress")
+                .select("completed")
+                .eq("user_id", session.userId)
+                .eq("course_id", course.id)
+                .eq("module_id", previousModId)
+                .eq("completed", true)
+                .maybeSingle();
+
+            if (!previousProgress) {
+                return (
+                    <main className="flex-grow bg-muted/30 pt-24">
+                        <div className="container mx-auto px-4 max-w-2xl py-20 text-center">
+                            <div className="w-16 h-16 bg-gray-100 text-gray-500 flex items-center justify-center rounded-full mx-auto mb-6">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m0 0v2m0-2h2m-2 0H10m8-6V9a4 4 0 00-8 0v2M5 11h14a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2z" /></svg>
+                            </div>
+                            <h2 className="text-2xl font-bold mb-3">Examen bloqueado</h2>
+                            <p className="text-gray-600 mb-6">Debes aprobar el examen del módulo anterior antes de continuar con este.</p>
+                            <a href={`/diplomados/${params.id}`} className="bg-primary text-white px-6 py-3 rounded-lg font-bold hover:bg-primary/90 transition-colors">
+                                Volver al Diplomado
+                            </a>
+                        </div>
+                    </main>
+                )
+            }
+        }
     }
 
     // Get current progress or create if doesn't exist

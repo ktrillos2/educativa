@@ -39,7 +39,7 @@ export function Footer() {
     <footer id="contacto" className="bg-foreground text-background">
       <div className="container mx-auto px-4 py-[1cm]">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-          <div className="lg:col-span-2">
+          <div>
             <div className="mb-6">
               <Image
                 src="/images/image.png"
@@ -105,6 +105,33 @@ export function Footer() {
           </div>
 
 
+
+          <div>
+            <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">
+              <span className="w-6 h-0.5 bg-secondary" />
+              Entidades Oficiales
+            </h3>
+            <ul className="space-y-3">
+              {[
+                { label: "CNSC", href: "https://www.cnsc.gov.co" },
+                { label: "SIMO", href: "https://simo.cnsc.gov.co" },
+                { label: "Función Pública", href: "https://www.funcionpublica.gov.co" },
+                { label: "SIET MinEducación", href: "https://siet.mineducacion.gov.co/siet/" }
+              ].map((item) => (
+                <li key={item.label}>
+                  <Link
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-background/70 hover:text-secondary transition-colors text-sm inline-flex items-center gap-1.5 group"
+                  >
+                    <ArrowUpRight className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                    {item.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
 
           <div>
             <h3 className="text-sm font-semibold mb-4 flex items-center gap-2">

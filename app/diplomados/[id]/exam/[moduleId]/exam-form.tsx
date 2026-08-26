@@ -514,7 +514,7 @@ export function ExamForm({ courseId, moduleId }: { courseId: string; moduleId: s
         }
 
         // Return user to the course details page
-        router.push(`/diplomados/${courseId}`)
+        router.push(`/estudiante/cursos/${courseId}`)
         router.refresh()
     }
 

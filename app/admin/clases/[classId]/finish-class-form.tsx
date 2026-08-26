@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { finishClassWithRecording } from "@/app/actions/class-management"
+import { finishClassWithRecording, finishClassWithoutRecording } from "@/app/actions/class-management"
 import { UploadCloud, Loader2, CheckCircle2, Video } from "lucide-react"
 import { createClient } from "@/utils/supabase/client"
 
@@ -10,6 +10,22 @@ export function FinishClassForm({ classId, courseId }: { classId: string, course
   const [error, setError] = useState("")
   const [success, setSuccess] = useState(false)
   const [uploadProgress, setUploadProgress] = useState(0)
+
+  async function handleFinishWithoutRecording() {
+    if (!confirm("¿Estás seguro de finalizar la clase sin subir una grabación?")) return;
+    
+    setLoading(true)
+    setError("")
+    try {
+      const result = await finishClassWithoutRecording(classId, courseId)
+      if (result.error) setError(result.error)
+      else setSuccess(true)
+    } catch (err: any) {
+      setError("Ocurrió un error inesperado: " + err.message)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   async function onSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -117,17 +133,28 @@ export function FinishClassForm({ classId, courseId }: { classId: string, course
         </div>
       )}
 
-      <button
-        type="submit"
-        disabled={loading}
-        className="w-full bg-primary text-white font-bold py-3 rounded-md hover:bg-primary/90 transition-colors flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-wait"
-      >
-        {loading ? (
-          <><Loader2 className="w-5 h-5 animate-spin" /> Subiendo video a Supabase... (Por favor espera)</>
-        ) : (
-          "Subir Grabación y Finalizar Clase"
-        )}
-      </button>
+      <div className="flex flex-col gap-3">
+        <button
+          type="submit"
+          disabled={loading}
+          className="w-full bg-primary text-white font-bold py-3 rounded-md hover:bg-primary/90 transition-colors flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-wait"
+        >
+          {loading ? (
+            <><Loader2 className="w-5 h-5 animate-spin" /> Procesando... (Por favor espera)</>
+          ) : (
+            "Subir Grabación y Finalizar Clase"
+          )}
+        </button>
+        
+        <button
+          type="button"
+          disabled={loading}
+          onClick={handleFinishWithoutRecording}
+          className="w-full bg-transparent border-2 border-red-200 text-red-600 font-bold py-2 rounded-md hover:bg-red-50 transition-colors flex justify-center items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed text-sm"
+        >
+          Terminar clase sin subir grabación
+        </button>
+      </div>
     </form>
   )
 }

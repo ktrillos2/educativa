@@ -51,3 +51,33 @@ export async function finishClassWithRecording(formData: FormData) {
 
   return { success: true }
 }
+
+export async function finishClassWithoutRecording(classId: string, courseId?: string) {
+  const session = await getSession()
+  if (!session || session.role !== "admin") {
+    return { error: "No autorizado" }
+  }
+
+  if (!classId) return { error: "Falta class_id" }
+
+  const supabase = createAdminClient()
+
+  const { error: updateError } = await supabase
+    .from("live_classes")
+    .update({ status: "finished" })
+    .eq("id", classId)
+
+  if (updateError) {
+    console.error("Error actualizando estado de clase:", updateError)
+    return { error: "Error al finalizar la clase" }
+  }
+
+  revalidatePath(`/admin/clases/${classId}`)
+  revalidatePath(`/admin/clases`)
+  if (courseId) {
+    revalidatePath(`/diplomados/${courseId}`)
+    revalidatePath(`/diplomados/${courseId}/clase/${classId}`)
+  }
+
+  return { success: true }
+}
