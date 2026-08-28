@@ -17,7 +17,7 @@ const formacionData = [
         duration: "18 meses",
         students: "100+",
         rating: 4.8,
-        image: "/images/bg1.webp",
+        image: "/administracion.jpg",
         description: "Desarrolla habilidades clave para la gestión de recursos, atención al cliente y procesos administrativos empresariales.",
     },
     {
@@ -27,7 +27,7 @@ const formacionData = [
         duration: "24 meses",
         students: "300+",
         rating: 4.9,
-        image: "/images/bg2.webp",
+        image: "/desarrollo-software.jpg",
         description: "Aprende las tecnologías más demandadas por el mercado y conviértete en un desarrollador preparado para la industria actual.",
     },
     {
@@ -37,7 +37,7 @@ const formacionData = [
         duration: "18 meses",
         students: "150+",
         rating: 4.7,
-        image: "/images/bg3.webp",
+        image: "/primera-infancia.jpg",
         description: "Fórmate para cuidar, guiar y apoyar el desarrollo integral de niños en sus primeros años de vida de forma responsable.",
     }
 ]
