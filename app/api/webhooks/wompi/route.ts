@@ -1,8 +1,5 @@
 import { NextResponse } from 'next/server'
-import { Resend } from 'resend'
 import { createAdminClient } from '@/utils/supabase/admin'
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
@@ -60,36 +57,6 @@ export async function POST(request: Request) {
         if (updateEnrollmentError) {
           console.error('Error updating enrollment payment status:', updateEnrollmentError)
         }
-      }
-
-      if (order.email) {
-        // Enviar correo de felicitaciones con el enlace de descarga
-        const certificateUrl = `${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/diplomados/${courseId}/certificado`
-        
-        await resend.emails.send({
-          from: 'Academia Lideres del Merito <pagos@lideresdelmerito.edu.co>',
-          to: order.email,
-          subject: `¡Certificado Desbloqueado! - ${order.program_name}`,
-          html: `
-            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #e2e8f0; border-radius: 8px;">
-              <h2 style="color: #006838;">¡Felicidades ${order.student_name}!</h2>
-              <p>Hemos recibido el pago de tu certificado exitosamente.</p>
-              <div style="background-color: #f8fafc; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                <p style="margin: 5px 0;"><strong>Programa:</strong> ${order.program_name}</p>
-                <p style="margin: 5px 0;"><strong>Referencia de Pago:</strong> ${reference}</p>
-                <p style="margin: 5px 0;"><strong>Total Pagado:</strong> $${(order.amount / 100).toLocaleString('es-CO')}</p>
-              </div>
-              <p>Ya puedes acceder a tu Certificado oficial y Acta de finalización académica desde nuestro portal estudiantil.</p>
-              <div style="text-align: center; margin: 30px 0;">
-                <a href="${certificateUrl}" style="background-color: #C5A059; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: bold; display: inline-block;">
-                  Descargar Certificado
-                </a>
-              </div>
-              <hr style="border-top: 1px solid #e2e8f0;" />
-              <p style="color: #64748b; font-size: 12px; text-align: center;">Academia de Formación Líderes del Mérito S.A.S.</p>
-            </div>
-          `
-        })
       }
     }
 
