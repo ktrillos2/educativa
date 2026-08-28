@@ -31,10 +31,6 @@ export default async function EstudianteLayout({ children }: { children: React.R
             {/* Nav items */}
             <SidebarNav variant="estudiante" />
 
-            {/* Sidebar footer */}
-            <div className="bg-[oklch(0.30_0.10_145)]/8 px-5 py-3 border-t border-[oklch(0.88_0.04_145)]">
-              <p className="text-[oklch(0.40_0.08_145)] text-xs">Plataforma educativa segura</p>
-            </div>
           </div>
         </aside>
 
