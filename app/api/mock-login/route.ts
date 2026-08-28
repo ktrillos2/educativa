@@ -1,11 +1,10 @@
 import { cookies } from "next/headers"
-import { createSession } from "@/lib/auth"
 import { NextResponse } from "next/server"
 
 export async function GET() {
     try {
         const userId = "mock-user-no-db"
-        await createSession(userId)
+        // await createSession(userId) // Deprecated
 
         // Emulate that this user has paid for everything by setting a special cookie
         const cookieStore = await cookies()
