@@ -155,3 +155,7 @@ CREATE POLICY "Users can view recordings" ON public.class_recordings
 -- Service role handles recording inserts
 CREATE POLICY "Service role manages recordings" ON public.class_recordings
   FOR ALL USING (true);
+
+-- NOTE: The courses table (created elsewhere) requires the following column 
+-- to differentiate between Diplomados and ETDH Formación Académica:
+-- ALTER TABLE public.courses ADD COLUMN type TEXT DEFAULT 'diplomado';

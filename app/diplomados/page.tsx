@@ -12,6 +12,7 @@ export default async function DiplomadosPage() {
   const { data: coursesData } = await supabase
     .from("courses")
     .select("*")
+    .or("type.eq.diplomado,type.is.null")
     .order("created_at", { ascending: true })
 
   const initialCourses = await Promise.all((coursesData || []).map(async (course) => {

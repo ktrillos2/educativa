@@ -1,13 +1,54 @@
 import { FormacionAcademicaList } from "@/components/formacion-academica-list"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { BookOpen, GraduationCap, Trophy, Users } from "@/components/ui/icons"
+import { createClient } from "@/utils/supabase/server"
+import { createAdminClient } from "@/utils/supabase/admin"
 
 export const metadata = {
     title: "Formación Académica - Academia de Formación Líderes del Mérito",
     description: "Descubre nuestra oferta de programas formales para impulsar tu desarrollo profesional y personal con altos estándares de calidad.",
 }
 
-export default function FormacionAcademicaPage() {
+export default async function FormacionAcademicaPage() {
+    const supabase = await createClient()
+    const supabaseAdmin = createAdminClient()
+    
+    // Fetch ETDH courses based on type column
+    const { data: coursesData } = await supabase
+        .from("courses")
+        .select("*")
+        .eq("type", "etdh")
+        .order("created_at", { ascending: true })
+
+    const initialCourses = await Promise.all((coursesData || []).map(async (course) => {
+        // Buscar conteo de inscritos (bypassing RLS para obtener el total real)
+        const { count: enrolledCount } = await supabaseAdmin
+            .from("enrollments")
+            .select("*", { count: "exact", head: true })
+            .eq("course_id", course.id)
+
+        return {
+            id: course.id,
+            title: course.title,
+            description: course.description,
+            duration: course.duration,
+            students: course.students,
+            badge: course.badge,
+            category: course.category,
+            image: course.image,
+            price: course.price,
+            startDate: course.start_date,
+            modules: course.modules,
+            minStudents: course.min_students ?? 15,
+            enrolledCount: enrolledCount ?? 0,
+        }
+    }))
+
+    const uniqueCategories = [
+        "Todos",
+        ...Array.from(new Set(initialCourses.map((c) => c.category).filter((cat): cat is string => Boolean(cat)))),
+    ]
+
     return (
         <main className="flex-grow bg-muted/20">
             {/* Hero Section */}
@@ -53,7 +94,7 @@ export default function FormacionAcademicaPage() {
                 </div>
             </section>
 
-            <FormacionAcademicaList />
+            <FormacionAcademicaList initialCourses={initialCourses} initialCategories={uniqueCategories} />
         </main>
     )
 }

@@ -8,47 +8,32 @@ import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
 
-// Mock data as long as there is no specific table/data structure requested
-const formacionData = [
-    {
-        id: "f1",
-        title: "Técnico en Asistencia Administrativa",
-        category: "Administración",
-        duration: "18 meses",
-        students: "100+",
-        rating: 4.8,
-        image: "/administracion.jpg",
-        description: "Desarrolla habilidades clave para la gestión de recursos, atención al cliente y procesos administrativos empresariales.",
-    },
-    {
-        id: "f2",
-        title: "Técnico en Desarrollo de Software",
-        category: "Tecnología",
-        duration: "24 meses",
-        students: "300+",
-        rating: 4.9,
-        image: "/desarrollo-software.jpg",
-        description: "Aprende las tecnologías más demandadas por el mercado y conviértete en un desarrollador preparado para la industria actual.",
-    },
-    {
-        id: "f3",
-        title: "Técnico en Atención a la Primera Infancia",
-        category: "Educación",
-        duration: "18 meses",
-        students: "150+",
-        rating: 4.7,
-        image: "/primera-infancia.jpg",
-        description: "Fórmate para cuidar, guiar y apoyar el desarrollo integral de niños en sus primeros años de vida de forma responsable.",
-    }
-]
+interface Course {
+  id: string
+  title: string
+  description: string
+  duration: string
+  students: string
+  badge: string | null
+  category: string
+  image: string
+  price: string
+  startDate: string
+  modules: number
+  minStudents?: number
+  enrolledCount?: number
+}
 
-const categories = ["Todos", "Administración", "Tecnología", "Educación", "Salud"]
+interface FormacionAcademicaListProps {
+  initialCourses: Course[]
+  initialCategories: string[]
+}
 
-export function FormacionAcademicaList() {
+export function FormacionAcademicaList({ initialCourses, initialCategories }: FormacionAcademicaListProps) {
     const [searchTerm, setSearchTerm] = useState("")
     const [activeCategory, setActiveCategory] = useState("Todos")
 
-    const filteredPrograms = formacionData.filter(program =>
+    const filteredPrograms = initialCourses.filter(program =>
         (activeCategory === "Todos" || program.category === activeCategory) &&
         (program.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
             program.description.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -61,7 +46,7 @@ export function FormacionAcademicaList() {
                 {/* Filters */}
                 <div className="flex flex-col md:flex-row justify-between items-center gap-6 mb-12">
                     <div className="flex w-full md:w-auto overflow-x-auto pb-2 md:pb-0 gap-2 hide-scrollbar">
-                        {categories.map(cat => (
+                        {initialCategories.map(cat => (
                             <Button
                                 key={cat}
                                 variant={activeCategory === cat ? "default" : "outline"}
@@ -107,7 +92,7 @@ export function FormacionAcademicaList() {
                                     <div className="relative h-48 w-full overflow-hidden">
                                         <div className="absolute inset-0 bg-primary/20 z-10 group-hover:bg-transparent transition-colors duration-500" />
                                         <Image
-                                            src={program.image}
+                                            src={program.image || "/placeholder.svg"}
                                             alt={program.title}
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -139,13 +124,12 @@ export function FormacionAcademicaList() {
                                             </div>
                                             <div className="flex items-center gap-1">
                                                 <Star className="w-4 h-4 text-yellow-400" />
-                                                <span>{program.rating}</span>
+                                                <span>4.8</span>
                                             </div>
                                         </div>
 
                                         <Button asChild className="w-full rounded-none group/btn overflow-hidden relative shadow-[4px_4px_0_0_#C5A059]">
-                                            {/* Using href="#" temporarily since individual dynamic pages for formacion-academica aren't created yet */}
-                                            <Link href={`#`} className="flex items-center justify-center">
+                                            <Link href={`/formacion-academica/${program.id}`} className="flex items-center justify-center">
                                                 <span className="relative z-10 font-semibold">Ver Detalles</span>
                                                 <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform relative z-10" />
                                                 <div className="absolute inset-0 bg-primary/10 scale-x-0 origin-left group-hover/btn:scale-x-100 transition-transform duration-300 ease-out" />
