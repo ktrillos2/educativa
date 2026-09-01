@@ -28,6 +28,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Grupos",    href: "/admin/grupos",     icon: Users },
   { label: "Clases",    href: "/admin/clases",     icon: Video },
   { label: "Reportes",  href: "/admin/reportes",   icon: BarChart2 },
+  { label: "Videos",    href: "/admin/videos",     icon: Video },
 ]
 
 const ESTUDIANTE_NAV: NavItem[] = [

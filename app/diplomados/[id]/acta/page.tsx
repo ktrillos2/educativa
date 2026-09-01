@@ -19,7 +19,11 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
   }
 
   const isAdmin = session.role === "admin"
-  const supabase = isAdmin ? createAdminClient() : supabaseUser
+  if (!isAdmin) {
+    redirect(`/diplomados/${params.id}/certificado`)
+  }
+
+  const supabase = createAdminClient()
 
   // Obtener diplomado desde Supabase
   const { data: course } = await supabase
@@ -96,7 +100,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
             <DownloadCertificateButton 
               courseId={course.id} 
               type="ACTA" 
-              label="Imprimir Acta"
+              label="Descargar Acta"
               className="bg-primary text-white px-4 py-2 font-medium hover:bg-primary/90 flex items-center gap-2 print:hidden shadow-lg shadow-primary/20"
               iconClassName="w-4 h-4"
             />

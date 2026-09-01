@@ -121,13 +121,15 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     <p className="text-muted-foreground">Has completado exitosamente todos los requisitos del programa.</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                    <Link
-                        href={`/diplomados/${course.id}/acta${studentIdParam ? `?studentId=${studentIdParam}` : ''}`}
-                        className="bg-white text-secondary border-2 border-secondary px-6 py-2.5 font-bold hover:bg-secondary/5 flex items-center gap-2 transition-all shadow-sm"
-                    >
-                        <FileSpreadsheet className="w-5 h-5" />
-                        Ver Acta Académica
-                    </Link>
+                    {isAdmin && (
+                      <Link
+                          href={`/diplomados/${course.id}/acta${studentIdParam ? `?studentId=${studentIdParam}` : ''}`}
+                          className="bg-white text-secondary border-2 border-secondary px-6 py-2.5 font-bold hover:bg-secondary/5 flex items-center gap-2 transition-all shadow-sm"
+                      >
+                          <FileSpreadsheet className="w-5 h-5" />
+                          Ver Acta Académica
+                      </Link>
+                    )}
                     <DownloadCertificateButton 
                         courseId={course.id} 
                         type="CERTIFICATE" 

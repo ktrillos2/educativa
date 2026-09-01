@@ -4,6 +4,7 @@ import { GraduationCap } from "@/components/ui/icons"
 import { createClient } from "@/utils/supabase/server"
 import Image from "next/image"
 import { createAdminClient } from "@/utils/supabase/admin"
+import { getSettings } from "@/app/actions/settings"
 
 export default async function DiplomadosPage() {
   const supabase = await createClient()
@@ -43,6 +44,20 @@ export default async function DiplomadosPage() {
     "Todos",
     ...Array.from(new Set(initialCourses.map((c) => c.category).filter((cat): cat is string => Boolean(cat)))),
   ]
+
+  let promoVideos = [
+    { url: "", title: "" },
+    { url: "", title: "" },
+    { url: "", title: "" },
+  ]
+  try {
+    const data = await getSettings("promo_videos")
+    if (data && Array.isArray(data) && data.length > 0) {
+      promoVideos = data
+    }
+  } catch (error) {
+    console.error("Error fetching promo videos", error)
+  }
 
   return (
     <main className="flex-grow">
@@ -96,6 +111,45 @@ export default async function DiplomadosPage() {
       </section>
 
       <DiplomadosList initialCourses={initialCourses} initialCategories={uniqueCategories} />
+
+      {/* Sección de Videos Motivacionales */}
+      <section className="py-16 bg-muted/30 border-t border-border/50 mt-12">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-[oklch(0.25_0.10_145)] mb-4">¿Por qué estudiar un Diplomado con nosotros?</h2>
+            <p className="text-[oklch(0.55_0.04_145)] max-w-2xl mx-auto">
+              Conoce la experiencia de nuestros estudiantes y descubre cómo nuestros programas han impulsado sus carreras profesionales.
+            </p>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {promoVideos.map((video: any, index: number) => {
+              if (!video.url) {
+                return (
+                  <div key={index} className="bg-white p-4 rounded-xl shadow-sm border border-[oklch(0.88_0.04_145)] flex flex-col group hover:shadow-md transition-shadow">
+                    <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative flex items-center justify-center border-2 border-dashed border-gray-300 group-hover:border-primary/50 transition-colors">
+                      <div className="text-center p-4">
+                        <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-2">
+                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        </div>
+                        <span className="text-sm font-bold text-gray-500">Espacio para Video {index + 1}</span>
+                      </div>
+                    </div>
+                  </div>
+                )
+              }
+
+              return (
+                <div key={index} className="bg-white p-4 rounded-xl shadow-sm border border-[oklch(0.88_0.04_145)] flex flex-col group hover:shadow-md transition-shadow">
+                  <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative flex items-center justify-center border-2 border-dashed border-gray-300">
+                    <video src={video.url} controls className="w-full h-full object-cover"></video>
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      </section>
     </main>
   )
 }

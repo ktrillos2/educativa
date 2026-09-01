@@ -109,7 +109,7 @@ export default async function AdminUsuariosPage() {
                                   </span>
                                   {isCompleted && e.payment_verified && (
                                     <Link 
-                                      href={`/diplomados/${e.course_id}/certificado?studentId=${u.id}`}
+                                      href={`${course?.type === 'etdh' ? '/formacion-academica' : '/diplomados'}/${e.course_id}/certificado?studentId=${u.id}`}
                                       target="_blank"
                                       className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 transition-colors flex items-center gap-1 cursor-pointer"
                                     >
