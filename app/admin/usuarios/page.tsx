@@ -108,13 +108,22 @@ export default async function AdminUsuariosPage() {
                                     Progreso: {completedModules}/{totalModules}
                                   </span>
                                   {isCompleted && e.payment_verified && (
-                                    <Link 
-                                      href={`${course?.type === 'etdh' ? '/formacion-academica' : '/diplomados'}/${e.course_id}/certificado?studentId=${u.id}`}
-                                      target="_blank"
-                                      className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 transition-colors flex items-center gap-1 cursor-pointer"
-                                    >
-                                      Certificado 🎓
-                                    </Link>
+                                    <>
+                                      <Link 
+                                        href={`${course?.type === 'etdh' ? '/formacion-academica' : '/diplomados'}/${e.course_id}/certificado?studentId=${u.id}`}
+                                        target="_blank"
+                                        className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border bg-purple-50 text-purple-700 border-purple-200 hover:bg-purple-100 transition-colors flex items-center gap-1 cursor-pointer"
+                                      >
+                                        Certificado 🎓
+                                      </Link>
+                                      <Link 
+                                        href={`${course?.type === 'etdh' ? '/formacion-academica' : '/diplomados'}/${e.course_id}/acta?studentId=${u.id}&download=true`}
+                                        target="_blank"
+                                        className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border bg-orange-50 text-orange-700 border-orange-200 hover:bg-orange-100 transition-colors flex items-center gap-1 cursor-pointer"
+                                      >
+                                        Descargar Acta 📄
+                                      </Link>
+                                    </>
                                   )}
                                 </div>
                               </div>

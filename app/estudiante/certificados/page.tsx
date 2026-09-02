@@ -3,10 +3,36 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { diplomados } from "@/lib/data"
 import { Award, ChevronRight, GraduationCap } from "lucide-react"
 import Link from "next/link"
+import { redirect } from "next/navigation"
 
-export default async function CertificadosPage() {
+export default async function CertificadosPage(
+  props: { searchParams?: Promise<{ [key: string]: string | string[] | undefined }> }
+) {
   const session = await getSession()
   const supabase = createAdminClient()
+  const searchParams = await props.searchParams
+
+  // Verificar si venimos de Openpay (fallback si el webhook no llega rápido o en localhost)
+  // Openpay devuelve a esta URL agregando el parámetro ?id=trx_...
+  if (searchParams?.id) {
+    // Openpay pasa su propio 'id' de transacción. Como no tenemos webhooks en local, 
+    // buscamos la orden PENDIENTE más reciente del usuario y la marcamos como pagada.
+    const { data: order } = await supabase
+      .from("orders")
+      .select("*")
+      .eq("user_id", session?.userId ?? "")
+      .eq("status", "PENDING")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle()
+      
+    if (order) {
+      await supabase.from("orders").update({ status: "PAID" }).eq("id", order.id)
+      await supabase.from("enrollments").update({ payment_verified: true }).eq("user_id", order.user_id).eq("course_id", order.course_id)
+    }
+    // Redirigir para limpiar la URL
+    redirect("/estudiante/certificados")
+  }
 
   // Inscripciones reales del estudiante donde el pago esté verificado
   const { data: enrollments } = await supabase

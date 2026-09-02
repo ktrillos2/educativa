@@ -74,13 +74,13 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
 
         const { data: enrollment } = await supabase
             .from("enrollments")
-            .select("user_id")
+            .select("user_id, payment_verified")
             .eq("user_id", session.userId)
             .eq("course_id", course.id)
             .maybeSingle()
 
-        if (!enrollment) {
-            redirect(`/diplomados/${params.id}`)
+        if (!enrollment || !enrollment.payment_verified) {
+            redirect(`/formacion-academica/${params.id}`)
         }
 
         // Sequential locking: verify previous module is approved

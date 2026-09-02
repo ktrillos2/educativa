@@ -1,8 +1,10 @@
 // File updated to resolve build cache issues
 import { notFound } from "next/navigation"
+
 import { Breadcrumb } from "@/components/breadcrumb"
 import { EnrollmentDialog } from "@/components/enrollment-dialog"
 import { EnrollButton } from "@/components/enroll-button"
+import { CoursePayment } from "@/components/course-payment"
 import { getSession } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
@@ -218,39 +220,51 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         <div className="w-20 h-20 bg-green-100 text-green-600 flex items-center justify-center mx-auto shadow-inner">
                                             <CheckCircle className="w-10 h-10" />
                                         </div>
-                                        <div>
-                                            <h3 className="font-bold text-2xl mb-2 text-primary">¡Ya estás inscrito!</h3>
-                                            <p className="text-muted-foreground text-sm">El acceso a este programa está activo en tu cuenta.</p>
-                                        </div>
-
                                         {!paymentVerified ? (
-                                            <div className="flex items-start gap-3 p-4 bg-blue-50 border border-blue-200 text-blue-800 text-left shadow-sm">
-                                                <AlertCircle className="w-5 h-5 text-blue-600 flex-shrink-0 mt-0.5" />
-                                                <span className="text-sm">El programa es <strong>gratuito</strong>. Tu pago es necesario únicamente para **obtener el certificado oficial** al finalizar.</span>
-                                            </div>
+                                            <>
+                                                <div>
+                                                    <h3 className="font-bold text-2xl mb-2 text-primary">¡Inscripción Registrada!</h3>
+                                                    <p className="text-muted-foreground text-sm">Estás a un paso de comenzar este programa.</p>
+                                                </div>
+                                                <div className="mt-6">
+                                                    <CoursePayment courseId={course.id} programName={course.title} />
+                                                </div>
+                                            </>
                                         ) : (
-                                            <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 text-green-800 text-left shadow-sm">
-                                                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                                <span className="text-sm">Pago verificado. <strong>Podrás descargar tu certificado</strong> al completar satisfactoriamente todos los módulos.</span>
-                                            </div>
-                                        )}
+                                            <>
+                                                <div>
+                                                    <h3 className="font-bold text-2xl mb-2 text-primary">¡Ya estás inscrito!</h3>
+                                                    <p className="text-muted-foreground text-sm">El acceso a este programa está activo en tu cuenta.</p>
+                                                </div>
+                                                <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 text-green-800 text-left shadow-sm">
+                                                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                                    <span className="text-sm">Matrícula verificada. <strong>Tienes acceso total</strong> a la plataforma de estudios.</span>
+                                                </div>
 
-                                        <div className="space-y-3">
-                                            {whatsappLink && (
-                                                <a href={whatsappLink} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-3 font-bold hover:bg-green-600 transition-colors shadow-lg shadow-green-500/30">
-                                                    Unirse al grupo de WhatsApp
-                                                </a>
-                                            )}
-                                            <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 font-bold hover:bg-primary/20 transition-colors">
-                                                Ir al Programa <ChevronRight className="w-4 h-4" />
-                                            </a>
+                                                <div className="space-y-3">
+                                                    {isExpired ? (
+                                                        <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-left shadow-sm">
+                                                            <p className="text-sm font-bold mb-2 text-red-600">Tiempo límite expirado</p>
+                                                            <p className="text-xs mb-4">No completaste el diplomado en el tiempo estipulado. Contáctate con el profesor para revisar tu caso.</p>
+                                                            <a href="https://wa.me/1234567890?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-4 font-bold hover:bg-green-600 transition-colors shadow-sm rounded-none">
+                                                                Contactar por WhatsApp
+                                                            </a>
+                                                        </div>
+                                                    ) : (
+                                                        <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 font-bold hover:bg-primary/20 transition-colors">
+                                                            Ir al Programa <ChevronRight className="w-4 h-4" />
+                                                        </a>
+                                                    )}
+                                                </div>
+                                            </>
+                                        )}
                                         </div>
                                     </div>
                                 ) : (
                                     <>
                                         <div className="flex items-center justify-between mb-8 pb-6 border-b border-border/60">
                                             <div>
-                                                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Valor del Certificado</p>
+                                                <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Valor del Programa</p>
                                                 <span className="text-4xl font-extrabold text-primary">{course.price}</span>
                                             </div>
                                         </div>
@@ -354,7 +368,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                     >
                                         <div className="flex justify-between items-start mb-2">
                                             <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Unidad {index + 1}</span>
-                                            {mod.fileExists && isEnrolled && (
+                                            {mod.fileExists && isEnrolled && paymentVerified && !isExpired && (
                                                 <span className="flex items-center gap-1 text-[10px] font-bold text-green-600 bg-green-50 px-2 py-0.5">
                                                     <CheckCircle className="w-3 h-3" /> PDF
                                                 </span>
@@ -362,13 +376,15 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         </div>
                                         <h4 className="font-bold mb-3 group-hover:text-primary transition-colors">{mod.title}</h4>
                                         
-                                        {isEnrolled ? (
+                                        {isEnrolled && !isExpired && paymentVerified ? (
                                             <Link 
                                                 href={`/estudiante/cursos/${course.id}`}
                                                 className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
                                             >
                                                 <BookOpen className="w-3 h-3" /> Ir al Aula Virtual
                                             </Link>
+                                        ) : isEnrolled && !isExpired && !paymentVerified ? (
+                                            <p className="text-[10px] text-amber-600 font-bold">Pago requerido para acceder</p>
                                         ) : !session ? (
                                             <div className="text-[10px] text-muted-foreground space-y-1">
                                                 <p>
@@ -419,13 +435,17 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         </div>
                                         <h4 className="font-bold mb-3 group-hover:text-secondary transition-colors">Test de Unidad</h4>
                                         
-                                        {isEnrolled ? (
+                                        {isEnrolled && !isExpired && paymentVerified ? (
                                             <Link 
                                                 href={`/estudiante/cursos/${course.id}`}
                                                 className="inline-flex items-center gap-2 text-xs font-bold text-secondary hover:underline"
                                             >
                                                 <Award className="w-3 h-3" /> Ir al Aula Virtual
                                             </Link>
+                                        ) : isEnrolled && !isExpired && !paymentVerified ? (
+                                            <p className="text-[10px] text-amber-600 font-bold">Pago requerido para acceder</p>
+                                        ) : isEnrolled && isExpired ? (
+                                            <p className="text-[10px] text-red-600 font-bold">Tiempo expirado</p>
                                         ) : !session ? (
                                             <div className="text-[10px] text-muted-foreground space-y-1">
                                                 <p>
@@ -484,6 +504,10 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                 Tu pago está verificado. Continúa estudiando y completa al menos 4 unidades (o el 80% del programa) para habilitar la descarga de tu certificado oficial.
                             </p>
                         </motion.div>
+                    )}
+
+                    {/* End of content hidden when not paid */}
+                        </>
                     )}
                 </div>
             </section>

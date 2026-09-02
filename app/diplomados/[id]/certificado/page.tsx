@@ -4,7 +4,7 @@ import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { Award, Download, ArrowLeft, FileSpreadsheet } from "@/components/ui/icons"
 import Link from "next/link"
-import { CertificatePayment } from "@/components/certificate-payment"
+import { CoursePayment } from "@/components/course-payment"
 import { DownloadCertificateButton } from "@/components/download-certificate-button"
 
 export const dynamic = "force-dynamic";
@@ -112,7 +112,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </Link>
             </div>
           ) : !hasPaid ? (
-            <CertificatePayment courseId={course.id} programName={course.title} />
+            <CoursePayment courseId={course.id} programName={course.title} />
           ) : (
             <div className="space-y-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
@@ -146,7 +146,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 {/* Cabecera */}
                 <div className="relative w-full pt-3 md:pt-6 z-10 flex items-center justify-between px-2 md:px-8">
                   {/* Escudo/Mención (Izquierda) */}
-                  <div className="w-20 h-20 md:w-28 md:h-28 shrink-0 flex items-center justify-start -ml-4 md:-ml-12">
+                  <div className="w-20 h-20 md:w-28 md:h-28 print:w-32 print:h-32 shrink-0 flex items-center justify-start -ml-4 md:-ml-12 print:m-0 print:ml-8">
                     <img src="/mencion.svg" alt="Mención" className="w-full h-full object-contain object-left" />
                   </div>
                   
@@ -162,7 +162,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   </div>
 
                   {/* Logo Academia (Derecha) */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 shrink-0 flex items-center justify-end -mr-6 md:-mr-12">
+                  <div className="w-16 h-16 md:w-24 md:h-24 print:w-32 print:h-32 shrink-0 flex items-center justify-end -mr-6 md:-mr-12 print:m-0 print:mr-8">
                     <img src="/logo.svg" alt="Logo Academia" className="w-full h-full object-contain object-right" />
                   </div>
                 </div>

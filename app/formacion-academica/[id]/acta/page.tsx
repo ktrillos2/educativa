@@ -11,6 +11,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
   const params = await props.params
   const searchParams = await props.searchParams
   const studentIdParam = searchParams?.studentId as string | undefined
+  const autoDownload = searchParams?.download === "true"
   const supabaseUser = await createClient()
 
   const session = await getSession()
@@ -103,6 +104,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               label="Descargar Acta"
               className="bg-primary text-white px-4 py-2 font-medium hover:bg-primary/90 flex items-center gap-2 print:hidden shadow-lg shadow-primary/20"
               iconClassName="w-4 h-4"
+              autoDownload={autoDownload}
             />
           </div>
 
@@ -112,12 +114,12 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
                 <FileSpreadsheet className="w-full h-full" />
             </div>
 
-            <div className="text-center mb-12 border-b-2 border-primary/10 pb-8">
-              <h1 className="text-3xl font-serif font-bold text-primary uppercase tracking-widest mb-2">Acta de Finalización Académica</h1>
+            <div className="text-center mb-12 print:mb-6 border-b-2 border-primary/10 pb-8 print:pb-4">
+              <h1 className="text-3xl font-serif font-bold text-primary uppercase tracking-widest mb-2 print:text-2xl">Acta de Finalización Académica</h1>
               <p className="text-muted-foreground font-medium uppercase tracking-wider text-sm">Registro No. FLM-{course.id}-{session.userId.slice(0, 5)}</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-8 mb-12 print:gap-4 print:mb-6">
               <div className="space-y-4">
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Estudiante</p>
@@ -141,12 +143,12 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               </div>
             </div>
 
-            <div className="mb-12">
-              <h2 className="text-lg font-bold mb-6 flex items-center gap-2">
+            <div className="mb-12 print:mb-6">
+              <h2 className="text-lg font-bold mb-6 print:mb-4 flex items-center gap-2">
                   <div className="w-2 h-6 bg-secondary"></div>
                   Calificaciones Detalladas
               </h2>
-              <div className="overflow-hidden border border-border/60">
+              <div className="overflow-hidden print:overflow-visible border border-border/60">
                 <table className="w-full text-left">
                   <thead>
                     <tr className="bg-muted/50 text-xs font-bold uppercase tracking-wider border-b">
@@ -160,7 +162,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
                     {modulesData.map((mod) => {
                       const equivalence = getQualitativeEquivalence(mod.score);
                       return (
-                        <tr key={mod.id} className="hover:bg-muted/20 transition-colors">
+                        <tr key={mod.id} className="hover:bg-muted/20 transition-colors break-inside-avoid">
                           <td className="px-6 py-4 font-bold text-sm whitespace-nowrap">{mod.id.replace('mod-', 'Módulo ')}</td>
                           <td className="px-6 py-4 text-sm text-muted-foreground">{mod.title}</td>
                           <td className="px-6 py-4 text-center font-mono font-bold">{equivalence.grade.toFixed(1)}</td>
@@ -177,7 +179,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               </div>
             </div>
 
-            <div className="mt-16 grid grid-cols-1 md:grid-cols-2 gap-12">
+            <div className="mt-16 print:mt-8 grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-12 print:gap-6 break-inside-avoid">
                 <div className="text-center pt-8 border-t border-black/20">
                     <p className="font-bold text-sm uppercase">Firma del Director</p>
                     <p className="text-xs text-muted-foreground">Academia de Formación Líderes del Mérito S.A.S.</p>
@@ -188,7 +190,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
                 </div>
             </div>
 
-            <div className="mt-16 pt-8 border-t border-dashed text-[10px] text-muted-foreground text-center">
+            <div className="mt-16 print:mt-8 pt-8 print:pt-4 border-t border-dashed text-[10px] text-muted-foreground text-center break-inside-avoid">
                 Este documento es una representación digital del acta académica original. 
                 Su validez puede ser verificada en nuestro portal estudiantil mediante el No. de Registro.
             </div>
@@ -201,7 +203,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
           body { background: white !important; }
           main { padding: 0 !important; }
           .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; margin: 0 !important; }
-          #academic-record { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 2cm !important; width: 100% !important; }
+          #academic-record { border: none !important; box-shadow: none !important; margin: 0 !important; padding: 0 !important; width: 100% !important; }
           .print\\:hidden { display: none !important; }
         }
       `}} />

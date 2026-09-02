@@ -11,6 +11,7 @@ import {
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import * as motion from "framer-motion/client"
 import path from "path"
+import { CoursePayment } from "@/components/course-payment"
 import fs from "fs"
 
 export const dynamic = "force-dynamic"
@@ -139,20 +140,24 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
         </div>
       </div>
 
-      {isExpired && (
-        <div className="bg-red-50 border border-red-200 p-6 rounded-xl flex flex-col sm:flex-row gap-4 items-center sm:items-start text-red-800">
-            <AlertCircle className="w-10 h-10 text-red-600 flex-shrink-0" />
-            <div className="flex-grow space-y-2 text-center sm:text-left">
-                <h3 className="font-bold text-xl text-red-700">Tiempo límite expirado</h3>
-                <p className="text-sm">El plazo de 30 días para completar tu diplomado ha finalizado y el contenido ha sido bloqueado. Para revisar opciones de extensión, por favor contacta a tu profesor directamente.</p>
-                <div className="pt-2">
-                    <a href="https://wa.me/1234567890?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-sm">
-                        Contactar por WhatsApp
-                    </a>
+      {!enrollment.payment_verified ? (
+        <CoursePayment courseId={course.id} programName={course.title} />
+      ) : (
+        <>
+          {isExpired && (
+            <div className="bg-red-50 border border-red-200 p-6 rounded-xl flex flex-col sm:flex-row gap-4 items-center sm:items-start text-red-800">
+                <AlertCircle className="w-10 h-10 text-red-600 flex-shrink-0" />
+                <div className="flex-grow space-y-2 text-center sm:text-left">
+                    <h3 className="font-bold text-xl text-red-700">Tiempo límite expirado</h3>
+                    <p className="text-sm">El plazo de 30 días para completar tu diplomado ha finalizado y el contenido ha sido bloqueado. Para revisar opciones de extensión, por favor contacta a tu profesor directamente.</p>
+                    <div className="pt-2">
+                        <a href="https://wa.me/1234567890?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-sm">
+                            Contactar por WhatsApp
+                        </a>
+                    </div>
                 </div>
             </div>
-        </div>
-      )}
+          )}
 
       {/* Section 1: Live Classes (Only for ETDH) */}
       {!isDiplomado && (
@@ -384,6 +389,8 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
           })}
         </div>
       </div>
+      </>
+      )}
 
       {/* Footer branding */}
       <div className="pt-4 text-center text-xs text-[oklch(0.65_0.04_145)]">
