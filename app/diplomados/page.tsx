@@ -5,6 +5,8 @@ import { createClient } from "@/utils/supabase/server"
 import Image from "next/image"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getSettings } from "@/app/actions/settings"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ProgramInfoDialog } from "@/components/program-info-dialog"
 
 export default async function DiplomadosPage() {
   const supabase = await createClient()
@@ -76,7 +78,7 @@ export default async function DiplomadosPage() {
           <div>
             <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Diplomados" }]} />
 
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-12 w-full mt-6">
+            <div className="flex flex-col lg:flex-row items-start justify-between gap-8 w-full mt-6">
               <div className="max-w-3xl w-full">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2.5 bg-white/10 rounded-none border border-white/20">
@@ -84,11 +86,42 @@ export default async function DiplomadosPage() {
                   </div>
                   <span className="text-white/80 text-sm font-medium">Formación Especializada</span>
                 </div>
+                
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">Diplomados</h1>
                 <p className="text-white/80 text-lg">
                   Programas de formación intensiva diseñados para profesionales que buscan actualizar y profundizar sus
                   conocimientos en áreas específicas.
                 </p>
+              </div>
+
+              <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[56px] flex justify-end">
+                <Dialog>
+                  <DialogTrigger className="w-full text-left px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors border-l-4 border-yellow-400 backdrop-blur-xl shadow-lg outline-none rounded-none cursor-pointer">
+                    <strong className="text-yellow-300 text-sm block">Información Legal Importante</strong>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-2xl bg-foreground text-background border-yellow-500/30 rounded-none shadow-2xl">
+                    <DialogHeader>
+                      <DialogTitle className="text-yellow-400 text-xl font-bold">Información Legal Importante</DialogTitle>
+                    </DialogHeader>
+                    <div className="mt-4 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                      <p className="mb-4">
+                        Al inscribirse en nuestros diplomados, el estudiante acepta los términos y condiciones de la institución. 
+                        Todos nuestros programas cumplen con las normativas vigentes del Ministerio de Educación Nacional y están sujetos 
+                        a las regulaciones de la Secretaría de Educación correspondiente. La institución se reserva el derecho de 
+                        modificar las fechas de inicio, los contenidos curriculares y el cuerpo docente según sea necesario para 
+                        garantizar la excelencia académica. Las certificaciones emitidas son de asistencia y participación, 
+                        salvo que se indique explícitamente lo contrario para programas formales.
+                      </p>
+                      <p>
+                        El presente documento constituye el acuerdo integral entre el estudiante y la institución. 
+                        Cualquier modificación a estos términos deberá realizarse por escrito y contar con la aprobación de la dirección académica. 
+                        Para información más detallada sobre las políticas de reembolso, retiro voluntario o cancelación de matrícula, 
+                        por favor consulte nuestro Manual de Convivencia y Reglamento Estudiantil vigente. 
+                        El uso de la plataforma educativa virtual y sus recursos asociados implica la aceptación total de nuestras políticas de privacidad y uso de datos.
+                      </p>
+                    </div>
+                  </DialogContent>
+                </Dialog>
               </div>
             </div>
           </div>
@@ -109,6 +142,10 @@ export default async function DiplomadosPage() {
           </div>
         </div>
       </section>
+
+      <div className="container mx-auto px-4 mt-8 relative z-20">
+        <ProgramInfoDialog type="diplomados" />
+      </div>
 
       <DiplomadosList initialCourses={initialCourses} initialCategories={uniqueCategories} />
 

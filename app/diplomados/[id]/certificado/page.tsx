@@ -75,6 +75,18 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   const totalModules = course.modules || 1
   const isEligible = completedModules >= 4 || (completedModules / totalModules) >= 0.8
 
+  // Check previous downloads
+  const { data: previousDownloads } = await supabase
+    .from("study_acts")
+    .select("type")
+    .eq("user_id", targetUserId)
+    .eq("course_id", course.id)
+
+  const hasDownloadedCert = previousDownloads?.some(d => d.type === "CERTIFICATE") || false;
+  // If the logic should apply to ACTA as well when rendering that button on another page, 
+  // we would check it. Here we only render the CERTIFICATE download button directly.
+  // Wait, if the admin views it, they can see "Ver Acta Académica". The user downloads the certificate.
+
   // Base URL for QR
   // Usamos localhost:3000 por defecto para que las pruebas locales funcionen, pero en producción 
   // se debe configurar NEXT_PUBLIC_APP_URL en el archivo .env
@@ -135,6 +147,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                         type="CERTIFICATE" 
                         label="Descargar Certificado"
                         className="bg-secondary text-white px-6 py-2.5 font-bold hover:bg-secondary/90 shadow-lg shadow-secondary/20"
+                        hasDownloadedBefore={hasDownloadedCert && !isAdmin}
                     />
                 </div>
               </div>

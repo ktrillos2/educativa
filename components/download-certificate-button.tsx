@@ -11,19 +11,40 @@ interface DownloadButtonProps {
     className?: string
     iconClassName?: string
     autoDownload?: boolean
+    hasDownloadedBefore?: boolean
 }
 
-export function DownloadCertificateButton({ courseId, type, label, className = "", iconClassName = "w-5 h-5", autoDownload = false }: DownloadButtonProps) {
+export function DownloadCertificateButton({ courseId, type, label, className = "", iconClassName = "w-5 h-5", autoDownload = false, hasDownloadedBefore = false }: DownloadButtonProps) {
     const [loading, setLoading] = useState(false)
+    const [showPayAlert, setShowPayAlert] = useState(false)
+    const [confirming, setConfirming] = useState(false)
+    const [isDownloaded, setIsDownloaded] = useState(hasDownloadedBefore)
     const hasDownloaded = useRef(false)
 
-    const handleDownload = async () => {
-        setLoading(true)
-        try {
-            await recordDownload(courseId, type).catch(() => {})
+    // Sincronizar el estado local si cambia la prop
+    useEffect(() => {
+        if (hasDownloadedBefore) {
+            setIsDownloaded(true)
+        }
+    }, [hasDownloadedBefore])
 
+    const startDownload = async () => {
+        if (isDownloaded) {
+            setShowPayAlert(true)
+            return
+        }
+        setConfirming(true)
+    }
+
+    const executeDownload = async () => {
+        setConfirming(false)
+        setLoading(true)
+
+        try {
             if (type === "ACTA") {
                 window.print()
+                await recordDownload(courseId, type).catch(() => {})
+                setIsDownloaded(true)
                 return
             }
 
@@ -158,6 +179,8 @@ export function DownloadCertificateButton({ courseId, type, label, className = "
             console.error("Error al generar el PDF:", error)
             window.print()
         } finally {
+            await recordDownload(courseId, type).catch(() => {})
+            setIsDownloaded(true)
             setLoading(false)
         }
     }
@@ -167,19 +190,53 @@ export function DownloadCertificateButton({ courseId, type, label, className = "
             hasDownloaded.current = true
             // Pequeño delay para asegurar que fuentes/imágenes estén cargadas
             setTimeout(() => {
-                handleDownload()
+                executeDownload()
             }, 1000)
         }
     }, [autoDownload])
 
     return (
-        <button
-            onClick={handleDownload}
-            disabled={loading}
-            className={`flex items-center gap-2 transition-all ${className} ${loading ? 'opacity-70 cursor-not-allowed' : ''}`}
-        >
-            <Download className={iconClassName} />
-            {loading ? "Generando PDF..." : label}
-        </button>
+        <div className="flex flex-col items-center gap-2">
+            {!confirming ? (
+                <>
+                    <button
+                        onClick={startDownload}
+                        disabled={loading}
+                        className={`flex items-center gap-2 transition-all ${className} ${loading ? 'opacity-70 cursor-not-allowed' : ''} ${isDownloaded ? 'bg-amber-600 hover:bg-amber-700' : ''}`}
+                    >
+                        <Download className={iconClassName} />
+                        {loading ? "Generando PDF..." : isDownloaded ? "VOLVER A DESCARGAR" : label}
+                    </button>
+                    
+                    {isDownloaded && (
+                        <div className="text-center">
+                            <p className="text-xs font-bold text-amber-700">Tiene un valor de $40.000</p>
+                            {showPayAlert ? (
+                                <p className="text-[10px] text-muted-foreground mt-1 bg-amber-50 p-2 rounded border border-amber-200">
+                                    Por favor, comunícate con el profesor o administración para procesar el pago y habilitar la descarga nuevamente.
+                                </p>
+                            ) : (
+                                <p className="text-[10px] text-muted-foreground cursor-pointer hover:underline" onClick={() => setShowPayAlert(true)}>Contactar al profesor</p>
+                            )}
+                        </div>
+                    )}
+                </>
+            ) : (
+                <div className="bg-amber-50 border border-amber-200 p-4 rounded-md text-left shadow-lg max-w-sm">
+                    <p className="text-sm font-bold text-amber-800 mb-2">¡Atención! Única descarga gratuita</p>
+                    <p className="text-xs text-amber-700 mb-4">
+                        Recuerda que solo tienes permitida <strong>UNA (1) descarga gratuita</strong> de este documento. Asegúrate de estar en un dispositivo seguro donde puedas guardar el archivo ahora mismo.
+                    </p>
+                    <div className="flex gap-2 justify-end">
+                        <button onClick={() => setConfirming(false)} className="px-3 py-1.5 text-xs font-medium text-amber-800 hover:bg-amber-100 rounded transition-colors">
+                            Cancelar
+                        </button>
+                        <button onClick={executeDownload} className="px-3 py-1.5 text-xs font-bold bg-amber-600 text-white hover:bg-amber-700 rounded transition-colors shadow-sm">
+                            Sí, descargar
+                        </button>
+                    </div>
+                </div>
+            )}
+        </div>
     )
 }

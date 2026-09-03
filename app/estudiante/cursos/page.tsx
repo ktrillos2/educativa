@@ -110,12 +110,10 @@ export default async function CursosPage() {
                 <div className="flex-shrink-0 md:ml-4 flex flex-col sm:flex-row gap-3">
                   {(e.progressPercent >= 80 || e.completedModules >= 4) && (
                     <span
-                      onClick={(ev) => ev.stopPropagation()}
                       className="inline-flex"
                     >
                       <a
                         href={`/diplomados/${e.course_id}/certificado`}
-                        onClick={(ev) => ev.stopPropagation()}
                         className={`inline-flex items-center justify-center gap-2 text-sm font-bold px-5 py-2.5 rounded-md transition-colors ${
                           e.payment_verified
                             ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)] hover:bg-[oklch(0.30_0.10_145)]/20"

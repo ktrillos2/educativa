@@ -3,6 +3,8 @@ import { Breadcrumb } from "@/components/breadcrumb"
 import { BookOpen, GraduationCap, Trophy, Users } from "@/components/ui/icons"
 import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { ProgramInfoDialog } from "@/components/program-info-dialog"
 
 export const metadata = {
     title: "Formación Académica - Academia de Formación Líderes del Mérito",
@@ -58,19 +60,54 @@ export default async function FormacionAcademicaPage() {
                     <div>
                         <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Oferta Académica", href: "/#oferta" }, { label: "ETDH Formación Académica" }]} />
 
-                        <div className="max-w-3xl mt-10">
-                        <div className="flex items-center gap-3 mb-6">
-                            <div className="p-3 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
-                                <BookOpen className="h-6 w-6 text-white" />
+                        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 w-full mt-10">
+                            <div className="max-w-3xl w-full">
+                                <div className="flex items-center gap-3 mb-6">
+                                    <div className="p-3 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+                                        <BookOpen className="h-6 w-6 text-white" />
+                                    </div>
+                                    <span className="text-white/90 text-sm font-semibold tracking-wider uppercase">Excelencia Educativa</span>
+                                </div>
+
+                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
+                                    ETDH Formación Académica
+                                </h1>
+                                <p className="text-white/80 text-xl max-w-2xl leading-relaxed">
+                                    Programas diseñados para forjar los líderes del mañana, ofreciendo conocimientos profundos y habilidades clave para el éxito profesional en un entorno competitivo.
+                                </p>
                             </div>
-                            <span className="text-white/90 text-sm font-semibold tracking-wider uppercase">Excelencia Educativa</span>
-                        </div>
-                        <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-                            ETDH Formación Académica
-                        </h1>
-                        <p className="text-white/80 text-xl max-w-2xl leading-relaxed">
-                            Programas diseñados para forjar los líderes del mañana, ofreciendo conocimientos profundos y habilidades clave para el éxito profesional en un entorno competitivo.
-                        </p>
+
+                            <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[76px] flex justify-end">
+                                <Dialog>
+                                    <DialogTrigger className="w-full text-left px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors border-l-4 border-yellow-400 backdrop-blur-xl shadow-lg outline-none rounded-none cursor-pointer">
+                                        <strong className="text-yellow-300 text-sm block">Información Legal Importante</strong>
+                                    </DialogTrigger>
+                                    <DialogContent className="max-w-2xl bg-foreground text-background border-yellow-500/30 rounded-none shadow-2xl">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-yellow-400 text-xl font-bold">Información Legal Importante</DialogTitle>
+                                        </DialogHeader>
+                                        <div className="mt-4 text-sm leading-relaxed max-h-[70vh] overflow-y-auto pr-2 custom-scrollbar">
+                                            <p className="mb-4">
+                                                Al inscribirse en nuestros programas de Educación para el Trabajo y el Desarrollo Humano (ETDH), 
+                                                el estudiante acepta los términos y condiciones de la institución. Todos nuestros programas cumplen 
+                                                con las normativas vigentes del Ministerio de Educación Nacional y cuentan con el respectivo 
+                                                registro ante la Secretaría de Educación pertinente. La institución se reserva el derecho de 
+                                                modificar las fechas de inicio, los contenidos curriculares y el cuerpo docente según sea necesario 
+                                                para garantizar la excelencia académica y cumplir con los requisitos legales establecidos. 
+                                                La certificación está sujeta al cumplimiento de los requisitos académicos y de asistencia exigidos 
+                                                por la ley para los programas formales.
+                                            </p>
+                                            <p>
+                                                El presente documento constituye el acuerdo integral entre el estudiante y la institución. 
+                                                Cualquier modificación a estos términos deberá realizarse por escrito y contar con la aprobación de la dirección académica. 
+                                                Para información más detallada sobre las políticas de reembolso, retiro voluntario o cancelación de matrícula, 
+                                                por favor consulte nuestro Manual de Convivencia y Reglamento Estudiantil vigente. 
+                                                El uso de la plataforma educativa virtual y sus recursos asociados implica la aceptación total de nuestras políticas de privacidad y uso de datos.
+                                            </p>
+                                        </div>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
                         </div>
                     </div>
 
@@ -93,6 +130,10 @@ export default async function FormacionAcademicaPage() {
                     </div>
                 </div>
             </section>
+
+            <div className="container mx-auto px-4 mt-8 relative z-20">
+                <ProgramInfoDialog type="etdh" />
+            </div>
 
             <FormacionAcademicaList initialCourses={initialCourses} initialCategories={uniqueCategories} />
         </main>

@@ -66,6 +66,15 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
     redirect(`/diplomados/${course.id}/certificado`)
   }
 
+  // Check previous downloads for ACTA
+  const { data: previousDownloads } = await supabase
+    .from("study_acts")
+    .select("type")
+    .eq("user_id", targetUserId)
+    .eq("course_id", course.id)
+
+  const hasDownloadedActa = previousDownloads?.some(d => d.type === "ACTA") || false;
+
   // Get all module progress
   const { data: progressResult } = await supabase
     .from("progress")
@@ -105,6 +114,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               className="bg-primary text-white px-4 py-2 font-medium hover:bg-primary/90 flex items-center gap-2 print:hidden shadow-lg shadow-primary/20"
               iconClassName="w-4 h-4"
               autoDownload={autoDownload}
+              hasDownloadedBefore={hasDownloadedActa && !isAdmin}
             />
           </div>
 

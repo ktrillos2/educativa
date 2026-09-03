@@ -48,6 +48,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
     let paymentVerified = false
     let whatsappLink: string | null = null;
     let liveClasses: any[] = [];
+    let isExpired = false;
 
     const { cookies } = await import("next/headers")
     const cookieStore = await cookies()
@@ -245,7 +246,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                                     {isExpired ? (
                                                         <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-left shadow-sm">
                                                             <p className="text-sm font-bold mb-2 text-red-600">Tiempo límite expirado</p>
-                                                            <p className="text-xs mb-4">No completaste el diplomado en el tiempo estipulado. Contáctate con el profesor para revisar tu caso.</p>
+                                                            <p className="text-xs mb-4">No completaste el programa en el tiempo estipulado. Contáctate con el profesor para revisar tu caso.</p>
                                                             <a href="https://wa.me/1234567890?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-4 font-bold hover:bg-green-600 transition-colors shadow-sm rounded-none">
                                                                 Contactar por WhatsApp
                                                             </a>
@@ -259,7 +260,6 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                             </>
                                         )}
                                         </div>
-                                    </div>
                                 ) : (
                                     <>
                                         <div className="flex items-center justify-between mb-8 pb-6 border-b border-border/60">
@@ -333,8 +333,10 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
             {/* Programa Académico Section */}
             <section id="programa" className="py-20 bg-white">
                 <div className="container mx-auto px-4 max-w-7xl">
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
+                    {(!isEnrolled || paymentVerified) && (
+                        <>
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
                         whileInView={{ opacity: 1, y: 0 }}
                         viewport={{ once: true }}
                         className="mb-16 text-center"
@@ -385,6 +387,8 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                             </Link>
                                         ) : isEnrolled && !isExpired && !paymentVerified ? (
                                             <p className="text-[10px] text-amber-600 font-bold">Pago requerido para acceder</p>
+                                        ) : isEnrolled && isExpired ? (
+                                            <p className="text-[10px] text-red-600 font-bold">Tiempo expirado</p>
                                         ) : !session ? (
                                             <div className="text-[10px] text-muted-foreground space-y-1">
                                                 <p>
@@ -466,6 +470,40 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         )}
                                     </motion.div>
                                 ))}
+                                </div>
+                            </AccordionContent>
+                        </AccordionItem>
+
+                        {/* Accordion Item: Autoevaluación */}
+                        <AccordionItem value="autoevaluacion" className="border border-border/50 bg-white">
+                            <AccordionTrigger className="hover:no-underline py-4 px-6 bg-yellow-500/5">
+                                <div className="flex items-center gap-3">
+                                    <div className="p-2 bg-yellow-500 text-white shadow-lg shadow-yellow-500/20">
+                                        <CheckCircle className="w-5 h-5" />
+                                    </div>
+                                    <h3 className="text-xl font-bold text-yellow-700">AUTOEVALUACIÓN</h3>
+                                </div>
+                            </AccordionTrigger>
+                            <AccordionContent>
+                                <div className="space-y-4 pt-6 pb-4 px-6 text-sm text-muted-foreground leading-relaxed">
+                                    <p className="font-semibold text-foreground">
+                                        Mide tu progreso y asimila los conocimientos (Información Hipotética)
+                                    </p>
+                                    <p>
+                                        La autoevaluación es un proceso fundamental en tu aprendizaje. A través de este módulo, 
+                                        podrás reflexionar sobre las competencias adquiridas durante el desarrollo del programa 
+                                        e identificar áreas de mejora.
+                                    </p>
+                                    <ul className="list-disc pl-5 space-y-2 mt-2">
+                                        <li>No tiene calificación numérica que afecte tu promedio.</li>
+                                        <li>Te permite prepararte mejor para los exámenes finales.</li>
+                                        <li>Incluye retroalimentación automática al finalizar.</li>
+                                    </ul>
+                                    <div className="mt-4 p-4 bg-muted/30 border border-border/50 rounded-md">
+                                        <p className="text-xs font-medium">
+                                            * Esta sección estará disponible en tu aula virtual una vez inicies el programa y completes el primer módulo.
+                                        </p>
+                                    </div>
                                 </div>
                             </AccordionContent>
                         </AccordionItem>
