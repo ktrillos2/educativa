@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS public.course_groups (
   registration_start TIMESTAMP WITH TIME ZONE NOT NULL,
   registration_end TIMESTAMP WITH TIME ZONE NOT NULL,
   whatsapp_link TEXT,
+  first_certificate_download_at TIMESTAMP WITH TIME ZONE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -28,6 +29,7 @@ CREATE TABLE IF NOT EXISTS public.enrollments (
   course_id TEXT NOT NULL,
   group_id UUID REFERENCES public.course_groups(id) ON DELETE SET NULL,
   payment_verified BOOLEAN DEFAULT FALSE,
+  is_expired BOOLEAN DEFAULT FALSE,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -159,3 +161,44 @@ CREATE POLICY "Service role manages recordings" ON public.class_recordings
 -- NOTE: The courses table (created elsewhere) requires the following column 
 -- to differentiate between Diplomados and ETDH Formación Académica:
 -- ALTER TABLE public.courses ADD COLUMN type TEXT DEFAULT 'diplomado';
+
+-- ==========================================
+-- FORUMS (Social & Academic)
+-- ==========================================
+
+CREATE TABLE IF NOT EXISTS public.forum_topics (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  course_id TEXT, -- NULL para foro social global, o ID del curso para foro académico
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  title TEXT NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS public.forum_replies (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  topic_id UUID REFERENCES public.forum_topics(id) ON DELETE CASCADE NOT NULL,
+  user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
+  content TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+);
+
+-- RLS for Forums
+ALTER TABLE public.forum_topics ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.forum_replies ENABLE ROW LEVEL SECURITY;
+
+-- Select policies
+CREATE POLICY "Anyone can read topics" ON public.forum_topics FOR SELECT USING (true);
+CREATE POLICY "Anyone can read replies" ON public.forum_replies FOR SELECT USING (true);
+
+-- Insert policies
+CREATE POLICY "Users can create topics" ON public.forum_topics FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "Users can create replies" ON public.forum_replies FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Update policies (only for own topics/replies, or admin via service role which bypasses RLS)
+CREATE POLICY "Users can update own topics" ON public.forum_topics FOR UPDATE USING (auth.uid() = user_id);
+CREATE POLICY "Users can update own replies" ON public.forum_replies FOR UPDATE USING (auth.uid() = user_id);
+
+-- Delete policies
+CREATE POLICY "Users can delete own topics" ON public.forum_topics FOR DELETE USING (auth.uid() = user_id);
+CREATE POLICY "Users can delete own replies" ON public.forum_replies FOR DELETE USING (auth.uid() = user_id);

@@ -33,7 +33,7 @@ export default async function FormacionAcademicaPage() {
             id: course.id,
             title: course.title,
             description: course.description,
-            duration: course.duration,
+            duration: "160 horas",
             students: course.students,
             badge: course.badge,
             category: course.category,

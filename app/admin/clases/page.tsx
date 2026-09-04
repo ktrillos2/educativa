@@ -110,7 +110,7 @@ export default async function AdminClasesPage() {
                   <div className="flex flex-col gap-2">
                     {cls.status !== 'finished' && (
                       <Link 
-                        href={`/diplomados/${courseId}/clase/${cls.id}`}
+                        href={`/formacion-academica/${courseId}/clase/${cls.id}`}
                         className="w-full inline-flex items-center justify-center gap-2 bg-primary text-white py-2 rounded-lg font-medium hover:bg-primary/90 transition-colors"
                       >
                         <PlayCircle className="w-4 h-4" /> Entrar a la Sala

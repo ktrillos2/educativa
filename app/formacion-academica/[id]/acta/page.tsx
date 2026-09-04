@@ -139,7 +139,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
                 <div>
                   <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-1">Programa</p>
                   <p className="text-lg font-semibold">{course.title}</p>
-                  <p className="text-sm text-muted-foreground">Intensidad: {course.duration}</p>
+                  <p className="text-sm text-muted-foreground">Intensidad: 160 horas</p>
                 </div>
               </div>
               <div className="flex flex-col items-start md:items-end justify-center text-left md:text-right">

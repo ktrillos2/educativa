@@ -47,6 +47,9 @@ export async function finishClassWithRecording(formData: FormData) {
   if (courseId) {
     revalidatePath(`/diplomados/${courseId}`)
     revalidatePath(`/diplomados/${courseId}/clase/${classId}`)
+    revalidatePath(`/formacion-academica/${courseId}`)
+    revalidatePath(`/formacion-academica/${courseId}/clase/${classId}`)
+    revalidatePath(`/estudiante/cursos/${courseId}`)
   }
 
   return { success: true }
@@ -77,6 +80,9 @@ export async function finishClassWithoutRecording(classId: string, courseId?: st
   if (courseId) {
     revalidatePath(`/diplomados/${courseId}`)
     revalidatePath(`/diplomados/${courseId}/clase/${classId}`)
+    revalidatePath(`/formacion-academica/${courseId}`)
+    revalidatePath(`/formacion-academica/${courseId}/clase/${classId}`)
+    revalidatePath(`/estudiante/cursos/${courseId}`)
   }
 
   return { success: true }

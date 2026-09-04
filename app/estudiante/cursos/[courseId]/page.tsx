@@ -6,7 +6,8 @@ import Link from "next/link"
 import { 
   BookOpen, Award, Clock, Video, CheckCircle, 
   Lock, PlayCircle, ChevronLeft, Flame, FileText,
-  AlertCircle
+  AlertCircle,
+  MessageSquare
 } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import * as motion from "framer-motion/client"
@@ -39,7 +40,7 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
   // 2. Verify enrollment
   const { data: enrollment } = await supabase
     .from("enrollments")
-    .select("*, course_groups(id, name, whatsapp_link)")
+    .select("*, course_groups(id, name, whatsapp_link, first_certificate_download_at)")
     .eq("user_id", session.userId)
     .eq("course_id", course.id)
     .maybeSingle()
@@ -98,16 +99,39 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
 
   const now = new Date()
 
-  // Diplomado Expiration Check
+  // Expiration / Warning Check (Diplomado y ETDH)
   let isExpired = false;
+  let showWarning = false;
+  let expiredTitle = "";
+  let expiredMessage = "";
+  let whatsappDefaultText = "Hola,%20mi%20tiempo%20para%20terminar%20el%20curso%20expiró";
+
   if (isDiplomado && enrollment.created_at) {
       const enrollmentDate = new Date(enrollment.created_at);
       const oneMonthLater = new Date(enrollmentDate);
       oneMonthLater.setDate(oneMonthLater.getDate() + 30);
       if (now > oneMonthLater && !isEligibleForCert) {
           isExpired = true;
+          expiredTitle = "Tiempo límite expirado";
+          expiredMessage = "El plazo de 30 días para completar tu diplomado ha finalizado y el contenido ha sido bloqueado. Para revisar opciones de extensión, por favor contacta a tu profesor directamente.";
+          whatsappDefaultText = "Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró";
+      }
+  } else if (!isDiplomado && enrollment.course_groups) {
+      const groupData = Array.isArray(enrollment.course_groups) ? enrollment.course_groups[0] : enrollment.course_groups as any;
+      if (groupData?.first_certificate_download_at) {
+          const firstDownload = new Date(groupData.first_certificate_download_at);
+          const fiveDaysMs = 5 * 24 * 60 * 60 * 1000;
+          if (now.getTime() - firstDownload.getTime() > fiveDaysMs && !isEligibleForCert) {
+              showWarning = true;
+              expiredTitle = "El cohorte ha finalizado";
+              expiredMessage = "Se ha pasado el tiempo establecido para este cohorte y aún no has completado los requisitos para tu grado. Por favor contáctate por WhatsApp para poder terminar el programa y descargar tu diploma.";
+              whatsappDefaultText = "Hola,%20el%20cohorte%20finalizó%20y%20necesito%20ayuda%20para%20terminar%20mi%20programa";
+          }
       }
   }
+
+  const groupWhatsappLink = !isDiplomado && enrollment.course_groups && !Array.isArray(enrollment.course_groups) ? (enrollment.course_groups as any).whatsapp_link : null;
+  const finalWhatsappLink = groupWhatsappLink || `https://wa.me/1234567890?text=${whatsappDefaultText}`;
 
   return (
     <div className="space-y-8 animate-fade-up pt-6 md:pt-8">
@@ -118,8 +142,19 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
           <Link href="/estudiante/cursos" className="inline-flex items-center gap-1 text-white/70 hover:text-white text-sm mb-3 transition-colors">
             <ChevronLeft className="w-4 h-4" /> Mis Cursos
           </Link>
-          <h1 className="text-2xl font-bold leading-tight">{course.title}</h1>
-          <p className="text-white/70 text-sm mt-1">{groupName}</p>
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h1 className="text-2xl font-bold leading-tight">{course.title}</h1>
+              <p className="text-white/70 text-sm mt-1">{groupName}</p>
+            </div>
+            <Link 
+              href={`/estudiante/cursos/${course.id}/foro`} 
+              className="bg-white/15 hover:bg-white/25 border border-white/10 px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 transition-colors whitespace-nowrap"
+            >
+              <MessageSquare className="w-4 h-4" />
+              Foro de Dudas
+            </Link>
+          </div>
         </div>
         <div className="px-6 py-4 flex flex-col sm:flex-row sm:items-center gap-4">
           <div className="flex-1">
@@ -144,20 +179,24 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
         <CoursePayment courseId={course.id} programName={course.title} />
       ) : (
         <>
-          {isExpired && (
-            <div className="bg-red-50 border border-red-200 p-6 rounded-xl flex flex-col sm:flex-row gap-4 items-center sm:items-start text-red-800">
-                <AlertCircle className="w-10 h-10 text-red-600 flex-shrink-0" />
+          {(isExpired || showWarning) && (
+            <div className={`${isExpired ? 'bg-red-50 border-red-200 text-red-800' : 'bg-amber-50 border-amber-200 text-amber-800'} border p-6 rounded-xl flex flex-col sm:flex-row gap-4 items-center sm:items-start mb-6`}>
+                <AlertCircle className={`w-10 h-10 ${isExpired ? 'text-red-600' : 'text-amber-600'} flex-shrink-0`} />
                 <div className="flex-grow space-y-2 text-center sm:text-left">
-                    <h3 className="font-bold text-xl text-red-700">Tiempo límite expirado</h3>
-                    <p className="text-sm">El plazo de 30 días para completar tu diplomado ha finalizado y el contenido ha sido bloqueado. Para revisar opciones de extensión, por favor contacta a tu profesor directamente.</p>
+                    <h3 className={`font-bold text-xl ${isExpired ? 'text-red-700' : 'text-amber-700'}`}>{expiredTitle}</h3>
+                    <p className="text-sm">{expiredMessage}</p>
                     <div className="pt-2">
-                        <a href="https://wa.me/1234567890?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-sm">
+                        <a href={finalWhatsappLink} target="_blank" rel="noreferrer" className="inline-flex items-center gap-2 bg-green-500 text-white px-6 py-2.5 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-sm">
                             Contactar por WhatsApp
                         </a>
                     </div>
                 </div>
             </div>
           )}
+          
+          {/* Si isExpired es true (solo pasa en diplomados) no mostramos el resto. Pero si es showWarning, mostramos el contenido. */}
+          {!isExpired && (
+            <>
 
       {/* Section 1: Live Classes (Only for ETDH) */}
       {!isDiplomado && (
@@ -389,6 +428,8 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
           })}
         </div>
       </div>
+      </>
+      )}
       </>
       )}
 

@@ -34,6 +34,7 @@ const ADMIN_NAV: NavItem[] = [
 const ESTUDIANTE_NAV: NavItem[] = [
   { label: "Mi Dashboard",  href: "/estudiante",                   icon: LayoutDashboard },
   { label: "Mis Cursos",    href: "/estudiante/cursos",            icon: BookOpen },
+  { label: "Comunidad",     href: "/estudiante/comunidad",         icon: Users },
   { label: "Certificados",  href: "/estudiante/certificados",      icon: Award },
 ]
 

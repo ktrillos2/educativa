@@ -15,10 +15,11 @@ export default async function AdminGruposPage() {
 
   const supabase = createAdminClient()
 
-  // Get all courses for the dropdown
+  // Get all courses for the dropdown (only ETDH/Formacion Academica)
   const { data: courses } = await supabase
     .from("courses")
     .select("id, title")
+    .eq("type", "etdh")
     .order("created_at", { ascending: true })
 
   // Get all groups with their course title

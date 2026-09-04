@@ -192,7 +192,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
 
                             <div className="flex flex-wrap gap-4 pt-6">
                                 {[
-                                    { icon: Clock, text: course.duration, label: "Duración" },
+                                    { icon: Clock, text: "160 horas", label: "Duración" },
                                     { icon: Users, text: course.students, label: "Cupos" },
                                     { icon: BookOpen, text: `${course.modules} Módulos`, label: "Contenido" }
                                 ].map((stat, i) => (
@@ -237,9 +237,18 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                                     <h3 className="font-bold text-2xl mb-2 text-primary">¡Ya estás inscrito!</h3>
                                                     <p className="text-muted-foreground text-sm">El acceso a este programa está activo en tu cuenta.</p>
                                                 </div>
-                                                <div className="flex items-start gap-3 p-4 bg-green-50 border border-green-200 text-green-800 text-left shadow-sm">
-                                                    <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                                                    <span className="text-sm">Matrícula verificada. <strong>Tienes acceso total</strong> a la plataforma de estudios.</span>
+                                                <div className={`flex items-start gap-3 p-4 border text-left shadow-sm ${isReadyToStart ? 'bg-green-50 border-green-200 text-green-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
+                                                    {isReadyToStart ? (
+                                                        <>
+                                                            <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
+                                                            <span className="text-sm">Matrícula verificada. <strong>Tienes acceso total</strong> a la plataforma de estudios.</span>
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+                                                            <span className="text-sm">Matrícula verificada. <strong>Tu cupo está reservado.</strong> Iniciaremos clases y te notificaremos por WhatsApp cuando completemos el grupo de {minStudents} estudiantes.</span>
+                                                        </>
+                                                    )}
                                                 </div>
 
                                                 <div className="space-y-3">
@@ -251,6 +260,14 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                                                 Contactar por WhatsApp
                                                             </a>
                                                         </div>
+                                                    ) : !isReadyToStart ? (
+                                                        whatsappLink ? (
+                                                            <a href={whatsappLink} target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-3 font-bold hover:bg-green-600 transition-colors shadow-sm">
+                                                                Unirme al grupo de WhatsApp
+                                                            </a>
+                                                        ) : (
+                                                            <p className="text-xs text-amber-700 text-center font-semibold mt-4">Esperando apertura del grupo...</p>
+                                                        )
                                                     ) : (
                                                         <a href="#programa" className="w-full inline-flex items-center justify-center gap-2 bg-primary/10 text-primary py-3 font-bold hover:bg-primary/20 transition-colors">
                                                             Ir al Programa <ChevronRight className="w-4 h-4" />
@@ -379,12 +396,16 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         <h4 className="font-bold mb-3 group-hover:text-primary transition-colors">{mod.title}</h4>
                                         
                                         {isEnrolled && !isExpired && paymentVerified ? (
-                                            <Link 
-                                                href={`/estudiante/cursos/${course.id}`}
-                                                className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
-                                            >
-                                                <BookOpen className="w-3 h-3" /> Ir al Aula Virtual
-                                            </Link>
+                                            isReadyToStart ? (
+                                                <Link 
+                                                    href={`/estudiante/cursos/${course.id}`}
+                                                    className="inline-flex items-center gap-2 text-xs font-bold text-primary hover:underline"
+                                                >
+                                                    <BookOpen className="w-3 h-3" /> Ir al Aula Virtual
+                                                </Link>
+                                            ) : (
+                                                <p className="text-[10px] text-amber-600 font-bold">Inicia al completar cupos</p>
+                                            )
                                         ) : isEnrolled && !isExpired && !paymentVerified ? (
                                             <p className="text-[10px] text-amber-600 font-bold">Pago requerido para acceder</p>
                                         ) : isEnrolled && isExpired ? (
@@ -440,12 +461,16 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         <h4 className="font-bold mb-3 group-hover:text-secondary transition-colors">Test de Unidad</h4>
                                         
                                         {isEnrolled && !isExpired && paymentVerified ? (
-                                            <Link 
-                                                href={`/estudiante/cursos/${course.id}`}
-                                                className="inline-flex items-center gap-2 text-xs font-bold text-secondary hover:underline"
-                                            >
-                                                <Award className="w-3 h-3" /> Ir al Aula Virtual
-                                            </Link>
+                                            isReadyToStart ? (
+                                                <Link 
+                                                    href={`/estudiante/cursos/${course.id}`}
+                                                    className="inline-flex items-center gap-2 text-xs font-bold text-secondary hover:underline"
+                                                >
+                                                    <Award className="w-3 h-3" /> Ir al Aula Virtual
+                                                </Link>
+                                            ) : (
+                                                <p className="text-[10px] text-amber-600 font-bold">Inicia al completar cupos</p>
+                                            )
                                         ) : isEnrolled && !isExpired && !paymentVerified ? (
                                             <p className="text-[10px] text-amber-600 font-bold">Pago requerido para acceder</p>
                                         ) : isEnrolled && isExpired ? (

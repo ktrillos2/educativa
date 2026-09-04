@@ -54,13 +54,29 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   // Check enrollment and payment
   const { data: enrollment } = await supabase
     .from("enrollments")
-    .select("id, payment_verified")
+    .select("id, payment_verified, course_groups(first_certificate_download_at, whatsapp_link)")
     .eq("user_id", targetUserId)
     .eq("course_id", course.id)
     .maybeSingle()
 
   // Removed strict payment_verified redirect. Now it decides UI.
   const hasPaid = enrollment && enrollment.payment_verified
+
+  // Evaluar expiración del certificado de 5 días (solo si no es admin)
+  let certificateExpired = false
+  let whatsappLink = "https://wa.me/1234567890?text=Hola,%20tengo%20problemas%20con%20mi%20certificado"
+  if (enrollment?.course_groups && !isAdmin) {
+    const groupData = Array.isArray(enrollment.course_groups) ? enrollment.course_groups[0] : enrollment.course_groups as any
+    if (groupData?.whatsapp_link) whatsappLink = groupData.whatsapp_link
+    
+    if (groupData?.first_certificate_download_at) {
+        const firstDownloadDate = new Date(groupData.first_certificate_download_at)
+        const fiveDaysMs = 5 * 24 * 60 * 60 * 1000
+        if (Date.now() - firstDownloadDate.getTime() > fiveDaysMs) {
+            certificateExpired = true
+        }
+    }
+  }
 
   // Check progress
   const { data: progressCheck } = await supabase
@@ -116,12 +132,26 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 Para obtener el certificado oficial necesitas completar al menos 4 módulos o el 80% del programa.
                 Asegúrate de aprobar las evaluaciones requeridas.
               </p>
-              <Link href={`/diplomados/${course.id}`} className="inline-block bg-primary text-white px-6 py-2 font-medium hover:bg-primary/90">
+              <Link href={`/formacion-academica/${course.id}`} className="inline-block bg-primary text-white px-6 py-2 font-medium hover:bg-primary/90">
                 Continuar Estudiando
               </Link>
             </div>
           ) : !hasPaid ? (
             <CoursePayment courseId={course.id} programName={course.title} />
+          ) : certificateExpired ? (
+            <div className="bg-red-50 shadow-sm border border-red-200 p-8 text-center">
+              <div className="w-16 h-16 bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4">
+                <Award className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-bold mb-4 text-red-700">Tiempo de descarga expirado</h2>
+              <p className="text-red-800 mb-6 max-w-xl mx-auto">
+                El plazo de 5 días para descargar gratuitamente este certificado ha finalizado. 
+                Si necesitas una copia, por favor comunícate con el administrador o el profesor encargado.
+              </p>
+              <a href={whatsappLink} target="_blank" rel="noreferrer" className="inline-block bg-green-500 text-white px-6 py-3 font-bold hover:bg-green-600 rounded-lg">
+                Contactar por WhatsApp
+              </a>
+            </div>
           ) : (
             <div className="space-y-8">
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
@@ -198,7 +228,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                       Modalidad virtual asincrónica a los <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().getDate()}</span> días del mes de <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().getFullYear()}</span>.
                     </p>
                     <p className="whitespace-nowrap">
-                      Con una intensidad académica de <span className="font-medium">{course.duration || 'setenta (70) horas'}</span>.
+                      Con una intensidad académica de <span className="font-medium">ciento sesenta (160) horas</span>.
                     </p>
                     <p className="whitespace-nowrap">
                       Registrado en el Libro de Actas N° <span className="border-b-2 border-red-800 border-dotted px-4 inline-block font-medium pb-0.5">2026-00001</span>
