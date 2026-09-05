@@ -1,6 +1,6 @@
 import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
-import { Users, Mail, Phone, Calendar, BookOpen } from "lucide-react"
+import { Users, Mail, Phone, Calendar, BookOpen, FileText } from "lucide-react"
 import Link from "next/link"
 
 export const dynamic = "force-dynamic"
@@ -62,7 +62,13 @@ export default async function AdminUsuariosPage() {
                   <tr key={u.id} className="hover:bg-[oklch(0.98_0.01_145)] transition-colors align-top">
                     <td className="px-6 py-4">
                       <p className="font-bold text-[oklch(0.25_0.10_145)]">{u.name}</p>
-                      <p className="text-xs text-[oklch(0.55_0.04_145)] mt-0.5">CC: {u.document || 'N/A'}</p>
+                      <p className="text-xs text-[oklch(0.55_0.04_145)] mt-0.5 mb-2">CC: {u.document || 'N/A'}</p>
+                      {u.id_document_url && (
+                        <a href={u.id_document_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold uppercase rounded-md transition-colors border border-gray-200">
+                          <FileText className="w-3.5 h-3.5" />
+                          Ver Cédula
+                        </a>
+                      )}
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5 text-[oklch(0.45_0.08_145)] mb-1">

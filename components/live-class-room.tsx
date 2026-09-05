@@ -16,6 +16,56 @@ import { useEffect, useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 
+function useTranslateLiveKit() {
+  useEffect(() => {
+    const translate = () => {
+      const translations: Record<string, string> = {
+        "Leave": "Salir",
+        "Microphone": "Micrófono",
+        "Camera": "Cámara",
+        "Chat": "Chat",
+        "Share Screen": "Compartir pantalla",
+        "Stop sharing": "Dejar de compartir",
+        "Unmute": "Activar Micrófono",
+        "Mute": "Silenciar Micrófono",
+        "Start video": "Iniciar Cámara",
+        "Stop video": "Detener Cámara",
+        "Send": "Enviar"
+      };
+
+      document.querySelectorAll('.lk-button').forEach(el => {
+        const title = el.getAttribute('title');
+        if (title && translations[title]) {
+          el.setAttribute('title', translations[title]);
+        }
+        const textEl = el.querySelector('.lk-button-text');
+        if (textEl && textEl.textContent && translations[textEl.textContent.trim()]) {
+          textEl.textContent = translations[textEl.textContent.trim()];
+        }
+      });
+      
+      document.querySelectorAll('.lk-chat-form-input').forEach(el => {
+        if (el.getAttribute('placeholder') === 'Enter a message...') {
+           el.setAttribute('placeholder', 'Escribe un mensaje...');
+        }
+      });
+      
+      document.querySelectorAll('.lk-participant-placeholder').forEach(el => {
+          if (el.textContent === 'No video') el.textContent = 'Sin video';
+      });
+    };
+
+    const observer = new MutationObserver(() => {
+      translate();
+    });
+
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    translate();
+
+    return () => observer.disconnect();
+  }, []);
+}
+
 export function LiveClassRoom({ 
   roomName, 
   username, 
@@ -25,6 +75,7 @@ export function LiveClassRoom({
   username: string,
   courseId: string
 }) {
+  useTranslateLiveKit();
   const [token, setToken] = useState("")
   const router = useRouter()
 

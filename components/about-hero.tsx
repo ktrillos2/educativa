@@ -52,9 +52,9 @@ export function AboutHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.5 }}
-            className="text-xl md:text-2xl text-white/90 leading-relaxed text-pretty font-light max-w-3xl mx-auto"
+            className="text-lg md:text-xl text-white/90 leading-relaxed text-pretty font-light max-w-4xl mx-auto"
           >
-            Somos una institución educativa de vanguardia comprometida con la excelencia académica y el desarrollo integral de profesionales preparados para liderar el futuro.
+            Somos una institución de Educación para el Trabajo y el Desarrollo Humano (ETDH), dedicada a la formación integral y actualización del talento humano mediante programas académicos, cursos, diplomados y simulacros orientados al fortalecimiento de competencias para servidores públicos y entidades de las diferentes ramas del poder público.
           </motion.p>
         </div>
       </div>

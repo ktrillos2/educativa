@@ -18,11 +18,11 @@ export function AboutMission() {
             </div>
             <div className="order-1 lg:order-2">
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nuestra Misión</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Proporcionar formación profesional de alta calidad mediante diplomados, cursos y certificaciones que
-                permitan a nuestros estudiantes desarrollar competencias sólidas y actualizadas. Nos comprometemos a
-                formar líderes íntegros y competentes que contribuyan al progreso de sus organizaciones y de la
-                sociedad.
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                La Academia de Formación Líderes del Mérito S.A.S. tiene como misión ofrecer programas de formación académica y actividades de actualización orientados al fortalecimiento de conocimientos y habilidades en gestión pública, dirigidos a personas interesadas en participar en procesos de selección por mérito para empleos públicos de carrera administrativa y a servidores públicos que requieran actualización, inducción, reinducción y fortalecimiento de capacidades para el ejercicio de sus funciones.
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Desarrollamos procesos formativos de carácter práctico mediante estrategias sincrónicas y asincrónicas, análisis de casos hipotéticos, simulaciones y situaciones contextualizadas en el funcionamiento de las entidades públicas y en el ejercicio de la función pública, promoviendo el aprendizaje significativo, la autogestión, la participación responsable y la aplicación de los conocimientos en contextos institucionales y comunitarios.
               </p>
             </div>
           </div>
@@ -30,10 +30,14 @@ export function AboutMission() {
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
               <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">Nuestra Visión</h2>
-              <p className="text-lg text-muted-foreground leading-relaxed">
-                Ser reconocidos como la academia líder en formación profesional especializada, distinguiéndonos por la
-                calidad de nuestros programas, la excelencia de nuestros docentes y el impacto positivo de nuestros
-                egresados en el ámbito profesional y empresarial de Colombia.
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                Para el año 2030, la Academia de Formación Líderes del Mérito S.A.S. será reconocida a nivel nacional como una institución de Educación para el Trabajo y el Desarrollo Humano referente en formación académica, actualización y educación continua, mediante una oferta pertinente y de calidad orientada a la gestión pública, la preparación para procesos de selección por mérito y la actualización, inducción y reinducción de servidores públicos.
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-4">
+                La Academia se proyecta como una institución destacada por la incorporación de metodologías pedagógicas aplicadas, tecnologías digitales y modalidades de formación sincrónica y asincrónica, mediante programas y actividades formativas que favorezcan el aprendizaje autónomo, el análisis de situaciones propias de las entidades públicas y el desarrollo de conocimientos y habilidades para el ejercicio responsable, eficiente, transparente y orientado al ciudadano de la función pública.
+              </p>
+              <p className="text-sm text-muted-foreground leading-relaxed">
+                Asimismo, buscará consolidar una oferta académica accesible y pertinente para personas de diferentes regiones del país, contribuyendo a la cultura del mérito, la ética en el servicio público, la actualización permanente del talento humano y el fortalecimiento institucional, mediante procesos educativos vinculados con las necesidades reales de la administración pública colombiana.
               </p>
             </div>
             <div>

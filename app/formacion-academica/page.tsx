@@ -54,30 +54,39 @@ export default async function FormacionAcademicaPage() {
     return (
         <main className="flex-grow bg-muted/20">
             {/* Hero Section */}
-            <section className="pt-[calc(6rem+1cm)] pb-[1cm] min-h-[100dvh] flex flex-col bg-gradient-to-br from-primary via-primary/95 to-primary/90 relative overflow-hidden">
+            <section className="pt-[calc(6rem+2.5rem)] pb-8 min-h-[100dvh] lg:h-[100dvh] flex flex-col bg-gradient-to-br from-primary via-primary/95 to-primary/90 relative overflow-hidden">
                 <div className="absolute inset-0 opacity-10 bg-[url('/images/pattern.png')] bg-repeat" />
-                <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-between flex-grow">
+                <div className="container mx-auto px-4 relative z-10 h-full flex flex-col justify-center flex-grow">
                     <div>
                         <Breadcrumb items={[{ label: "Inicio", href: "/" }, { label: "Oferta Académica", href: "/#oferta" }, { label: "ETDH Formación Académica" }]} />
 
-                        <div className="flex flex-col lg:flex-row items-start justify-between gap-8 w-full mt-10">
+                        <div className="flex flex-col lg:flex-row items-center lg:items-start justify-between gap-6 w-full mt-4">
                             <div className="max-w-3xl w-full">
-                                <div className="flex items-center gap-3 mb-6">
-                                    <div className="p-3 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
-                                        <BookOpen className="h-6 w-6 text-white" />
+                                <div className="flex items-center gap-3 mb-4">
+                                    <div className="p-2 bg-white/10 backdrop-blur-md border border-white/20 shadow-xl">
+                                        <BookOpen className="h-5 w-5 text-secondary" />
                                     </div>
-                                    <span className="text-white/90 text-sm font-semibold tracking-wider uppercase">Excelencia Educativa</span>
+                                    <span className="text-secondary text-sm font-semibold tracking-wider uppercase">FORMACIÓN ACADÉMICA DE CALIDAD</span>
                                 </div>
 
-                                <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold text-white mb-6 tracking-tight leading-tight">
-                                    ETDH Formación Académica
+                                <h1 className="text-3xl md:text-4xl lg:text-5xl font-extrabold text-white mb-4 tracking-tight leading-tight">
+                                    Programas ETDH
                                 </h1>
-                                <p className="text-white/80 text-xl max-w-2xl leading-relaxed">
-                                    Programas diseñados para forjar los líderes del mañana, ofreciendo conocimientos profundos y habilidades clave para el éxito profesional en un entorno competitivo.
+                                <p className="text-white/80 text-lg max-w-2xl leading-relaxed">
+                                    Programas orientados al fortalecimiento de conocimientos y habilidades, con contenidos pertinentes y aplicados a contextos institucionales, laborales y de gestión pública.
                                 </p>
+                                
+                                <div className="mt-5 pl-3 py-1 border-l-2 border-secondary inline-block max-w-3xl">
+                                    <h3 className="text-white font-bold text-[11px] md:text-xs uppercase mb-1">
+                                        FORMACIÓN ACADÉMICA ETDH, CON RESPALDO LEGAL Y VERIFICABLE.
+                                    </h3>
+                                    <p className="text-white/80 text-[11px] md:text-xs leading-tight">
+                                        Nuestros programas Académicos son ofrecidos con licencia de funcionamiento institucional y registro otorgado por la Secretaría de Educación del Departamento del Cesar, conforme al Decreto 1075 de 2015 del Ministerio de Educación Nacional, y son reportados en el SIET para su consulta y verificación.
+                                    </p>
+                                </div>
                             </div>
 
-                            <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[76px] flex justify-end">
+                            <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[52px] flex justify-end">
                                 <Dialog>
                                     <DialogTrigger className="w-full text-left px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors border-l-4 border-yellow-400 backdrop-blur-xl shadow-lg outline-none rounded-none cursor-pointer">
                                         <strong className="text-yellow-300 text-sm block">Información Legal Importante</strong>
@@ -112,19 +121,20 @@ export default async function FormacionAcademicaPage() {
                     </div>
 
                     {/* Stats Bar */}
-                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mt-12 bg-white/5 backdrop-blur-sm p-6 border border-white/10 shadow-2xl">
+                    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mt-8 bg-white/5 backdrop-blur-sm p-4 border border-white/10 shadow-2xl items-start">
                         {[
-                            { icon: GraduationCap, value: "15+", label: "Especialidades" },
-                            { icon: BookOpen, value: "Flexible", label: "Modalidad" },
-                            { icon: Users, value: "1200+", label: "Estudiantes" },
-                            { icon: Trophy, value: "Avalados", label: "Por MinEducación" },
+                            { icon: GraduationCap, topText: "15+", value: "ETDH", label: "Formación Académica" },
+                            { icon: BookOpen, topText: "", value: "Flexible", label: "Virtual" },
+                            { icon: Users, topText: "1200+", value: "Certificados", label: "Conocimientos Académicos" },
+                            { icon: Trophy, topText: "", value: "Verificable", label: "Registro en SIET" },
                         ].map((stat, index) => (
-                            <div key={index} className="text-center group hover:-translate-y-1 transition-transform duration-300">
-                                <div className="bg-secondary/20 p-3 mx-auto mb-3 w-12 h-12 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
-                                    <stat.icon className="h-6 w-6 text-secondary" />
+                            <div key={index} className="text-center group hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center justify-center h-full">
+                                <div className="bg-secondary/20 p-2.5 mx-auto mb-3 w-10 h-10 flex items-center justify-center group-hover:bg-secondary/30 transition-colors">
+                                    <stat.icon className="h-5 w-5 text-secondary" />
                                 </div>
-                                <p className="text-2xl font-bold text-white mb-1">{stat.value}</p>
-                                <p className="text-white/70 text-sm font-medium">{stat.label}</p>
+                                {stat.topText && <p className="text-base text-white/90 mb-0.5 font-medium">{stat.topText}</p>}
+                                <p className="text-xl font-bold text-white mb-1">{stat.value}</p>
+                                <p className="text-sm text-white/70 leading-tight px-2">{stat.label}</p>
                             </div>
                         ))}
                     </div>

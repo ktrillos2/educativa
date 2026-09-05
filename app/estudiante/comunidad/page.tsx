@@ -2,7 +2,7 @@ import { createClient } from "@/utils/supabase/server"
 import { getSession } from "@/lib/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { MessageCircle, Users, Clock } from "lucide-react"
+import { MessageCircle, Users, Clock, Pin, Eye, Search, Hash } from "lucide-react"
 import { CreateTopicForm } from "@/components/create-topic-form"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
@@ -10,80 +10,197 @@ import { es } from "date-fns/locale"
 export const dynamic = "force-dynamic"
 export const revalidate = 0
 
-export default async function ComunidadPage() {
+// Función auxiliar para obtener las iniciales del nombre
+function getInitials(name: string) {
+  if (!name) return "U"
+  return name.split(" ").map(n => n[0]).join("").substring(0, 2).toUpperCase()
+}
+
+// Colores por categoría para un look más visual
+const categoryColors: Record<string, string> = {
+  "General": "bg-gray-100 text-gray-700 border-gray-200",
+  "Recursos de Estudio": "bg-blue-100 text-blue-700 border-blue-200",
+  "Noticias de la Academia": "bg-emerald-100 text-emerald-700 border-emerald-200",
+  "Dudas Administrativas": "bg-amber-100 text-amber-700 border-amber-200",
+  "Grupos de Estudio": "bg-purple-100 text-purple-700 border-purple-200",
+  "default": "bg-[oklch(0.97_0.01_145)] text-[oklch(0.40_0.08_145)] border-[oklch(0.90_0.02_145)]"
+}
+
+export default async function ComunidadPage(props: { searchParams: Promise<{ q?: string, cat?: string }> }) {
+  const searchParams = await props.searchParams
   const session = await getSession()
   if (!session) redirect("/login")
 
   const supabase = await createClient()
 
-  // Buscar temas globales (course_id IS NULL)
-  const { data: topics } = await supabase
+  // Leer parámetros de búsqueda y filtro
+  const query = searchParams.q || ""
+  const activeCategory = searchParams.cat || "Todas"
+
+  // Construir la consulta de Supabase
+  let supaQuery = supabase
     .from("forum_topics")
     .select(`
         id, 
         title, 
+        category,
+        is_pinned,
+        views_count,
         created_at, 
         users:user_id (name, role),
         replies:forum_replies (count)
     `)
     .is("course_id", null)
+
+  // Aplicar filtros si existen
+  if (activeCategory !== "Todas") {
+      supaQuery = supaQuery.eq("category", activeCategory)
+  }
+  if (query) {
+      supaQuery = supaQuery.ilike("title", `%${query}%`)
+  }
+
+  // Ordenar: Fijados primero, luego los más recientes
+  const { data: topics } = await supaQuery
+    .order("is_pinned", { ascending: false })
     .order("created_at", { ascending: false })
 
+  const categories = ["Todas", "General", "Recursos de Estudio", "Noticias de la Academia", "Dudas Administrativas", "Grupos de Estudio"]
+
   return (
-    <div className="space-y-6 animate-fade-up">
+    <div className="space-y-6 animate-fade-up max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)] flex items-center gap-2">
-            <Users className="w-6 h-6" /> Comunidad y Networking
+            <Users className="w-6 h-6" /> Comunidad Estudiantil
           </h1>
-          <p className="text-[oklch(0.55_0.04_145)] text-sm mt-1">Conecta con otros estudiantes, preséntate y comparte recursos de interés general.</p>
+          <p className="text-[oklch(0.55_0.04_145)] text-sm mt-1">Comparte recursos, entérate de las noticias y conecta con otros alumnos.</p>
         </div>
         <CreateTopicForm />
       </div>
 
-      <div className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm overflow-hidden">
-        {topics && topics.length > 0 ? (
-          <div className="divide-y divide-[oklch(0.94_0.01_145)]">
-            {topics.map((topic: any) => {
-              const replyCount = topic.replies?.[0]?.count || 0
-              const isTeacher = topic.users?.role === 'admin' || topic.users?.role === 'teacher'
-              return (
-                <Link 
-                  key={topic.id} 
-                  href={`/estudiante/comunidad/tema/${topic.id}`}
-                  className="block hover:bg-[oklch(0.98_0.01_145)] transition-colors p-5 group"
-                >
-                  <div className="flex justify-between gap-4 items-start">
-                    <div className="space-y-1">
-                      <h3 className="font-bold text-[oklch(0.25_0.10_145)] group-hover:text-[oklch(0.35_0.10_145)] transition-colors line-clamp-1">
-                        {topic.title}
-                      </h3>
-                      <div className="flex items-center gap-3 text-xs text-[oklch(0.55_0.04_145)]">
-                        <span className={`font-semibold ${isTeacher ? 'text-[oklch(0.35_0.10_145)]' : ''}`}>
-                          {topic.users?.name || 'Usuario Desconocido'} {isTeacher && '👑'}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> 
-                          {formatDistanceToNow(new Date(topic.created_at), { addSuffix: true, locale: es })}
-                        </span>
+      <div className="flex flex-col md:flex-row gap-6 items-start">
+        {/* Sidebar (Filtros) */}
+        <div className="w-full md:w-64 flex-shrink-0 space-y-4">
+            {/* Buscador */}
+            <form className="relative">
+                <input 
+                    type="text"
+                    name="q"
+                    defaultValue={query}
+                    placeholder="Buscar temas..."
+                    className="w-full pl-9 pr-3 py-2 bg-white border border-[oklch(0.88_0.04_145)] rounded-lg text-sm focus:outline-none focus:border-[oklch(0.35_0.10_145)] shadow-sm"
+                />
+                <Search className="w-4 h-4 text-gray-400 absolute left-3 top-2.5" />
+                {activeCategory !== "Todas" && <input type="hidden" name="cat" value={activeCategory} />}
+            </form>
+
+            {/* Lista de Categorías */}
+            <div className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm p-2 overflow-hidden">
+                <h3 className="text-xs font-bold text-[oklch(0.40_0.08_145)] uppercase tracking-wider px-3 py-2">Categorías</h3>
+                <div className="space-y-1">
+                    {categories.map(cat => (
+                        <Link 
+                            key={cat}
+                            href={`/estudiante/comunidad?cat=${encodeURIComponent(cat)}${query ? `&q=${encodeURIComponent(query)}` : ''}`}
+                            className={`flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                                activeCategory === cat 
+                                    ? "bg-[oklch(0.35_0.10_145)] text-white" 
+                                    : "text-gray-700 hover:bg-gray-100"
+                            }`}
+                        >
+                            <Hash className="w-3.5 h-3.5 opacity-70" />
+                            {cat}
+                        </Link>
+                    ))}
+                </div>
+            </div>
+        </div>
+
+        {/* Lista Principal de Foros */}
+        <div className="flex-1 w-full bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm overflow-hidden min-h-[400px]">
+          {topics && topics.length > 0 ? (
+            <div className="divide-y divide-[oklch(0.94_0.01_145)]">
+              {topics.map((topic: any) => {
+                const replyCount = topic.replies?.[0]?.count || 0
+                const isTeacher = topic.users?.role === 'admin' || topic.users?.role === 'teacher'
+                const catColor = categoryColors[topic.category] || categoryColors["default"]
+
+                return (
+                  <Link 
+                    key={topic.id} 
+                    href={`/estudiante/comunidad/tema/${topic.id}`}
+                    className={`block hover:bg-[oklch(0.98_0.01_145)] transition-colors p-4 sm:p-5 group ${topic.is_pinned ? 'bg-[oklch(0.99_0.01_145)]' : ''}`}
+                  >
+                    <div className="flex gap-4 items-start">
+                      {/* Avatar */}
+                      <div className={`hidden sm:flex w-10 h-10 rounded-full items-center justify-center font-bold text-sm flex-shrink-0 text-white ${
+                          isTeacher ? 'bg-[oklch(0.35_0.10_145)] ring-2 ring-[oklch(0.80_0.10_145)]' : 'bg-gray-400'
+                      }`}>
+                          {getInitials(topic.users?.name)}
+                      </div>
+
+                      <div className="flex-1 min-w-0">
+                        {/* Tags and Title */}
+                        <div className="flex items-center gap-2 mb-1 flex-wrap">
+                            {topic.is_pinned && (
+                                <span className="flex items-center gap-1 bg-red-100 text-red-700 border border-red-200 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide">
+                                    <Pin className="w-3 h-3" /> Fijado
+                                </span>
+                            )}
+                            <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide border ${catColor}`}>
+                                {topic.category}
+                            </span>
+                        </div>
+                        <h3 className="font-bold text-base text-[oklch(0.25_0.10_145)] group-hover:text-[oklch(0.35_0.10_145)] transition-colors line-clamp-2">
+                          {topic.title}
+                        </h3>
+
+                        {/* Author info */}
+                        <div className="flex items-center gap-3 text-xs text-[oklch(0.55_0.04_145)] mt-1.5">
+                          <span className={`font-semibold ${isTeacher ? 'text-[oklch(0.35_0.10_145)]' : 'text-gray-600'}`}>
+                            {topic.users?.name || 'Usuario'} {isTeacher && '👑'}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Clock className="w-3.5 h-3.5 opacity-70" /> 
+                            {formatDistanceToNow(new Date(topic.created_at), { addSuffix: true, locale: es })}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Stats */}
+                      <div className="flex flex-col sm:flex-row items-end sm:items-center gap-2 sm:gap-4 flex-shrink-0 mt-1 sm:mt-0">
+                        <div className="flex items-center gap-1.5 text-gray-500 text-xs">
+                          <Eye className="w-4 h-4 opacity-70" />
+                          <span className="font-medium">{topic.views_count || 0}</span>
+                        </div>
+                        <div className="flex items-center gap-1.5 text-[oklch(0.50_0.04_145)] bg-[oklch(0.97_0.01_145)] px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap group-hover:bg-[oklch(0.93_0.02_145)] transition-colors">
+                          <MessageCircle className="w-4 h-4" />
+                          <span>{replyCount}</span>
+                        </div>
                       </div>
                     </div>
-                    <div className="flex items-center gap-1.5 text-[oklch(0.50_0.04_145)] bg-[oklch(0.97_0.01_145)] px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap">
-                      <MessageCircle className="w-3.5 h-3.5" />
-                      {replyCount} {replyCount === 1 ? 'respuesta' : 'respuestas'}
-                    </div>
-                  </div>
-                </Link>
-              )
-            })}
-          </div>
-        ) : (
-          <div className="p-12 text-center text-[oklch(0.55_0.04_145)]">
-            <MessageCircle className="w-12 h-12 mx-auto text-gray-300 mb-3" />
-            <p className="font-medium text-gray-900">Aún no hay temas en la comunidad.</p>
-            <p className="text-sm">¡Sé el primero en presentarte e iniciar una conversación!</p>
-          </div>
-        )}
+                  </Link>
+                )
+              })}
+            </div>
+          ) : (
+            <div className="flex flex-col items-center justify-center p-12 text-center text-[oklch(0.55_0.04_145)] h-full min-h-[300px]">
+              <MessageCircle className="w-12 h-12 text-gray-300 mb-3" />
+              <p className="font-medium text-gray-900">No se encontraron temas.</p>
+              <p className="text-sm">
+                {query || activeCategory !== "Todas" 
+                    ? "Intenta buscar con otros términos o quita los filtros." 
+                    : "¡Sé el primero en iniciar una conversación!"}
+              </p>
+              {(query || activeCategory !== "Todas") && (
+                  <Link href="/estudiante/comunidad" className="mt-4 text-sm font-bold text-[oklch(0.35_0.10_145)] hover:underline">
+                      Borrar filtros
+                  </Link>
+              )}
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

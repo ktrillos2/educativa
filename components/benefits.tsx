@@ -19,33 +19,33 @@ import {
 const benefits = [
   {
     icon: GraduationCap,
-    title: "Docentes Expertos",
-    description: "Profesionales con amplia experiencia en el campo académico, aportando conocimientos prácticos del sector laboral actual.",
+    title: "Formadores idóneos",
+    description: "Profesionales seleccionados por su formación académica, experiencia y pertinencia con los contenidos de cada programa, conforme a los perfiles institucionales.",
   },
   {
-    icon: Medal,
-    title: "Certificación Avalada",
-    description: "Certificados con validez nacional diseñados específicamente para impulsar tu hoja de vida y oportunidades.",
+    icon: Target,
+    title: "Formación aplicada",
+    description: "Actividades, simulaciones y casos hipotéticos que favorecen la comprensión y aplicación de los conocimientos en situaciones de la gestión pública.",
   },
   {
     icon: Users2,
-    title: "Grupos Reducidos",
-    description: "Aprendizaje garantizado gracias a nuestra atención personalizada con grupos de máximo 30 estudiantes.",
+    title: "Acompañamiento académico",
+    description: "Orientación y seguimiento durante el proceso formativo mediante las estrategias y canales establecidos para cada programa.",
   },
   {
     icon: CalendarClock,
-    title: "Horarios Flexibles",
-    description: "Equilibra tu vida profesional y educativa con nuestros programas en horarios nocturnos y fines de semana.",
+    title: "Estrategias flexibles de aprendizaje",
+    description: "Interacciones sincrónicas y asincrónicas que apoyan el aprendizaje autónomo, de acuerdo con la metodología y condiciones autorizadas.",
   },
   {
     icon: ShieldCheck,
-    title: "Garantía de Calidad",
-    description: "Contenido curricular rigurosamente actualizado según las necesidades reales y urgentes del mercado competitivo.",
+    title: "Mejoramiento continuo",
+    description: "Seguimiento y evaluación de los procesos académicos para mantener la pertinencia de contenidos, recursos y estrategias de formación.",
   },
   {
     icon: BookMarked,
-    title: "Material Incluido",
-    description: "Acceso 24/7 a nuestra plataforma virtual especializada y todo el material de estudio completo sin costo adicional.",
+    title: "Recursos académicos digitales",
+    description: "Acceso, a través de la plataforma institucional, a contenidos, actividades y materiales previstos para el desarrollo de cada programa.",
   },
 ]
 
@@ -125,10 +125,10 @@ export function Benefits() {
             Nuestras Ventajas
           </div>
           <h2 className="text-4xl md:text-5xl font-extrabold text-foreground mb-4 tracking-tight">
-            ¿Por qué <span className="text-primary">elegirnos</span>?
+            ¿Por qué <span className="text-primary">formarte con nosotros</span>?
           </h2>
-          <p className="text-lg text-muted-foreground max-w-2xl mx-auto font-medium">
-            Más de 10 años formando líderes y profesionales de excelencia con los más altos estándares educativos.
+          <p className="text-lg text-muted-foreground max-w-3xl mx-auto font-medium">
+            Formación académica orientada al fortalecimiento de conocimientos y habilidades, con metodologías aplicadas, acompañamiento y recursos digitales.
           </p>
         </motion.div>
 
@@ -165,6 +165,19 @@ export function Benefits() {
               </div>
             </motion.div>
           ))}
+        </motion.div>
+
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="mt-16 max-w-4xl mx-auto p-6 md:p-8 bg-white/50 backdrop-blur-sm border border-border/60 rounded-xl shadow-sm text-center relative overflow-hidden"
+        >
+          <div className="absolute top-0 left-0 w-1.5 h-full bg-primary" />
+          <p className="text-base md:text-lg text-muted-foreground leading-relaxed font-medium">
+            La Academia de Formación Líderes del Mérito S.A.S. orienta sus procesos académicos mediante criterios de pertinencia, idoneidad de los formadores, acompañamiento al estudiante, aplicación práctica de los conocimientos y mejoramiento continuo.
+          </p>
         </motion.div>
       </div>
 

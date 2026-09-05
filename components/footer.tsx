@@ -50,7 +50,7 @@ export function Footer() {
               />
             </div>
             <p className="text-background/70 mb-6 text-sm leading-relaxed">
-              Formando líderes y profesionales de excelencia desde hace más de 10 años.
+              10 años impulsando el aprendizaje, la actualización y el desarrollo de conocimientos para nuevos desafíos.
             </p>
             <div className="flex gap-2">
               {["facebook", "instagram", "linkedin", "youtube"].map((social) => (

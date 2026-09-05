@@ -31,34 +31,39 @@ function useScrollAnimation() {
 
 const faqs = [
   {
-    question: "¿Cuál es la modalidad de los diplomados?",
+    question: "¿Cuál es la modalidad de los programas de formación académica?",
     answer:
-      "Nuestros diplomados se ofrecen en modalidad presencial, virtual y semipresencial, adaptándonos a tus necesidades. Las clases virtuales son en vivo con docentes expertos, permitiendo interacción en tiempo real.",
+      "Los programas se desarrollan mediante estrategias virtuales sincrónicas y asincrónicas, de acuerdo con la metodología autorizada para cada programa.",
   },
   {
-    question: "¿Los certificados tienen validez nacional?",
+    question: "¿Los certificados tienen validez?",
     answer:
-      "Sí, todos nuestros certificados tienen validez nacional y están avalados por instituciones de educación superior. Además, contamos con convenios que fortalecen el reconocimiento de nuestros programas.",
+      "Sí. los programas están habilitados por la Secretaria de Educación del Departamento del Cesar y reportado en el SIET.",
   },
   {
     question: "¿Cuáles son las formas de pago disponibles?",
     answer:
-      "Ofrecemos múltiples opciones de pago: tarjetas de crédito y débito, transferencia bancaria, PSE, y planes de financiación hasta en 12 cuotas sin intereses. También aceptamos pagos desde el exterior.",
+      "Los medios y condiciones de pago habilitados serán informados en la plataforma al momento de realizar la inscripción.",
   },
   {
-    question: "¿Cuánto tiempo duran los diplomados?",
+    question: "¿Cuánto tiempo duran los programas?",
     answer:
-      "La duración varía según el programa, generalmente entre 80 y 120 horas académicas, distribuidas en 2 a 4 meses. Cada diplomado tiene un calendario específico que puedes consultar en la información del programa.",
+      "La duración se especificará en cada oferta académica. Los programas actualmente proyectados por la Academia están estructurados en 160 horas, conforme a su diseño académico y al registro autorizado.",
   },
   {
-    question: "¿Hay descuentos para grupos o empresas?",
+    question: "¿Hay descuentos para grupos o entidades?",
     answer:
-      "Sí, ofrecemos descuentos especiales para inscripciones grupales (3 o más personas), convenios empresariales, egresados y pronto pago. Contáctanos para conocer las tarifas especiales.",
+      "La Academia podrá establecer tarifas especiales, convenios o beneficios para grupos y entidades, de acuerdo con sus políticas comerciales vigentes.",
+  },
+  {
+    question: "¿Los programas conducen a un título profesional?",
+    answer:
+      "No. Los programas de formación académica ETDH no conducen a título profesional. Al cumplir satisfactoriamente los requisitos del programa registrado, se expide un Certificado de Conocimientos Académicos.",
   },
   {
     question: "¿Qué requisitos necesito para inscribirme?",
     answer:
-      "Los requisitos varían según el programa. Generalmente se requiere copia del documento de identidad, certificado de estudios previos (bachillerato o profesional según el diplomado), y diligenciar el formulario de inscripción.",
+      "Diligenciar el formulario de matrícula, adjuntar en formato PDF una copia del documento de identidad y realizar el pago correspondiente a la matrícula del programa.",
   },
 ]
 
@@ -90,33 +95,40 @@ export function FAQSection() {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto">
-          <div className={`space-y-3 ${isVisible ? "animate-fade-up stagger-2" : "opacity-0"}`}>
+        <div className="max-w-6xl mx-auto">
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-4 ${isVisible ? "animate-fade-up stagger-2" : "opacity-0"}`}>
             {faqs.map((faq, index) => (
               <div
                 key={index}
-                className={`border rounded-none transition-all duration-200 ${
+                className={`border rounded-none transition-all duration-200 h-fit ${
                   openIndex === index
                     ? "border-primary/50 bg-primary/5"
                     : "border-border bg-card hover:border-primary/30"
+                } ${
+                  index === faqs.length - 1 ? "lg:col-span-2 lg:w-[calc(50%-0.5rem)] lg:mx-auto w-full" : ""
                 }`}
               >
                 <button
                   onClick={() => setOpenIndex(openIndex === index ? null : index)}
-                  className="w-full flex items-center justify-between p-4 text-left"
+                  className="w-full flex items-center justify-between p-3 sm:p-4 text-left"
                 >
-                  <span className={`font-medium pr-4 ${openIndex === index ? "text-primary" : "text-foreground"}`}>
+                  <span 
+                    className={`font-semibold pr-2 text-[12px] sm:text-[13px] lg:text-[13.5px] xl:text-sm tracking-tight whitespace-nowrap overflow-hidden text-ellipsis ${
+                      openIndex === index ? "text-primary" : "text-foreground"
+                    }`}
+                    title={faq.question}
+                  >
                     {faq.question}
                   </span>
                   <ChevronDown
-                    className={`h-5 w-5 shrink-0 transition-transform duration-200 ${
+                    className={`h-4 w-4 sm:h-5 sm:w-5 shrink-0 transition-transform duration-200 ${
                       openIndex === index ? "rotate-180 text-primary" : "text-muted-foreground"
                     }`}
                   />
                 </button>
                 <div
                   className={`overflow-hidden transition-all duration-200 ${
-                    openIndex === index ? "max-h-48" : "max-h-0"
+                    openIndex === index ? "max-h-[500px]" : "max-h-0"
                   }`}
                 >
                   <p className="px-4 pb-4 text-muted-foreground text-sm leading-relaxed">{faq.answer}</p>

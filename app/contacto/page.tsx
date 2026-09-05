@@ -35,7 +35,8 @@ export default function ContactoPage() {
                             ¿En qué podemos ayudarte?
                         </h1>
                         <p className="text-xl text-white/80 max-w-2xl mx-auto font-light leading-relaxed">
-                            Estamos aquí para resolver tus dudas y orientarte en la mejor decisión para tu futuro profesional. No dudes en comunicarte con nosotros.
+                            Estamos aquí para resolver tus dudas y orientarte en la elección de programas de formación académica que fortalezcan tus conocimientos y habilidades. 
+                            <span className="block font-bold mt-2 text-white">Comunícate con nosotros.</span>
                         </p>
                     </motion.div>
                 </div>

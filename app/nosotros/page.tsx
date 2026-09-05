@@ -1,5 +1,6 @@
 import { AboutHero } from "@/components/about-hero"
 import { AboutMission } from "@/components/about-mission"
+import { AboutPrinciples } from "@/components/about-principles"
 import { AboutValues } from "@/components/about-values"
 import { AboutTeam } from "@/components/about-team"
 
@@ -15,6 +16,7 @@ export default function AboutPage() {
     <main className="min-h-screen">
       <AboutHero />
       <AboutMission />
+      <AboutPrinciples />
       <AboutValues />
 
       <AboutTeam />

@@ -6,6 +6,7 @@ import { Award, Download, ArrowLeft, FileSpreadsheet } from "@/components/ui/ico
 import Link from "next/link"
 import { CoursePayment } from "@/components/course-payment"
 import { DownloadCertificateButton } from "@/components/download-certificate-button"
+import { UploadDocumentForm } from "@/components/upload-document-form"
 
 export const dynamic = "force-dynamic";
 
@@ -43,7 +44,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   // Get User details
   const { data: userProfile } = await supabase
     .from("users")
-    .select("name, document")
+    .select("name, document, id_document_url")
     .eq("id", targetUserId)
     .maybeSingle()
   
@@ -152,8 +153,21 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 Contactar por WhatsApp
               </a>
             </div>
+          ) : !userProfile.id_document_url && !isAdmin ? (
+            <div className="py-8">
+              <UploadDocumentForm existingDocumentUrl={userProfile.id_document_url}>
+                <div />
+              </UploadDocumentForm>
+            </div>
           ) : (
             <div className="space-y-8">
+              {!isAdmin && userProfile.id_document_url && (
+                <div className="print:hidden">
+                  <UploadDocumentForm existingDocumentUrl={userProfile.id_document_url}>
+                    <div />
+                  </UploadDocumentForm>
+                </div>
+              )}
               <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 print:hidden">
                 <div>
                     <h1 className="text-3xl font-bold text-primary">Certificación Académica</h1>

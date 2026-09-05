@@ -7,6 +7,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   phone TEXT,
   email TEXT UNIQUE NOT NULL,
   role TEXT DEFAULT 'user',
+  id_document_url TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -172,6 +173,10 @@ CREATE TABLE IF NOT EXISTS public.forum_topics (
   user_id UUID REFERENCES public.users(id) ON DELETE CASCADE NOT NULL,
   title TEXT NOT NULL,
   content TEXT NOT NULL,
+  category TEXT DEFAULT 'General',
+  is_pinned BOOLEAN DEFAULT FALSE,
+  is_resolved BOOLEAN DEFAULT FALSE,
+  views_count INTEGER DEFAULT 0,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -202,3 +207,9 @@ CREATE POLICY "Users can update own replies" ON public.forum_replies FOR UPDATE 
 -- Delete policies
 CREATE POLICY "Users can delete own topics" ON public.forum_topics FOR DELETE USING (auth.uid() = user_id);
 CREATE POLICY "Users can delete own replies" ON public.forum_replies FOR DELETE USING (auth.uid() = user_id);
+
+-- ==========================================
+-- STORAGE FOR USER DOCUMENTS
+-- ==========================================
+-- INSERT INTO storage.buckets (id, name, public) VALUES ('user_documents', 'user_documents', true);
+-- (Configura este bucket como público o usa RLS si prefieres mayor privacidad)

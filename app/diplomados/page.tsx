@@ -82,19 +82,21 @@ export default async function DiplomadosPage() {
               <div className="max-w-3xl w-full">
                 <div className="flex items-center gap-3 mb-4">
                   <div className="p-2.5 bg-white/10 rounded-none border border-white/20">
-                    <GraduationCap className="h-6 w-6 text-white" />
+                    <GraduationCap className="h-6 w-6 text-secondary" />
                   </div>
-                  <span className="text-white/80 text-sm font-medium">Formación Especializada</span>
+                  <span className="text-secondary text-sm font-semibold uppercase tracking-wider">Educación informal</span>
                 </div>
                 
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">Diplomados</h1>
                 <p className="text-white/80 text-lg">
-                  Programas de formación intensiva diseñados para profesionales que buscan actualizar y profundizar sus
-                  conocimientos en áreas específicas.
+                  Para actualizar conocimientos, fortalecer tu hoja de vida y aportar formación complementaria en procesos donde sea valorada dentro de los antecedentes.
+                </p>
+                <p className="mt-4 text-white/80 text-[11px] md:text-xs leading-tight pl-3 py-1 border-l-2 border-secondary inline-block max-w-3xl">
+                  Nuestra oferta de diplomados se desarrolla conforme al artículo 2.6.6.8 del Decreto 1075 de 2015, expedido por el Ministerio de Educación Nacional.
                 </p>
               </div>
 
-              <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[56px] flex justify-end">
+              <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[67px] flex justify-end">
                 <Dialog>
                   <DialogTrigger className="w-full text-left px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors border-l-4 border-yellow-400 backdrop-blur-xl shadow-lg outline-none rounded-none cursor-pointer">
                     <strong className="text-yellow-300 text-sm block">Información Legal Importante</strong>

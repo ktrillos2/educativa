@@ -8,14 +8,19 @@ export function CreateTopicForm({ courseId = null }: { courseId?: string | null 
     const [isOpen, setIsOpen] = useState(false)
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
+    const [category, setCategory] = useState("General")
     const [loading, setLoading] = useState(false)
+
+    const socialCategories = ["General", "Recursos de Estudio", "Noticias de la Academia", "Dudas Administrativas", "Grupos de Estudio"]
+    const academicCategories = ["Dudas Generales", "Problemas Técnicos", "Sobre Evaluaciones"]
+    const categories = courseId ? academicCategories : socialCategories
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!title.trim() || !content.trim()) return
 
         setLoading(true)
-        const res = await createTopic(title, content, courseId)
+        const res = await createTopic(title, content, category, courseId)
         if (res.success) {
             setTitle("")
             setContent("")
@@ -53,6 +58,20 @@ export function CreateTopicForm({ courseId = null }: { courseId?: string | null 
                         required
                         maxLength={100}
                     />
+                </div>
+                <div>
+                    <label className="block text-xs font-bold text-[oklch(0.40_0.08_145)] mb-1">Categoría</label>
+                    <select
+                        value={category}
+                        onChange={(e) => setCategory(e.target.value)}
+                        className="w-full px-3 py-2 border border-[oklch(0.88_0.04_145)] rounded-lg text-sm focus:outline-none focus:border-[oklch(0.35_0.10_145)] bg-white"
+                        required
+                    >
+                        <option value="" disabled>Selecciona una categoría...</option>
+                        {categories.map(cat => (
+                            <option key={cat} value={cat}>{cat}</option>
+                        ))}
+                    </select>
                 </div>
                 <div>
                     <label className="block text-xs font-bold text-[oklch(0.40_0.08_145)] mb-1">Tu Pregunta o Mensaje</label>
