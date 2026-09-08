@@ -15,6 +15,10 @@ export async function uploadIdDocument(formData: FormData) {
         return { success: false, error: "No se proporcionó ningún archivo" }
     }
 
+    if (session.userId === "mock-user-no-db") {
+        return { success: true, url: "/mock-cedula.pdf" }
+    }
+
     // Validar tipo de archivo
     if (file.type !== "application/pdf") {
         return { success: false, error: "El documento debe ser un archivo PDF" }
@@ -33,17 +37,20 @@ export async function uploadIdDocument(formData: FormData) {
         // Al usar upsert: true, si el usuario vuelve a subirlo, se sobrescribirá su cédula anterior
         const filePath = `${session.userId}/cedula.pdf`
 
+        const arrayBuffer = await file.arrayBuffer()
+        const buffer = Buffer.from(arrayBuffer)
+
         const { data: uploadData, error: uploadError } = await supabase.storage
             .from("user_documents")
-            .upload(filePath, file, {
+            .upload(filePath, buffer, {
                 cacheControl: "3600",
                 upsert: true,
-                contentType: "application/pdf"
+                contentType: file.type
             })
 
         if (uploadError) {
             console.error("Error uploading to storage:", uploadError)
-            return { success: false, error: "Error al subir el archivo al servidor." }
+            return { success: false, error: "Error al subir el archivo al servidor. Detalles: " + uploadError.message }
         }
 
         // Obtener la URL pública (asumiendo que el bucket es público, o generar SignedUrl si es privado)

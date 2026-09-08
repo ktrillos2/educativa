@@ -105,24 +105,8 @@ export function DownloadCertificateButton({ courseId, type, label, className = "
                             firmaImg.style.mixBlendMode = "normal"
                         }
 
-                        // Ajustar logos específicamente para el PDF (hacerlos más grandes y centrarlos más)
                         if (type === "CERTIFICATE") {
-                            const leftLogoContainer = cert.querySelector<HTMLElement>("img[alt='Mención']")?.parentElement
-                            const rightLogoContainer = cert.querySelector<HTMLElement>("img[alt='Logo Academia']")?.parentElement
-                            
-                            if (leftLogoContainer) {
-                                // Quitar márgenes negativos (-ml-12, etc) y aumentar tamaño
-                                leftLogoContainer.className = leftLogoContainer.className.replace(/-ml-\d+/g, '')
-                                leftLogoContainer.classList.add('w-32', 'h-32') // Forzar un tamaño mayor
-                                leftLogoContainer.style.marginLeft = '1rem' // Darle un poco de margen positivo
-                            }
-                            
-                            if (rightLogoContainer) {
-                                // Quitar márgenes negativos (-mr-12, etc) y aumentar tamaño
-                                rightLogoContainer.className = rightLogoContainer.className.replace(/-mr-\d+/g, '')
-                                rightLogoContainer.classList.add('w-32', 'h-32') // Forzar un tamaño mayor
-                                rightLogoContainer.style.marginRight = '1rem' // Darle un poco de margen positivo
-                            }
+                            // Los márgenes de los logos ya están corregidos en el HTML, no es necesario ajustarlos en onclone.
                         }
                     }
                 },

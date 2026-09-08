@@ -134,7 +134,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
     const isEligibleForCert = totalModules > 0 && (completedModules / totalModules) >= 0.8;
 
     // Generate an array of modules based on course.modules length for visualization
-    const courseModules = Array.from({ length: course.modules }).map((_, i) => {
+    const courseModules = Array.from({ length: totalModules }).map((_, i) => {
         // We use course ID in the filename to avoid collisions between courses
         const docName = `Modulo ${i + 1} - ${course.id}.pdf`
         const examName = `Cuestionario Modulo ${i + 1} - ${course.id}.docx`

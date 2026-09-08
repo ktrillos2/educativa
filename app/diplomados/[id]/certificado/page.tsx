@@ -167,109 +167,150 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </div>
 
               {/* Certificate UI designed for printing and responsive display */}
-              <div id="certificate" className="bg-white text-black font-serif p-6 md:p-12 text-center relative shadow-lg min-h-[500px] flex flex-col justify-between" style={{ border: '12px solid #C5A059', boxSizing: 'border-box' }}>
-                <div className="absolute inset-0 m-1 md:m-2 pointer-events-none" style={{ border: '2px solid #C5A059' }}></div>
-                
-                {/* Cabecera */}
-                <div className="relative w-full pt-3 md:pt-6 z-10 flex items-center justify-between px-2 md:px-8">
-                  {/* Escudo/Mención (Izquierda) */}
-                  <div className="w-20 h-20 md:w-28 md:h-28 print:w-32 print:h-32 shrink-0 flex items-center justify-start -ml-4 md:-ml-12 print:m-0 print:ml-8">
-                    <img src="/mencion.svg" alt="Mención" className="w-full h-full object-contain object-left" />
-                  </div>
-                  
-                  {/* Texto Central */}
-                  <div className="flex-1 text-center px-2 -translate-x-1 md:-translate-x-2">
-                    <h1 className="text-[10px] sm:text-sm md:text-base lg:text-lg font-bold text-[#006838] uppercase tracking-normal leading-tight whitespace-nowrap">
-                      ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
-                    </h1>
-                    <div className="flex gap-4 md:gap-8 text-[#006838] text-[9px] sm:text-[11px] md:text-xs lg:text-sm font-bold mt-1.5 justify-center whitespace-nowrap">
-                      <span>Registro mercantil: 95312</span>
-                      <span>NIT: 900361774-5</span>
-                    </div>
-                  </div>
-
-                  {/* Logo Academia (Derecha) */}
-                  <div className="w-16 h-16 md:w-24 md:h-24 print:w-32 print:h-32 shrink-0 flex items-center justify-end -mr-6 md:-mr-12 print:m-0 print:mr-8">
-                    <img src="/logo.svg" alt="Logo Academia" className="w-full h-full object-contain object-right" />
-                  </div>
-                </div>
-
-                {/* Cuerpo Central */}
-                <div className="flex-1 flex flex-col items-center justify-center space-y-2 md:space-y-3 relative z-10 my-4 md:my-6">
-                  <p className="text-base md:text-xl font-bold uppercase text-black mt-2">HACE CONSTAR QUE</p>
-                  
-                  <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-serif font-bold text-black uppercase tracking-wide leading-tight my-1">
-                    {String(userProfile.name)}
-                  </h2>
-                  
-                  <p className="text-xs sm:text-sm md:text-base text-black whitespace-nowrap">
-                    Identificado(a) con documento de identidad N° <span className="border-b border-black inline-block px-3 md:px-6 font-medium pb-0.5">{String(userProfile.document)}</span>
-                  </p>
-                  
-                  <p className="text-base md:text-xl font-bold text-black mt-2">ASISTIÓ AL</p>
-                  
-                  <h3 className="text-base sm:text-lg md:text-xl lg:text-2xl font-bold text-black uppercase px-2 md:px-8 tracking-wide leading-snug">{course.title}</h3>
-                  
-                  <div className="text-xs sm:text-sm md:text-base text-black mt-2 max-w-4xl leading-normal px-2 md:px-0 space-y-2 md:space-y-3">
-                    <p className="whitespace-nowrap">
-                      Modalidad virtual asincrónica a los <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().getDate()}</span> días del mes de <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="border-b border-black px-2 inline-block font-medium pb-0.5">{new Date().getFullYear()}</span>.
-                    </p>
-                    <p className="whitespace-nowrap">
-                      Con una intensidad académica de <span className="font-medium">{course.duration || 'setenta (70) horas'}</span>.
-                    </p>
-                    <p className="whitespace-nowrap">
-                      Registrado en el Libro de Actas N° <span className="border-b-2 border-red-800 border-dotted px-4 inline-block font-medium pb-0.5">2026-00001</span>
-                    </p>
-                  </div>
-                </div>
-
-                {/* Pie / Footer */}
-                <div className="flex flex-col w-full relative z-10 mt-2">
-                  <div className="flex justify-between items-end w-full px-2 md:px-12 mb-2 md:mb-4 flex-nowrap gap-2">
-                    {/* QR */}
-                    <div className="text-center w-28 md:w-36 flex flex-col items-center shrink-0">
-                      <p className="text-[9px] md:text-xs font-bold text-black mb-1">QR DE VERIFICACIÓN</p>
-                      <div className="w-14 h-14 md:w-20 md:h-20 bg-gray-50 border border-gray-300 flex items-center justify-center rounded overflow-hidden p-1 relative group">
-                        <img src={qrImageUrl} alt="QR Code" className="w-full h-full object-contain mix-blend-multiply" />
-                        
-                        {/* Enlace de prueba visible al pasar el mouse por encima del QR (solo para entorno de desarrollo) */}
-                        <a 
-                          href={verificationUrl} 
-                          target="_blank" 
-                          rel="noreferrer"
-                          className="absolute inset-0 bg-black/80 text-white text-[10px] flex items-center justify-center text-center p-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden"
-                        >
-                          Probar <br/> Link
-                        </a>
-                      </div>
-                      <p className="text-[9px] md:text-xs text-black mt-1">Escanea para verificar</p>
-                    </div>
-                    
-                    {/* Signature */}
-                    <div className="text-center flex-1 max-w-xs flex flex-col items-center mx-auto shrink-0">
-                      {/* Firma */}
-                      <div className="h-24 md:h-28 w-56 md:w-72 bg-transparent mt-[calc(1rem-1cm)] mb-1 relative">
-                        <img src="/firma.svg" alt="Firma Director" className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-[1cm] scale-[1.3] max-h-full w-auto" />
-                      </div>
-                      <div className="border-t border-black w-full pt-1">
-                        <p className="font-bold text-xs md:text-sm text-black uppercase whitespace-nowrap">AUDEN VILORIA TORRES</p>
-                        <p className="text-[10px] md:text-xs text-black whitespace-nowrap">Director Académico</p>
+              {/* Certificate UI designed for printing and responsive display */}
+              {/* Certificate UI designed for printing and responsive display */}
+              <div className="w-full flex justify-center pb-4 pt-2 print:p-0">
+                {/* Wrapper that scales down on smaller screens without clipping */}
+                <div 
+                  className="mx-auto origin-top"
+                  style={{ 
+                    transform: 'scale(min(1, calc((100vw - 32px) / 1050)))',
+                    marginBottom: 'calc(742.5px * (min(1, calc((100vw - 32px) / 1050)) - 1))'
+                  }}
+                >
+                  <div 
+                    id="certificate" 
+                    className="bg-white text-black relative shadow-xl mx-auto overflow-hidden print:shadow-none print:w-[297mm] print:h-[210mm] print:mx-0" 
+                    style={{ 
+                      width: '1050px',
+                      height: '742.5px',
+                      border: '3px solid #b58c2a', 
+                      boxShadow: 'inset 0 0 0 6px white, inset 0 0 0 12px #b58c2a',
+                      boxSizing: 'border-box' 
+                    }}
+                  >
+                               {/* Escudo/Mención (Izquierda) */}
+                    <div className="absolute top-10 left-4 pointer-events-none z-20">
+                      <div className="relative overflow-hidden" style={{ width: '180px', height: '180px', transform: 'scale(0.92)' }}>
+                        <img 
+                          src="/certificado-diplomado/liston-verde.svg" 
+                          alt="Mención" 
+                          className="absolute max-w-none" 
+                          style={{ width: '1309px', height: '981px', left: '-22px', top: '-22px' }}
+                        />
                       </div>
                     </div>
                     
-                    {/* Unique Code */}
-                    <div className="text-center w-28 md:w-36 flex flex-col items-center justify-end h-full mb-1 shrink-0">
-                      <p className="text-[10px] md:text-xs text-black mb-0.5">Código único:</p>
-                      <p className="text-[10px] md:text-xs text-black font-medium border-b-2 border-red-800 border-dotted pb-0.5 whitespace-nowrap">AFLM-2026-00001</p>
+                    {/* Logo Academia (Derecha) */}
+                    <div className="absolute top-10 right-4 pointer-events-none z-20">
+                      <div className="relative overflow-hidden" style={{ width: '180px', height: '164px', transform: 'scale(0.92)' }}>
+                        <img 
+                          src="/certificado-diplomado/logo-diploma.svg" 
+                          alt="Logo Academia" 
+                          className="absolute max-w-none" 
+                          style={{ width: '1232px', height: '924px', left: '-41px', top: '-57px' }}
+                        />
+                      </div>
                     </div>
-                  </div>
-                  
-                  {/* Additional Footer Texts */}
-                  <div className="w-full text-center space-y-1 mt-2">
-                    <p className="font-bold text-xs md:text-sm text-black uppercase">WWW.ACADEMIADEFORMACIONLIDERESDELMERITO.EDU.CO</p>
-                    <p className="text-[8px] md:text-[10px] text-black px-4 md:px-8">
-                      La autenticidad de este diploma puede verificarse escaneando el código QR o escribiendo al correo academiadeformacion@lideresdelmerito.edu.co indicando el número de acta.
-                    </p>
+
+                    {/* Texto Central Header */}
+                    <div className="absolute top-10 left-0 right-0 text-center flex flex-col items-center z-10 pointer-events-none">
+                      <h1 className="text-[24px] font-bold text-[#006838] uppercase tracking-wide leading-tight mb-1" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
+                      </h1>
+                      <div className="flex gap-12 text-[#006838] text-[14px] font-bold justify-center" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        <span>Registro mercantil: 95312</span>
+                        <span>NIT: 900361774-5</span>
+                      </div>
+                    </div>
+
+                    {/* Cuerpo Central */}
+                    <div className="absolute top-[125px] left-0 right-0 text-center flex flex-col items-center px-12 z-10 pointer-events-none">
+                      <p className="text-[20px] font-bold text-black tracking-widest" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        HACE CONSTAR QUE
+                      </p>
+                      
+                      <h2 className="text-[40px] font-bold text-black uppercase tracking-wide mt-2 mb-1" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        {String(userProfile.name)}
+                      </h2>
+                      
+                      <p className="text-[18px] text-black" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        Identificado(a) con documento de identidad N° <span className="inline-block border-b border-black px-6 min-w-[200px] text-center pb-0.5">{String(userProfile.document)}</span>
+                      </p>
+                      
+                      <p className="text-[20px] font-bold text-black mt-6 tracking-widest" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        ASISTIÓ AL
+                      </p>
+                      
+                      <h3 className="text-[30px] font-bold text-black uppercase mt-2 mb-3 tracking-wide leading-snug px-12" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        {course.title}
+                      </h3>
+                      
+                      <div className="text-[17px] text-black max-w-[900px] leading-relaxed space-y-2" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        <p>
+                          Modalidad virtual asincrónica a los <span className="inline-block border-b border-black px-4 min-w-[40px] text-center pb-0.5">{new Date().getDate()}</span> días del mes de <span className="inline-block border-b border-black px-4 min-w-[120px] text-center pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="inline-block border-b border-black px-4 min-w-[60px] text-center pb-0.5">{new Date().getFullYear()}</span>.
+                        </p>
+                        <p>
+                          Con una intensidad académica de <span className="font-bold">{course.duration || 'ochenta (80) horas'}</span>.
+                        </p>
+                        <p>
+                          Registrado en el Libro de Actas N° <span className="inline-block border-b border-black px-8 min-w-[150px] text-center pb-0.5">2026-00001</span>
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Pie / Footer */}
+                    <div className="absolute bottom-[60px] left-12 right-12 flex justify-between items-end z-10">
+                      {/* QR */}
+                      <div className="text-center flex flex-col items-center w-40">
+                        <p className="text-[14px] font-bold text-black mb-1 whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>QR DE VERIFICACIÓN</p>
+                        <div className="w-[100px] h-[100px] flex items-center justify-center relative group bg-white border border-transparent">
+                          <img src={qrImageUrl} alt="QR Code" className="w-full h-full object-contain mix-blend-multiply" />
+                          <a 
+                            href={verificationUrl} 
+                            target="_blank" 
+                            rel="noreferrer"
+                            className="absolute inset-0 bg-black/80 text-white text-xs flex items-center justify-center text-center p-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden pointer-events-auto"
+                          >
+                            Probar <br/> Link
+                          </a>
+                        </div>
+                        <p className="text-[12px] text-black mt-1" style={{ fontFamily: 'Times New Roman, serif' }}>(Insertar aquí)</p>
+                      </div>
+                      
+                      {/* Signature */}
+                      <div className="text-center flex flex-col items-center w-[400px] pb-4">
+                        <div className="flex justify-center relative pointer-events-none z-10" style={{ width: '305px', height: '182px', marginBottom: '-60px', marginLeft: '30px' }}>
+                          <div className="w-full h-full relative overflow-hidden">
+                            <img 
+                              src="/certificado-diplomado/firma-auden-viloria.svg" 
+                              alt="Firma Director" 
+                              className="absolute mix-blend-multiply max-w-none"
+                              style={{ width: '1400px', height: '1050px', left: '-47px', top: '-47px' }}
+                            />
+                          </div>
+                        </div>
+                        <div className="border-t border-black w-full pt-2 relative z-20">
+                          <p className="font-bold text-[18px] text-black uppercase" style={{ fontFamily: 'Times New Roman, serif' }}>AUDEN VILORIA TORRES</p>
+                          <p className="text-[16px] text-black" style={{ fontFamily: 'Times New Roman, serif' }}>Director Académico</p>
+                          <p className="font-bold text-[14px] text-black uppercase tracking-wide mt-1" style={{ fontFamily: 'Times New Roman, serif' }}>WWW.ACADEMIADEFORMACIONLIDERESDELMERITO.EDU.CO</p>
+                        </div>
+                      </div>
+                      
+                      {/* Unique Code */}
+                      <div className="text-center flex flex-col items-center w-40 pb-7">
+                        <p className="text-[14px] text-black mb-1.5 whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>Código único:</p>
+                        <p className="text-[16px] text-black font-bold border-b border-black pb-0.5 px-3 whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>AFLM-2026-00001</p>
+                      </div>
+                    </div>
+                    
+                    {/* Additional Footer Texts */}
+                    <div className="absolute bottom-[22px] left-0 right-0 text-center z-10">
+                      <p className="text-[11px] text-black px-16 mt-0.5" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        La autenticidad de este diploma puede verificarse escaneando el código QR o escribiendo al correo academiadeformacion@lideresdelmerito.edu.co indicando el número de acta.
+                      </p>
+                    </div>
+
                   </div>
                 </div>
               </div>

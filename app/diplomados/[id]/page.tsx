@@ -100,7 +100,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
     }
 
     // Generate an array of modules based on course.modules length for visualization
-    const courseModules = Array.from({ length: course.modules }).map((_, i) => {
+    const courseModules = Array.from({ length: totalModules }).map((_, i) => {
         // We use course ID in the filename to avoid collisions between courses
         const docName = `Modulo ${i + 1} - ${course.id}.pdf`
         const examName = `Cuestionario Modulo ${i + 1} - ${course.id}.docx`
@@ -292,13 +292,10 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                     <AccordionContent>
                                         <div className="space-y-4 pt-6 pb-2 px-6">
                                         {courseModules.map((mod, index) => (
-                                            <motion.div
+                                            <div
                                                 key={`mod-${mod.id}`}
-                                                initial={{ opacity: 0, x: -20 }}
-                                                whileInView={{ opacity: 1, x: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.05 }}
-                                                className="p-5 bg-muted/20 border border-border/50 hover:border-primary/30 transition-all group"
+                                                className="p-5 bg-muted/20 border border-border/50 hover:border-primary/30 transition-all group animate-fade-up"
+                                                style={{ animationDelay: `${index * 50}ms` }}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">Unidad {index + 1}</span>
@@ -337,7 +334,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                 ) : (
                                                     <p className="text-[10px] text-muted-foreground">Inscríbete para acceder</p>
                                                 )}
-                                            </motion.div>
+                                            </div>
                                         ))}
                                         </div>
                                     </AccordionContent>
@@ -356,13 +353,10 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                     <AccordionContent>
                                         <div className="space-y-4 pt-6 pb-2 px-6">
                                         {courseModules.map((mod, index) => (
-                                            <motion.div
+                                            <div
                                                 key={`ques-${mod.id}`}
-                                                initial={{ opacity: 0, y: 10 }}
-                                                whileInView={{ opacity: 1, y: 0 }}
-                                                viewport={{ once: true }}
-                                                transition={{ delay: index * 0.05 }}
-                                                className="p-5 bg-secondary/5 border border-secondary/10 hover:border-secondary/30 transition-all group"
+                                                className="p-5 bg-secondary/5 border border-secondary/10 hover:border-secondary/30 transition-all group animate-fade-up"
+                                                style={{ animationDelay: `${index * 50}ms` }}
                                             >
                                                 <div className="flex justify-between items-start mb-2">
                                                     <span className="text-[10px] font-bold text-primary uppercase tracking-widest">Eval. {index + 1}</span>
@@ -398,7 +392,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                 ) : (
                                                     <p className="text-[10px] text-muted-foreground">Disponible tras inscripción</p>
                                                 )}
-                                            </motion.div>
+                                            </div>
                                         ))}
                                         </div>
                                     </AccordionContent>

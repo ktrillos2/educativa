@@ -5,6 +5,7 @@ import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { ExamForm } from "./exam-form"
 import { GroupWaiting } from "@/components/group-waiting"
+import { getQuestionsForClient } from "@/lib/exam-data"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -132,7 +133,7 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
                             </div>
                         )}
 
-                        <ExamForm courseId={course.id} moduleId={params.moduleId} />
+                        <ExamForm courseId={course.id} moduleId={params.moduleId} initialQuestions={getQuestionsForClient(course.id, params.moduleId)} />
                     </div>
                 </div>
             </section>
