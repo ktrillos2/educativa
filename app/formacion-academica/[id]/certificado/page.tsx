@@ -215,7 +215,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   >
                     
                     {/* Escudo/Mención (Izquierda) */}
-                    <div className="absolute top-10 left-4 pointer-events-none z-20">
+                    <div className="absolute top-8 left-2 pointer-events-none z-20">
                       <div className="relative overflow-hidden" style={{ width: '180px', height: '180px', transform: 'scale(0.92)' }}>
                         <img 
                           src="/certificado-diplomado/liston-verde.svg" 
@@ -227,7 +227,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     </div>
                     
                     {/* Logo Academia (Derecha) */}
-                    <div className="absolute top-10 right-4 pointer-events-none z-20">
+                    <div className="absolute top-8 right-2 pointer-events-none z-20">
                       <div className="relative overflow-hidden" style={{ width: '180px', height: '164px', transform: 'scale(0.92)' }}>
                         <img 
                           src="/certificado-diplomado/logo-diploma.svg" 
