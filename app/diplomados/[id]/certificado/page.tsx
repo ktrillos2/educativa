@@ -109,7 +109,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Diplomado
           </Link>
 
-          {!isEligible ? (
+          {!isEligible && !isAdmin ? (
             <div className="bg-white shadow-sm border p-8 text-center">
               <div className="w-16 h-16 bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4">
                 <Award className="w-8 h-8" />
@@ -124,7 +124,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                 Continuar Estudiando
               </Link>
             </div>
-          ) : !hasPaid ? (
+          ) : !hasPaid && !isAdmin ? (
             <CoursePayment courseId={course.id} programName={course.title} />
           ) : !userProfile.id_document_url && !isAdmin ? (
             <div className="py-8">
@@ -214,23 +214,24 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     </div>
 
                     {/* Texto Central Header */}
-                    <div className="absolute top-10 left-0 right-0 text-center flex flex-col items-center z-10 pointer-events-none">
+                    <div className="absolute top-8 left-0 right-0 text-center flex flex-col items-center px-48 z-10 pointer-events-none">
                       <h1 className="text-[24px] font-bold text-[#006838] uppercase tracking-wide leading-tight mb-1" style={{ fontFamily: 'Times New Roman, serif' }}>
                         ACADEMIA DE FORMACIÓN LÍDERES DEL MÉRITO S.A.S
                       </h1>
-                      <div className="flex gap-12 text-[#006838] text-[14px] font-bold justify-center" style={{ fontFamily: 'Arial, sans-serif' }}>
+                      <div className="flex gap-12 text-[#006838] text-[14px] font-bold justify-center mb-4" style={{ fontFamily: 'Times New Roman, serif' }}>
                         <span>Registro mercantil: 95312</span>
                         <span>NIT: 900361774-5</span>
+                      </div>
+                      
+                      <div className="text-[11px] text-black italic text-justify leading-tight" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        En cumplimiento de la Ley 115 de 1994, la Ley 1064 de 2006 y el artículo 2.6.4.3 del Decreto 1075 de 2015, en concordancia con las disposiciones que regulan la Educación para el Trabajo y el Desarrollo Humano. Resolución N° ___ de ___ expedida por la Secretaría de Educación de ____ Código SIET del programa: ____
                       </div>
                     </div>
 
                     {/* Cuerpo Central */}
-                    <div className="absolute top-[125px] left-0 right-0 text-center flex flex-col items-center px-12 z-10 pointer-events-none">
-                      <p className="text-[20px] font-bold text-black tracking-widest" style={{ fontFamily: 'Times New Roman, serif' }}>
-                        HACE CONSTAR QUE
-                      </p>
+                    <div className="absolute top-[180px] left-0 right-0 text-center flex flex-col items-center px-12 z-10 pointer-events-none">
                       
-                      <h2 className="text-[40px] font-bold text-black uppercase tracking-wide mt-2 mb-1" style={{ fontFamily: 'Times New Roman, serif' }}>
+                      <h2 className="text-[44px] font-bold text-black uppercase tracking-wide mb-1" style={{ fontFamily: 'Times New Roman, serif' }}>
                         {String(userProfile.name)}
                       </h2>
                       
@@ -238,23 +239,24 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                         Identificado(a) con documento de identidad N° <span className="inline-block border-b border-black px-6 min-w-[200px] text-center pb-0.5">{String(userProfile.document)}</span>
                       </p>
                       
-                      <p className="text-[20px] font-bold text-black mt-6 tracking-widest" style={{ fontFamily: 'Times New Roman, serif' }}>
-                        ASISTIÓ AL
-                      </p>
+                      <div className="mt-3 mb-4 text-[22px] italic text-black leading-snug" style={{ fontFamily: 'Arial, sans-serif' }}>
+                        <p>Cursó y aprobó el Programa de Formación Académica</p>
+                        <p>Y cumplió con las condiciones requeridas por la entidad. Le confiere el</p>
+                      </div>
                       
-                      <h3 className="text-[30px] font-bold text-black uppercase mt-2 mb-3 tracking-wide leading-snug px-12" style={{ fontFamily: 'Times New Roman, serif' }}>
-                        {course.title}
+                      <h3 className="text-[26px] font-bold text-black uppercase tracking-wide leading-snug px-16 mb-2" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        CERTIFICADO DE CONOCIMIENTOS ACADÉMICOS EN {course.title}
                       </h3>
                       
-                      <div className="text-[17px] text-black max-w-[900px] leading-relaxed space-y-2" style={{ fontFamily: 'Times New Roman, serif' }}>
+                      <div className="text-[18px] text-black max-w-[900px] leading-relaxed space-y-2" style={{ fontFamily: 'Times New Roman, serif' }}>
                         <p>
-                          Modalidad virtual asincrónica a los <span className="inline-block border-b border-black px-4 min-w-[40px] text-center pb-0.5">{new Date().getDate()}</span> días del mes de <span className="inline-block border-b border-black px-4 min-w-[120px] text-center pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="inline-block border-b border-black px-4 min-w-[60px] text-center pb-0.5">{new Date().getFullYear()}</span>.
+                          Metodología: a distancia con estrategia de educación virtual a los <span className="inline-block border-b border-black px-4 min-w-[30px] text-center pb-0.5">{new Date().getDate()}</span> días del mes de <span className="inline-block border-b border-black px-4 min-w-[100px] text-center pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="inline-block border-b border-black px-4 min-w-[50px] text-center pb-0.5">{new Date().getFullYear()}</span>.
                         </p>
                         <p>
                           Con una intensidad académica de <span className="font-bold">{course.duration || 'ochenta (80) horas'}</span>.
                         </p>
                         <p>
-                          Registrado en el Libro de Actas N° <span className="inline-block border-b border-black px-8 min-w-[150px] text-center pb-0.5">2026-00001</span>
+                          Registrado en el Libro de Actas N° <span className="inline-block border-b border-black px-8 min-w-[150px] text-center pb-0.5">2026-00001</span> Folio N° <span className="inline-block border-b border-black px-6 min-w-[50px] text-center pb-0.5">___</span>
                         </p>
                       </div>
                     </div>
@@ -275,12 +277,12 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                             Probar <br/> Link
                           </a>
                         </div>
-                        <p className="text-[12px] text-black mt-1" style={{ fontFamily: 'Times New Roman, serif' }}>(Insertar aquí)</p>
+                        <p className="text-[12px] text-black mt-1" style={{ fontFamily: 'Arial, sans-serif' }}>(Insertar aquí)</p>
                       </div>
                       
                       {/* Signature */}
                       <div className="text-center flex flex-col items-center w-[400px] pb-4">
-                        <div className="flex justify-center relative pointer-events-none z-10" style={{ width: '305px', height: '182px', marginBottom: '-60px', marginLeft: '30px' }}>
+                        <div className="flex justify-center relative pointer-events-none z-10" style={{ width: '305px', height: '182px', marginBottom: '-60px', marginLeft: '30px', transform: 'translateY(30px) scale(0.75)' }}>
                           <div className="w-full h-full relative overflow-hidden">
                             <img 
                               src="/certificado-diplomado/firma-auden-viloria.svg" 
@@ -293,20 +295,25 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                         <div className="border-t border-black w-full pt-2 relative z-20">
                           <p className="font-bold text-[18px] text-black uppercase" style={{ fontFamily: 'Times New Roman, serif' }}>AUDEN VILORIA TORRES</p>
                           <p className="text-[16px] text-black" style={{ fontFamily: 'Times New Roman, serif' }}>Director Académico</p>
-                          <p className="font-bold text-[14px] text-black uppercase tracking-wide mt-1" style={{ fontFamily: 'Times New Roman, serif' }}>WWW.ACADEMIADEFORMACIONLIDERESDELMERITO.EDU.CO</p>
                         </div>
                       </div>
                       
                       {/* Unique Code */}
                       <div className="text-center flex flex-col items-center w-40 pb-7">
                         <p className="text-[14px] text-black mb-1.5 whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>Código único:</p>
-                        <p className="text-[16px] text-black font-bold border-b border-black pb-0.5 px-3 whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>AFLM-2026-00001</p>
+                        <p className="text-[16px] text-black font-bold whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>AFLM-2026-00001</p>
                       </div>
                     </div>
                     
                     {/* Additional Footer Texts */}
-                    <div className="absolute bottom-[22px] left-0 right-0 text-center z-10">
-                      <p className="text-[11px] text-black px-16 mt-0.5" style={{ fontFamily: 'Arial, sans-serif' }}>
+                    <div className="absolute bottom-[35px] left-0 right-0 text-center z-10">
+                      <p className="font-bold text-[15px] text-black uppercase tracking-wide" style={{ fontFamily: 'Times New Roman, serif' }}>
+                        WWW.ACADEMIADEFORMACIONLIDERESDELMERITO.EDU.CO
+                      </p>
+                    </div>
+                    
+                    <div className="absolute bottom-[18px] left-0 right-0 text-center z-10">
+                      <p className="text-[11px] text-black px-16" style={{ fontFamily: 'Arial, sans-serif' }}>
                         La autenticidad de este diploma puede verificarse escaneando el código QR o escribiendo al correo academiadeformacion@lideresdelmerito.edu.co indicando el número de acta.
                       </p>
                     </div>

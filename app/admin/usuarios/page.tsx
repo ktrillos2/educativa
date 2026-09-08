@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { Users, Mail, Phone, Calendar, BookOpen, FileText } from "lucide-react"
 import Link from "next/link"
+import { ForceApproveButton } from "./force-approve-button"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -131,6 +132,7 @@ export default async function AdminUsuariosPage() {
                                       </Link>
                                     </>
                                   )}
+                                      <ForceApproveButton userId={u.id} courseId={e.course_id} totalModules={totalModules} />
                                 </div>
                               </div>
                             )
