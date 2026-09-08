@@ -115,6 +115,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               iconClassName="w-4 h-4"
               autoDownload={autoDownload}
               hasDownloadedBefore={hasDownloadedActa && !isAdmin}
+              isAdmin={isAdmin}
             />
           </div>
 

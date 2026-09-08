@@ -12,9 +12,10 @@ interface DownloadButtonProps {
     iconClassName?: string
     autoDownload?: boolean
     hasDownloadedBefore?: boolean
+    isAdmin?: boolean
 }
 
-export function DownloadCertificateButton({ courseId, type, label, className = "", iconClassName = "w-5 h-5", autoDownload = false, hasDownloadedBefore = false }: DownloadButtonProps) {
+export function DownloadCertificateButton({ courseId, type, label, className = "", iconClassName = "w-5 h-5", autoDownload = false, hasDownloadedBefore = false, isAdmin = false }: DownloadButtonProps) {
     const [loading, setLoading] = useState(false)
     const [showPayAlert, setShowPayAlert] = useState(false)
     const [confirming, setConfirming] = useState(false)
@@ -31,6 +32,10 @@ export function DownloadCertificateButton({ courseId, type, label, className = "
     const startDownload = async () => {
         if (isDownloaded) {
             setShowPayAlert(true)
+            return
+        }
+        if (isAdmin) {
+            executeDownload()
             return
         }
         setConfirming(true)
@@ -164,7 +169,9 @@ export function DownloadCertificateButton({ courseId, type, label, className = "
             window.print()
         } finally {
             await recordDownload(courseId, type).catch(() => {})
-            setIsDownloaded(true)
+            if (!isAdmin) {
+                setIsDownloaded(true)
+            }
             setLoading(false)
         }
     }

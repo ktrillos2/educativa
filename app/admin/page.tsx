@@ -62,7 +62,7 @@ export default async function AdminPage() {
   ]
 
   return (
-    <div className="space-y-8 animate-fade-up">
+    <div className="space-y-8 animate-fade-up pt-6">
 
       {/* ── Header ── */}
       <div className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm p-6 flex flex-col sm:flex-row sm:items-center gap-4">

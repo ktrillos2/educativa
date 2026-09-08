@@ -39,7 +39,7 @@ export default async function AdminUsuariosPage() {
   })
 
   return (
-    <div className="space-y-6 animate-fade-in pb-12">
+    <div className="space-y-6 animate-fade-in pb-12 pt-6">
       <div>
         <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)]">Gestión de Usuarios y Progreso</h1>
         <p className="text-[oklch(0.55_0.04_145)] text-sm">Administra los estudiantes, verifica sus pagos y monitorea su avance académico.</p>

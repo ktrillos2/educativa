@@ -68,7 +68,7 @@ export default function VideosAdminPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in max-w-4xl">
+    <div className="space-y-6 animate-fade-in max-w-4xl pt-6">
       <div>
         <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)]">Videos Promocionales</h1>
         <p className="text-[oklch(0.55_0.04_145)] text-sm">Gestiona los 3 videos motivacionales que aparecen en la página de diplomados.</p>

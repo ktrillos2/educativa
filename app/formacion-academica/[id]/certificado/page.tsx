@@ -174,21 +174,13 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     <p className="text-muted-foreground">Has completado exitosamente todos los requisitos del programa.</p>
                 </div>
                 <div className="flex flex-wrap gap-3">
-                    {isAdmin && (
-                      <Link
-                          href={`/formacion-academica/${course.id}/acta${studentIdParam ? `?studentId=${studentIdParam}` : ''}`}
-                          className="bg-white text-secondary border-2 border-secondary px-6 py-2.5 font-bold hover:bg-secondary/5 flex items-center gap-2 transition-all shadow-sm"
-                      >
-                          <FileSpreadsheet className="w-5 h-5" />
-                          Ver Acta Académica
-                      </Link>
-                    )}
                     <DownloadCertificateButton 
                         courseId={course.id} 
                         type="CERTIFICATE" 
                         label="Descargar Certificado"
                         className="bg-secondary text-white px-6 py-2.5 font-bold hover:bg-secondary/90 shadow-lg shadow-secondary/20"
                         hasDownloadedBefore={hasDownloadedCert && !isAdmin}
+                        isAdmin={isAdmin}
                     />
                 </div>
               </div>
@@ -275,7 +267,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                       
                       <div className="text-[18px] text-black max-w-[900px] leading-relaxed space-y-2" style={{ fontFamily: 'Times New Roman, serif' }}>
                         <p>
-                          Metodología: a distancia con estrategia de educación virtual a los <span className="inline-block border-b border-black px-4 min-w-[30px] text-center pb-0.5">{new Date().getDate()}</span> días del mes de <span className="inline-block border-b border-black px-4 min-w-[100px] text-center pb-0.5">{new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="inline-block border-b border-black px-4 min-w-[50px] text-center pb-0.5">{new Date().getFullYear()}</span>.
+                          Metodología: a distancia con estrategia de educación virtual a los <span className="inline-block border-b border-black px-4 min-w-[30px] text-center pb-0.5">{groupData?.first_certificate_download_at ? new Date(groupData.first_certificate_download_at).getDate() : new Date().getDate()}</span> días del mes de <span className="inline-block border-b border-black px-4 min-w-[100px] text-center pb-0.5">{groupData?.first_certificate_download_at ? new Date(groupData.first_certificate_download_at).toLocaleString('es-CO', { month: 'long' }) : new Date().toLocaleString('es-CO', { month: 'long' })}</span> del año <span className="inline-block border-b border-black px-4 min-w-[50px] text-center pb-0.5">{groupData?.first_certificate_download_at ? new Date(groupData.first_certificate_download_at).getFullYear() : new Date().getFullYear()}</span>.
                         </p>
                         <p>
                           Con una intensidad académica de <span className="font-bold">{course.duration || 'ciento sesenta (160) horas'}</span>.

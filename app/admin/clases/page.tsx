@@ -46,7 +46,7 @@ export default async function AdminClasesPage() {
     .order("scheduled_at", { ascending: true })
 
   return (
-    <div className="space-y-8 animate-fade-in">
+    <div className="space-y-8 animate-fade-in pt-6">
       <div>
         <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)]">Clases en Vivo</h1>
         <p className="text-[oklch(0.55_0.04_145)] text-sm">Programa sesiones en vivo para los diferentes grupos.</p>

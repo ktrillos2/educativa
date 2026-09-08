@@ -28,7 +28,7 @@ export default async function AdminCursosPage() {
   }
 
   return (
-    <div className="space-y-6 animate-fade-in">
+    <div className="space-y-6 animate-fade-in pt-6">
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)]">Gestión de Cursos</h1>

@@ -57,10 +57,12 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
   // Check enrollment and payment
   const { data: enrollment } = await supabase
     .from("enrollments")
-    .select("payment_verified")
+    .select("payment_verified, course_groups(first_certificate_download_at)")
     .eq("user_id", targetUserId)
     .eq("course_id", course.id)
     .maybeSingle()
+
+  const groupData = enrollment?.course_groups ? (Array.isArray(enrollment.course_groups) ? enrollment.course_groups[0] : enrollment.course_groups as any) : null;
 
   if (!enrollment || !enrollment.payment_verified) {
     redirect(`/diplomados/${course.id}/certificado`)
@@ -115,6 +117,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
               iconClassName="w-4 h-4"
               autoDownload={autoDownload}
               hasDownloadedBefore={hasDownloadedActa && !isAdmin}
+              isAdmin={isAdmin}
             />
           </div>
 
@@ -196,7 +199,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
                 </div>
                 <div className="text-center pt-8 border-t border-black/20">
                     <p className="font-bold text-sm uppercase">Sello de Registro</p>
-                    <p className="text-xs text-muted-foreground">Emitido el {new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                    <p className="text-xs text-muted-foreground">Emitido el {groupData?.first_certificate_download_at ? new Date(groupData.first_certificate_download_at).toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' }) : new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
                 </div>
             </div>
 

@@ -2,10 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { BookOpen, CreditCard, ShieldCheck, Zap } from '@/components/ui/icons'
+import { BookOpen, CreditCard, ShieldCheck } from '@/components/ui/icons'
 import { toast } from 'sonner'
-import { simulatePayment } from '@/app/actions/simulate-payment'
-
 interface CoursePaymentProps {
   courseId: string
   programName: string
@@ -48,20 +46,6 @@ export function CoursePayment({ courseId, programName }: CoursePaymentProps) {
     }
   }
 
-  const handleDevPayment = async () => {
-    setLoading(true)
-    try {
-      const res = await simulatePayment(courseId)
-      if (!res.success) throw new Error(res.error)
-      toast.success('Pago simulado con éxito (Modo Dev)')
-      // Forzar una recarga dura del navegador para limpiar cualquier caché de Next.js
-      window.location.reload()
-    } catch (error: any) {
-      toast.error(error.message)
-      setLoading(false)
-    }
-  }
-
   return (
     <div className="bg-white shadow-sm border p-8 md:p-12 text-center max-w-2xl mx-auto my-8">
 
@@ -93,16 +77,7 @@ export function CoursePayment({ courseId, programName }: CoursePaymentProps) {
         Pagos 100% seguros procesados por Openpay BBVA
       </div>
 
-      {process.env.NODE_ENV === 'development' && (
-        <button 
-          onClick={handleDevPayment}
-          disabled={loading}
-          className="w-full mt-6 bg-purple-600 text-white py-3 font-bold hover:bg-purple-700 transition-all flex items-center justify-center gap-2 rounded-md shadow-sm"
-        >
-          <Zap className="w-5 h-5" />
-          Simular Pago (Modo Desarrollo)
-        </button>
-      )}
+
     </div>
   )
 }
