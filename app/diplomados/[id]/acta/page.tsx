@@ -37,6 +37,11 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
     notFound()
   }
 
+  // Si el curso es ETDH, redirigir a la ruta correcta para que apliquen las lógicas de expiración
+  if (course.type === 'etdh') {
+    redirect(`/formacion-academica/${params.id}/acta${studentIdParam ? `?studentId=${studentIdParam}` : ''}`)
+  }
+
   // Permitir al admin ver el acta de un estudiante específico
   let targetUserId = session.userId
   if (studentIdParam && isAdmin) {

@@ -35,6 +35,11 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
     notFound()
   }
 
+  // Si el curso es ETDH, redirigir a la ruta correcta para que apliquen las lógicas de expiración
+  if (course.type === 'etdh') {
+    redirect(`/formacion-academica/${params.id}/certificado${studentIdParam ? `?studentId=${studentIdParam}` : ''}`)
+  }
+
   // Permitir al admin ver el certificado de un estudiante específico
   let targetUserId = session.userId
   if (studentIdParam && isAdmin) {

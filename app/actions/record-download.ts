@@ -10,10 +10,12 @@ export async function recordDownload(courseId: string, type: "CERTIFICATE" | "AC
             return { success: false, error: "No autorizado" }
         }
 
-        const supabase = await createClient()
+        const { createAdminClient } = await import("@/utils/supabase/admin")
+        const adminSupabase = createAdminClient()
 
-        // Insertar el registro de descarga (si falla, no interrumpimos la descarga del usuario)
-        const { error } = await supabase.from("study_acts").insert({
+        // Insertar el registro de descarga usando admin para evitar problemas de RLS
+        // que impedirían el registro de la primera descarga y el cierre del cohorte.
+        const { error } = await adminSupabase.from("study_acts").insert({
             user_id: session.userId,
             course_id: courseId,
             type: type
@@ -21,14 +23,15 @@ export async function recordDownload(courseId: string, type: "CERTIFICATE" | "AC
 
         if (error) {
             console.error("Error al registrar la descarga en study_acts:", error)
-            return { success: false, error: error.message }
+            // Si ya existe el registro (ej. unique constraint), continuamos para la lógica de ETDH
+            // en lugar de retornar inmediatamente.
+            if (error.code !== '23505') { 
+                return { success: false, error: error.message }
+            }
         }
 
         // Lógica de ETDH: registrar primera descarga de certificado del cohorte
         if (type === "CERTIFICATE") {
-            const { createAdminClient } = await import("@/utils/supabase/admin")
-            const adminSupabase = createAdminClient()
-            
             // Buscar inscripción y tipo de curso
             const { data: enrollmentData } = await adminSupabase
                 .from("enrollments")
