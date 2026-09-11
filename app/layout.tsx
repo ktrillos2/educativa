@@ -16,7 +16,12 @@ export const metadata: Metadata = {
   title: "Academia de Formación Líderes del Mérito S.A.S.",
   description:
     "Formación profesional de excelencia. Diplomados, cursos y certificaciones para impulsar tu carrera profesional.",
-  generator: 'v0.app'
+  generator: 'v0.app',
+  icons: {
+    icon: "/images/image.png",
+    shortcut: "/images/image.png",
+    apple: "/images/image.png",
+  }
 }
 
 export default async function RootLayout({
@@ -28,6 +33,10 @@ export default async function RootLayout({
 
   return (
     <html lang="es">
+      <head>
+        <link rel="icon" href="/images/image.png" type="image/png" sizes="any" />
+        <link rel="apple-touch-icon" href="/images/image.png" />
+      </head>
       <body className={`font-sans antialiased`}>
         <div className="print:hidden">
           <Header session={session} />

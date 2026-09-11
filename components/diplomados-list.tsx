@@ -62,11 +62,11 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
   const [activeCategory, setActiveCategory] = useState("Todos")
   const [searchTerm, setSearchTerm] = useState("")
 
-  const filteredDiplomados = initialCourses.filter((d) => {
-    const matchesCategory = activeCategory === "Todos" || d.category === activeCategory
+  const filteredDiplomados = (initialCourses || []).filter((d) => {
+    const matchesCategory = activeCategory === "Todos" || !d.category || d.category === activeCategory
     const matchesSearch =
-      d.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      d.description.toLowerCase().includes(searchTerm.toLowerCase())
+      (d.title || "").toLowerCase().includes((searchTerm || "").toLowerCase()) ||
+      (d.description || "").toLowerCase().includes((searchTerm || "").toLowerCase())
     return matchesCategory && matchesSearch
   })
 

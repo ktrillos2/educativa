@@ -1,46 +1,120 @@
 import { DiplomadosList } from "@/components/diplomados-list"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { GraduationCap } from "@/components/ui/icons"
-import { createClient } from "@/utils/supabase/server"
 import Image from "next/image"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getSettings } from "@/app/actions/settings"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ProgramInfoDialog } from "@/components/program-info-dialog"
 
+export const dynamic = "force-dynamic"
+export const revalidate = 0
+
 export default async function DiplomadosPage() {
-  const supabase = await createClient()
   const supabaseAdmin = createAdminClient()
   
-  const { data: coursesData } = await supabase
+  const { data: rawCourses, error: coursesError } = await supabaseAdmin
     .from("courses")
     .select("*")
-    .or("type.eq.diplomado,type.is.null")
     .order("created_at", { ascending: true })
 
-  const initialCourses = await Promise.all((coursesData || []).map(async (course) => {
-    // Buscar conteo de inscritos (bypassing RLS para obtener el total real)
+  if (coursesError) {
+    console.error("Error fetching courses for diplomados:", coursesError)
+  }
+
+  // Si hay cursos en la base de datos, usamos los cursos reales
+  const coursesData = (rawCourses && rawCourses.length > 0)
+    ? rawCourses.filter((course) => course.type !== "etdh" || rawCourses.length === 1)
+    : []
+
+  let initialCourses = await Promise.all((coursesData || []).map(async (course) => {
     const { count: enrolledCount } = await supabaseAdmin
         .from("enrollments")
         .select("*", { count: "exact", head: true })
         .eq("course_id", course.id)
 
     return {
-      id: course.id,
-      title: course.title,
-      description: course.description,
-      duration: course.duration,
-      students: course.students,
-      badge: course.badge,
-      category: course.category,
-      image: course.image,
-      price: course.price,
-      startDate: course.start_date,
-      modules: course.modules,
+      id: String(course.id),
+      title: course.title || "Sin título",
+      description: course.description || "",
+      duration: course.duration || "A tu ritmo",
+      students: course.students || "Autoestudio",
+      badge: course.badge || null,
+      category: course.category || "General",
+      image: course.image || "/placeholder.svg",
+      price: course.price || "Gratuito",
+      startDate: course.start_date || "Inscripciones Abiertas",
+      modules: course.modules || 0,
       minStudents: course.min_students ?? 5,
       enrolledCount: enrolledCount ?? 0,
     }
   }))
+
+  // Solo usamos el fallback si la BD está completamente vacía (0 registros en la tabla courses)
+  if ((!rawCourses || rawCourses.length === 0) && initialCourses.length === 0) {
+    initialCourses = [
+      {
+        id: 'diplomado-salud-ocupacional',
+        title: 'Diplomado en Seguridad y Salud en el Trabajo',
+        description: 'Capacítate en la prevención de riesgos laborales y normatividad vigente del SG-SST.',
+        category: 'Salud',
+        price: '$120.000 COP',
+        duration: '120 horas',
+        students: 'Autoestudio',
+        badge: 'Popular',
+        image: '/images/workplace-safety-health-professional-training.jpg',
+        startDate: 'Inscripciones Abiertas',
+        modules: 4,
+        minStudents: 5,
+        enrolledCount: 0
+      },
+      {
+        id: 'diplomado-gestion-publica',
+        title: 'Diplomado en Gestión Pública y Contratación Estatal',
+        description: 'Aprende los principios fundamentales de la administración pública y los procesos contractuales del Estado.',
+        category: 'Gestión',
+        price: '$150.000 COP',
+        duration: '140 horas',
+        students: 'Autoestudio',
+        badge: 'Certificado',
+        image: '/images/government-contract-legal-documents.jpg',
+        startDate: 'Inscripciones Abiertas',
+        modules: 5,
+        minStudents: 5,
+        enrolledCount: 0
+      },
+      {
+        id: 'diplomado-desarrollo-software',
+        title: 'Diplomado en Desarrollo de Software y Frontend Web',
+        description: 'Aprende a construir aplicaciones web modernas con React, Next.js y JavaScript avanzado.',
+        category: 'Tecnología',
+        price: '$180.000 COP',
+        duration: '160 horas',
+        students: 'Autoestudio',
+        badge: 'Nuevo',
+        image: '/images/desarrollo-software.jpg',
+        startDate: 'Inscripciones Abiertas',
+        modules: 6,
+        minStudents: 5,
+        enrolledCount: 0
+      },
+      {
+        id: 'diplomado-derecho-laboral',
+        title: 'Diplomado en Derecho Laboral y Talento Humano',
+        description: 'Domina los aspectos legales, contratos y liquidaciones en la gestión del talento humano.',
+        category: 'Legal',
+        price: '$130.000 COP',
+        duration: '120 horas',
+        students: 'Autoestudio',
+        badge: 'Popular',
+        image: '/images/labor-law-legal-documents-office.jpg',
+        startDate: 'Inscripciones Abiertas',
+        modules: 4,
+        minStudents: 5,
+        enrolledCount: 0
+      }
+    ]
+  }
 
   const uniqueCategories = [
     "Todos",
