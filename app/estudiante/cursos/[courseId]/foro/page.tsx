@@ -4,6 +4,7 @@ import { notFound, redirect } from "next/navigation"
 import Link from "next/link"
 import { MessageCircle, BookOpen, Clock, ChevronLeft, Search, Hash, Pin, Eye, CheckCircle2 } from "lucide-react"
 import { CreateTopicForm } from "@/components/create-topic-form"
+import { UserAvatar } from "@/components/user-avatar"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 
@@ -88,7 +89,7 @@ export default async function ForoCursoPage(props: { params: Promise<{ courseId:
   const categories = ["Todas", "Dudas Generales", "Problemas Técnicos", "Sobre Evaluaciones"]
 
   return (
-    <div className="space-y-6 animate-fade-up max-w-6xl mx-auto">
+    <div className="space-y-6 animate-fade-up pt-2 sm:pt-4 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <Link href={`/estudiante/cursos/${params.courseId}`} className="inline-flex items-center gap-1 text-[oklch(0.55_0.04_145)] hover:text-[oklch(0.35_0.10_145)] text-sm mb-2 transition-colors">
@@ -100,6 +101,61 @@ export default async function ForoCursoPage(props: { params: Promise<{ courseId:
           <p className="text-[oklch(0.55_0.04_145)] text-sm mt-1 truncate max-w-lg">{course.title}</p>
         </div>
         <CreateTopicForm courseId={params.courseId} />
+      </div>
+
+      {/* Banner Informativo FORO ACADÉMICO */}
+      <div className="bg-gradient-to-br from-blue-50 via-indigo-50/40 to-sky-100/30 border border-blue-200/80 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-blue-600/20">
+            <BookOpen className="w-5 h-5" />
+          </div>
+          <div className="flex-1 space-y-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="bg-blue-100 text-blue-800 text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-blue-200">
+                  Aprendizaje Colaborativo
+                </span>
+                <span className="text-xs font-semibold text-blue-700">Dudas y Debates</span>
+              </div>
+              <h2 className="text-lg font-bold text-blue-950 mt-1">Foro Académico</h2>
+              <p className="text-xs sm:text-sm text-blue-800/90 mt-0.5">
+                Espacio interactivo para resolver dudas sobre los contenidos de la unidad y aprender en grupo.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+              <div className="bg-white/80 backdrop-blur-sm border border-blue-200/60 rounded-xl p-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-blue-900 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">1</span>
+                  Dudas y Consultas
+                </div>
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  Formula tus preguntas e inquietudes sobre las lecciones estudiadas.
+                </p>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm border border-blue-200/60 rounded-xl p-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-blue-900 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">2</span>
+                  Casos Reales
+                </div>
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  Aporta experiencias de tu entorno laboral vinculadas con los temas del curso.
+                </p>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm border border-blue-200/60 rounded-xl p-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-blue-900 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-blue-100 text-blue-700 flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">3</span>
+                  Participación Activa
+                </div>
+                <p className="text-xs text-blue-800 leading-relaxed">
+                  Comenta en las publicaciones de tus compañeros para enriquecer el aprendizaje.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -157,11 +213,7 @@ export default async function ForoCursoPage(props: { params: Promise<{ courseId:
                   >
                     <div className="flex gap-4 items-start">
                       {/* Avatar */}
-                      <div className={`hidden sm:flex w-10 h-10 rounded-full items-center justify-center font-bold text-sm flex-shrink-0 text-white ${
-                          isTeacher ? 'bg-[oklch(0.35_0.10_145)] ring-2 ring-[oklch(0.80_0.10_145)]' : 'bg-gray-400'
-                      }`}>
-                          {getInitials(topic.users?.name)}
-                      </div>
+                      <UserAvatar className="hidden sm:inline-flex" name={topic.users?.name} role={topic.users?.role} size="md" />
 
                       <div className="flex-1 min-w-0">
                         {/* Tags and Title */}

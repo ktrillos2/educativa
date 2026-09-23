@@ -173,16 +173,18 @@ export function AdminReportesClient({ users, enrollments, courses }: Props) {
     return enrollments.map(e => {
       const student = users.find(u => u.id === e.user_id)
       const course = courseMap.get(e.course_id)
-      return {
-        ...e,
-        studentName: student?.name || "Estudiante desconocido",
-        studentEmail: student?.email || "N/A",
-        studentPhone: student?.phone || "N/A",
-        studentDocument: student?.document || "N/A",
-        courseTitle: course?.title || `Diplomado (${e.course_id})`,
-        coursePrice: course?.price || "$0",
-        priceNumber: course ? parsePrice(course.price) : 0
-      }
+        const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
+        const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+        return {
+          ...e,
+          studentName: student?.name || "Estudiante desconocido",
+          studentEmail: student?.email || "N/A",
+          studentPhone: student?.phone || "N/A",
+          studentDocument: student?.document || "N/A",
+          courseTitle: courseTitle || `Diplomado (${e.course_id})`,
+          coursePrice: course?.price || "$0",
+          priceNumber: course ? parsePrice(course.price) : 0
+        }
     }).filter(e => {
       const matchesSearch = 
         e.studentName.toLowerCase().includes(searchQuery.toLowerCase()) ||

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation"
 import Link from "next/link"
 import { MessageCircle, Users, Clock, Pin, Eye, Search, Hash } from "lucide-react"
 import { CreateTopicForm } from "@/components/create-topic-form"
+import { UserAvatar } from "@/components/user-avatar"
 import { formatDistanceToNow } from "date-fns"
 import { es } from "date-fns/locale"
 
@@ -68,7 +69,7 @@ export default async function ComunidadPage(props: { searchParams: Promise<{ q?:
   const categories = ["Todas", "General", "Recursos de Estudio", "Noticias de la Academia", "Dudas Administrativas", "Grupos de Estudio"]
 
   return (
-    <div className="space-y-6 animate-fade-up max-w-6xl mx-auto">
+    <div className="space-y-6 animate-fade-up pt-2 sm:pt-4 max-w-6xl mx-auto">
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)] flex items-center gap-2">
@@ -77,6 +78,61 @@ export default async function ComunidadPage(props: { searchParams: Promise<{ q?:
           <p className="text-[oklch(0.55_0.04_145)] text-sm mt-1">Comparte recursos, entérate de las noticias y conecta con otros alumnos.</p>
         </div>
         <CreateTopicForm />
+      </div>
+
+      {/* Banner Informativo FORO SOCIAL */}
+      <div className="bg-gradient-to-br from-emerald-50 via-teal-50/50 to-emerald-100/30 border border-emerald-200/80 rounded-2xl p-5 sm:p-6 shadow-sm relative overflow-hidden">
+        <div className="flex flex-col md:flex-row md:items-start gap-4">
+          <div className="w-10 h-10 rounded-xl bg-emerald-600 text-white flex items-center justify-center flex-shrink-0 shadow-md shadow-emerald-600/20">
+            <Users className="w-5 h-5" />
+          </div>
+          <div className="flex-1 space-y-3">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="bg-emerald-100 text-emerald-800 text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded-full border border-emerald-200">
+                  Comunidad & Conexión
+                </span>
+                <span className="text-xs font-semibold text-emerald-700">Espacio Abierto</span>
+              </div>
+              <h2 className="text-lg font-bold text-emerald-950 mt-1">Foro Social</h2>
+              <p className="text-xs sm:text-sm text-emerald-800/90 mt-0.5">
+                ¡Queremos conocerte! Preséntate con el grupo y ayuda a construir una comunidad activa y cercana.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1">
+              <div className="bg-white/80 backdrop-blur-sm border border-emerald-200/60 rounded-xl p-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">1</span>
+                  Presentación
+                </div>
+                <p className="text-xs text-emerald-800 leading-relaxed">
+                  Comparte tu nombre completo, dónde vives y a qué te dedicas actualmente.
+                </p>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm border border-emerald-200/60 rounded-xl p-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">2</span>
+                  Motivación
+                </div>
+                <p className="text-xs text-emerald-800 leading-relaxed">
+                  Cuéntanos qué te motivó a realizar esta formación y cuáles son tus metas.
+                </p>
+              </div>
+
+              <div className="bg-white/80 backdrop-blur-sm border border-emerald-200/60 rounded-xl p-3 shadow-2xs">
+                <div className="flex items-center gap-2 text-xs font-bold text-emerald-900 mb-1">
+                  <span className="w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 flex items-center justify-center text-[10px] font-extrabold flex-shrink-0">3</span>
+                  Intereses y Experiencia
+                </div>
+                <p className="text-xs text-emerald-800 leading-relaxed">
+                  Agrega un interés o aspecto personal importante para conocernos mejor.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col md:flex-row gap-6 items-start">
@@ -134,11 +190,7 @@ export default async function ComunidadPage(props: { searchParams: Promise<{ q?:
                   >
                     <div className="flex gap-4 items-start">
                       {/* Avatar */}
-                      <div className={`hidden sm:flex w-10 h-10 rounded-full items-center justify-center font-bold text-sm flex-shrink-0 text-white ${
-                          isTeacher ? 'bg-[oklch(0.35_0.10_145)] ring-2 ring-[oklch(0.80_0.10_145)]' : 'bg-gray-400'
-                      }`}>
-                          {getInitials(topic.users?.name)}
-                      </div>
+                      <UserAvatar className="hidden sm:inline-flex" name={topic.users?.name} role={topic.users?.role} size="md" />
 
                       <div className="flex-1 min-w-0">
                         {/* Tags and Title */}

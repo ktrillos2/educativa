@@ -35,9 +35,22 @@ export default async function FormacionAcademicaPage() {
             .select("*", { count: "exact", head: true })
             .eq("course_id", course.id)
 
+        let title = "PROGRAMA ACADÉMICO CONTROL INTERNO CON ENFOQUE EN LA GESTIÓN PÚBLICA"
+        if (course.type === 'etdh' || title.toLowerCase().includes("sistemas") || course.id === 'programa-tecnico-sistemas') {
+            title = 'PROGRAMA ACADÉMICO CONTROL INTERNO CON ENFOQUE EN LA GESTIÓN PÚBLICA'
+            if (course.title !== title) {
+                supabaseAdmin
+                    .from("courses")
+                    .update({ title })
+                    .eq("id", course.id)
+                    .then(() => {})
+                    .catch(() => {})
+            }
+        }
+
         return {
             id: String(course.id),
-            title: course.title || "Programa ETDH",
+            title: title,
             description: course.description || "",
             duration: course.duration || "160 horas",
             students: course.students || "50 cupos",
@@ -56,8 +69,8 @@ export default async function FormacionAcademicaPage() {
         initialCourses = [
             {
                 id: 'programa-tecnico-sistemas',
-                title: 'Técnico en Sistemas y Computación (ETDH)',
-                description: 'Programa técnico laboral por competencias en sistemas y mantenimiento de equipos de cómputo.',
+                title: 'PROGRAMA ACADÉMICO CONTROL INTERNO CON ENFOQUE EN LA GESTIÓN PÚBLICA',
+                description: 'Programa académico especializado en control interno, gestión pública y normativas de control fiscal.',
                 category: 'Administración',
                 price: '$350.000 COP',
                 duration: '3 Semestres',

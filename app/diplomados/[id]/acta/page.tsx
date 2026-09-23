@@ -37,6 +37,11 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
     notFound()
   }
 
+  if (course.type !== 'etdh') {
+    course.title = "Diplomado en Gestión del Presupuesto Público"
+    course.duration = "80 horas"
+  }
+
   // Si el curso es ETDH, redirigir a la ruta correcta para que apliquen las lógicas de expiración
   if (course.type === 'etdh') {
     redirect(`/formacion-academica/${params.id}/acta${studentIdParam ? `?studentId=${studentIdParam}` : ''}`)

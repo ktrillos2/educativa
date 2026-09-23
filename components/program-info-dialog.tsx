@@ -52,7 +52,7 @@ function DiplomadosContent() {
         El manejo del presupuesto público es una competencia directamente relacionada con la planeación, ejecución y control de los recursos del Estado. Conocer cómo se programan los ingresos y gastos, cómo se ejecutan las apropiaciones presupuestales, cuáles son los controles aplicables y qué responsabilidades asumen los servidores públicos, permite comprender mejor el funcionamiento financiero de las entidades estatales.
       </p>
       <p>
-        El <strong>Diplomado en Presupuesto Público</strong> de la Academia de Formación Líderes del Mérito S.A.S. está orientado a servidores públicos, contratistas, profesionales, técnicos, tecnólogos, estudiantes y ciudadanos interesados en fortalecer conocimientos aplicables a la administración pública.
+        El <strong>Diplomado en Gestión del Presupuesto Público</strong> de la Academia de Formación Líderes del Mérito S.A.S. está orientado a servidores públicos, contratistas, profesionales, técnicos, tecnólogos, estudiantes y ciudadanos interesados en fortalecer conocimientos aplicables a la administración pública.
       </p>
 
       <SectionHeader>FORTALEZCA SU HOJA DE VIDA</SectionHeader>

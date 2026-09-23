@@ -16,8 +16,8 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 async function seed() {
   const { data, error } = await supabase.from('courses').insert({
     id: 'programa-tecnico-sistemas',
-    title: 'Técnico en Sistemas y Computación (ETDH)',
-    description: 'Programa técnico laboral por competencias en sistemas y mantenimiento de equipos de cómputo.',
+    title: 'PROGRAMA ACADÉMICO CONTROL INTERNO CON ENFOQUE EN LA GESTIÓN PÚBLICA Y EL CONTROL FISCAL',
+    description: 'Programa académico especializado en control interno, gestión pública y normativas de control fiscal.',
     category: 'Administración',
     price: '$350.000 COP',
     duration: '3 Semestres',

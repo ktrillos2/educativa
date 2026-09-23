@@ -41,6 +41,11 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
         notFound()
     }
 
+    if (course.type !== 'etdh') {
+        course.title = "Diplomado en Gestión del Presupuesto Público"
+        course.duration = "80 horas"
+    }
+
     const session = await getSession()
     let isEnrolled = false
     let paymentVerified = false

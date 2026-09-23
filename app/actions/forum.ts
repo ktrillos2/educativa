@@ -9,7 +9,7 @@ export async function createTopic(title: string, content: string, category: stri
     const session = await getSession()
     if (!session?.userId) return { success: false, error: "No autorizado" }
 
-    const supabase = await createClient()
+    const supabase = session.role === 'admin' ? createAdminClient() : await createClient()
 
     const { data, error } = await supabase
         .from("forum_topics")
@@ -30,9 +30,11 @@ export async function createTopic(title: string, content: string, category: stri
 
     if (courseId) {
         revalidatePath(`/estudiante/cursos/${courseId}`)
+        revalidatePath(`/estudiante/cursos/${courseId}/foro`)
     } else {
         revalidatePath("/estudiante/comunidad")
     }
+    revalidatePath("/admin/foros")
 
     return { success: true, topic: data }
 }
@@ -41,7 +43,7 @@ export async function createReply(topicId: string, content: string, courseId: st
     const session = await getSession()
     if (!session?.userId) return { success: false, error: "No autorizado" }
 
-    const supabase = await createClient()
+    const supabase = session.role === 'admin' ? createAdminClient() : await createClient()
 
     const { error } = await supabase
         .from("forum_replies")
@@ -63,6 +65,7 @@ export async function createReply(topicId: string, content: string, courseId: st
         revalidatePath("/estudiante/comunidad")
         revalidatePath(`/estudiante/comunidad/tema/${topicId}`)
     }
+    revalidatePath("/admin/foros")
 
     return { success: true }
 }
@@ -116,6 +119,74 @@ export async function deleteReply(replyId: string, topicId: string, courseId: st
     } else {
         revalidatePath(`/estudiante/comunidad/tema/${topicId}`)
     }
+
+    return { success: true }
+}
+
+export async function updateTopic(topicId: string, title: string, content: string, category?: string, courseId: string | null = null) {
+    const session = await getSession()
+    if (!session?.userId) return { success: false, error: "No autorizado" }
+
+    const supabase = session.role === 'admin' ? createAdminClient() : await createClient()
+
+    if (session.role !== 'admin') {
+        const { data: topic } = await supabase.from("forum_topics").select("user_id").eq("id", topicId).single()
+        if (topic?.user_id !== session.userId) return { success: false, error: "No tienes permiso para editar este tema" }
+    }
+
+    const updateData: any = { title, content }
+    if (category) updateData.category = category
+
+    const { error } = await supabase
+        .from("forum_topics")
+        .update(updateData)
+        .eq("id", topicId)
+
+    if (error) {
+        console.error("Error updating topic:", error)
+        return { success: false, error: error.message }
+    }
+
+    if (courseId) {
+        revalidatePath(`/estudiante/cursos/${courseId}`)
+        revalidatePath(`/estudiante/cursos/${courseId}/foro`)
+        revalidatePath(`/estudiante/cursos/${courseId}/foro/${topicId}`)
+    } else {
+        revalidatePath("/estudiante/comunidad")
+        revalidatePath(`/estudiante/comunidad/tema/${topicId}`)
+    }
+    revalidatePath("/admin/foros")
+
+    return { success: true }
+}
+
+export async function updateReply(replyId: string, content: string, topicId: string, courseId: string | null = null) {
+    const session = await getSession()
+    if (!session?.userId) return { success: false, error: "No autorizado" }
+
+    const supabase = session.role === 'admin' ? createAdminClient() : await createClient()
+
+    if (session.role !== 'admin') {
+        const { data: reply } = await supabase.from("forum_replies").select("user_id").eq("id", replyId).single()
+        if (reply?.user_id !== session.userId) return { success: false, error: "No tienes permiso para editar esta respuesta" }
+    }
+
+    const { error } = await supabase
+        .from("forum_replies")
+        .update({ content })
+        .eq("id", replyId)
+
+    if (error) {
+        console.error("Error updating reply:", error)
+        return { success: false, error: error.message }
+    }
+
+    if (courseId) {
+        revalidatePath(`/estudiante/cursos/${courseId}/foro/${topicId}`)
+    } else {
+        revalidatePath(`/estudiante/comunidad/tema/${topicId}`)
+    }
+    revalidatePath("/admin/foros")
 
     return { success: true }
 }

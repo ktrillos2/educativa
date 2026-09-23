@@ -5,6 +5,8 @@ import Link from "next/link"
 import { ArrowLeft, Clock, MessageCircle, Pin, Shield, CheckCircle2 } from "lucide-react"
 import { CreateReplyForm } from "@/components/create-reply-form"
 import { DeleteForumButton } from "@/components/delete-forum-button"
+import { EditForumDialog } from "@/components/edit-forum-dialog"
+import { UserAvatar } from "@/components/user-avatar"
 import { ForumModerationActions } from "@/components/forum-moderation-actions"
 import { incrementTopicViews } from "@/app/actions/forum"
 import { formatDistanceToNow } from "date-fns"
@@ -67,7 +69,7 @@ export default async function CursoTemaPage(props: { params: Promise<{ courseId:
   const isAuthor = session.userId === topic.users?.id
 
   return (
-    <div className="space-y-6 animate-fade-up max-w-4xl mx-auto">
+    <div className="space-y-6 animate-fade-up pt-2 sm:pt-4 max-w-4xl mx-auto">
       <Link href={`/estudiante/cursos/${params.courseId}/foro`} className="inline-flex items-center text-sm text-[oklch(0.55_0.04_145)] hover:text-[oklch(0.35_0.10_145)] transition-colors">
         <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Foro Académico
       </Link>
@@ -103,9 +105,7 @@ export default async function CursoTemaPage(props: { params: Promise<{ courseId:
         {/* Original Topic */}
         <div className={`bg-white rounded-xl shadow-sm border p-6 flex flex-col md:flex-row gap-6 ${topic.users?.role === 'admin' ? 'border-[oklch(0.35_0.10_145)] ring-1 ring-[oklch(0.35_0.10_145)]' : 'border-[oklch(0.88_0.04_145)]'}`}>
             <div className="flex flex-col items-center flex-shrink-0 text-center w-24">
-                <div className={`w-14 h-14 rounded-full flex items-center justify-center font-bold text-white text-xl mb-2 ${topic.users?.role === 'admin' ? 'bg-[oklch(0.35_0.10_145)] ring-2 ring-[oklch(0.80_0.10_145)]' : 'bg-gray-400'}`}>
-                    {getInitials(topic.users?.name)}
-                </div>
+                <UserAvatar name={topic.users?.name} role={topic.users?.role} size="xl" className="mb-2" />
                 <p className="font-bold text-xs text-gray-900 break-words w-full">{topic.users?.name}</p>
                 {topic.users?.role === 'admin' && (
                     <span className="text-[9px] font-bold uppercase tracking-wider text-[oklch(0.35_0.10_145)] flex items-center justify-center gap-1 mt-1">
@@ -125,9 +125,20 @@ export default async function CursoTemaPage(props: { params: Promise<{ courseId:
                         {formatDistanceToNow(new Date(topic.created_at), { addSuffix: true, locale: es })}
                     </span>
                     
-                    {/* Only author or admin can delete topic */}
+                    {/* Only author or admin can edit & delete topic */}
                     {(isAuthor || isAdmin) && (
-                        <DeleteForumButton id={topic.id} type="topic" courseId={params.courseId} />
+                        <div className="flex items-center gap-1">
+                            <EditForumDialog 
+                                id={topic.id} 
+                                type="topic" 
+                                initialTitle={topic.title} 
+                                initialContent={topic.content} 
+                                initialCategory={topic.category} 
+                                courseId={params.courseId}
+                                categories={["Dudas Generales", "Problemas Técnicos", "Sobre Evaluaciones"]}
+                            />
+                            <DeleteForumButton id={topic.id} type="topic" courseId={params.courseId} />
+                        </div>
                     )}
                 </div>
             </div>
@@ -146,9 +157,7 @@ export default async function CursoTemaPage(props: { params: Promise<{ courseId:
             return (
                 <div key={reply.id} className={`bg-white rounded-xl shadow-sm border p-5 flex flex-col md:flex-row gap-5 ${isReplyAdmin ? 'border-[oklch(0.40_0.10_145)] bg-[oklch(0.97_0.02_145)]' : 'border-[oklch(0.88_0.04_145)]'}`}>
                     <div className="flex flex-col items-center flex-shrink-0 text-center w-20">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-white text-sm mb-2 ${isReplyAdmin ? 'bg-[oklch(0.35_0.10_145)] ring-1 ring-[oklch(0.80_0.10_145)]' : 'bg-gray-400'}`}>
-                            {getInitials(reply.users?.name)}
-                        </div>
+                        <UserAvatar name={reply.users?.name} role={reply.users?.role} size="md" className="mb-2" />
                         <p className="font-bold text-[10px] text-gray-900 break-words w-full">{reply.users?.name}</p>
                     </div>
 
@@ -162,9 +171,18 @@ export default async function CursoTemaPage(props: { params: Promise<{ courseId:
                                 {formatDistanceToNow(new Date(reply.created_at), { addSuffix: true, locale: es })}
                             </span>
                             
-                            {/* Only author or admin can delete reply */}
+                            {/* Only author or admin can edit & delete reply */}
                             {(isReplyAuthor || isAdmin) && (
-                                <DeleteForumButton id={reply.id} type="reply" topicId={topic.id} courseId={params.courseId} />
+                                <div className="flex items-center gap-1">
+                                    <EditForumDialog 
+                                        id={reply.id} 
+                                        type="reply" 
+                                        initialContent={reply.content} 
+                                        topicId={topic.id} 
+                                        courseId={params.courseId}
+                                    />
+                                    <DeleteForumButton id={reply.id} type="reply" topicId={topic.id} courseId={params.courseId} />
+                                </div>
                             )}
                         </div>
                     </div>

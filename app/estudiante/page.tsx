@@ -22,7 +22,9 @@ export default async function EstudiantePage() {
   // Enriquecer inscripciones con datos de la DB o diplomado estático
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
     const course = dbCourses?.find((c) => String(c.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
-    return { ...e, courseTitle: course?.title ?? `Diplomado (${e.course_id})`, courseCategory: course?.category ?? "" }
+    const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
+    const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+    return { ...e, courseTitle: courseTitle ?? `Diplomado (${e.course_id})`, courseCategory: course?.category ?? "Gestión" }
   })
 
   const stats = [

@@ -3,9 +3,9 @@ export const categories = ["Todos", "Gestión", "Legal", "Tecnología", "Salud"]
 export const diplomados = [
     {
         id: "9",
-        title: "Diplomado en Presupuesto Público",
+        title: "Diplomado en Gestión del Presupuesto Público",
         description: "Capacitación integral sobre la planeación, programación y ejecución del presupuesto en el sector público.",
-        duration: "120 horas",
+        duration: "80 horas",
         students: "50 cupos",
         badge: "Nuevo",
         category: "Gestión",

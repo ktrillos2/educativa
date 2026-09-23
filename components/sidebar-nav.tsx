@@ -10,6 +10,7 @@ import {
   Settings,
   Award,
   Video,
+  MessageSquare,
   type LucideIcon,
 } from "lucide-react"
 
@@ -27,6 +28,7 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Cursos",    href: "/admin/cursos",     icon: BookOpen },
   { label: "Grupos",    href: "/admin/grupos",     icon: Users },
   { label: "Clases",    href: "/admin/clases",     icon: Video },
+  { label: "Foros / Comunidad", href: "/admin/foros", icon: MessageSquare },
   { label: "Reportes",  href: "/admin/reportes",   icon: BarChart2 },
   { label: "Videos",    href: "/admin/videos",     icon: Video },
 ]

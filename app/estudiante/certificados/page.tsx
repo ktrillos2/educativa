@@ -47,7 +47,9 @@ export default async function CertificadosPage(
 
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
     const course = dbCourses?.find((c) => String(c.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
-    return { ...e, courseTitle: course?.title ?? `Diplomado (${e.course_id})` }
+    const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
+    const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+    return { ...e, courseTitle: courseTitle ?? `Diplomado (${e.course_id})` }
   })
 
   // We should also theoretically check progress, but for this view we can just show the ones with payment_verified

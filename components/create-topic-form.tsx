@@ -3,28 +3,44 @@
 import { useState } from "react"
 import { createTopic } from "@/app/actions/forum"
 import { MessageSquarePlus } from "lucide-react"
+import { useRouter } from "next/navigation"
 
-export function CreateTopicForm({ courseId = null }: { courseId?: string | null }) {
+export function CreateTopicForm({ 
+    courseId: initialCourseId = null,
+    coursesList = []
+}: { 
+    courseId?: string | null
+    coursesList?: { id: string; title: string }[]
+}) {
     const [isOpen, setIsOpen] = useState(false)
     const [title, setTitle] = useState("")
     const [content, setContent] = useState("")
+    const [selectedCourseId, setSelectedCourseId] = useState<string | null>(initialCourseId)
     const [category, setCategory] = useState("General")
     const [loading, setLoading] = useState(false)
+    const router = useRouter()
 
     const socialCategories = ["General", "Recursos de Estudio", "Noticias de la Academia", "Dudas Administrativas", "Grupos de Estudio"]
     const academicCategories = ["Dudas Generales", "Problemas Técnicos", "Sobre Evaluaciones"]
-    const categories = courseId ? academicCategories : socialCategories
+    const categories = selectedCourseId ? academicCategories : socialCategories
+
+    const handleCourseSelect = (val: string) => {
+        const newCourseId = val === "general" ? null : val
+        setSelectedCourseId(newCourseId)
+        setCategory(newCourseId ? academicCategories[0] : socialCategories[0])
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
         if (!title.trim() || !content.trim()) return
 
         setLoading(true)
-        const res = await createTopic(title, content, category, courseId)
+        const res = await createTopic(title, content, category, selectedCourseId)
         if (res.success) {
             setTitle("")
             setContent("")
             setIsOpen(false)
+            router.refresh()
         } else {
             alert("Error al crear el tema: " + res.error)
         }
@@ -47,6 +63,21 @@ export function CreateTopicForm({ courseId = null }: { courseId?: string | null 
         <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 mb-6 shadow-sm animate-fade-in">
             <h3 className="font-bold text-[oklch(0.25_0.10_145)] mb-4">Crear un nuevo tema de discusión</h3>
             <form onSubmit={handleSubmit} className="space-y-4">
+                {coursesList.length > 0 && (
+                    <div>
+                        <label className="block text-xs font-bold text-[oklch(0.40_0.08_145)] mb-1">Publicar en</label>
+                        <select
+                            value={selectedCourseId || "general"}
+                            onChange={(e) => handleCourseSelect(e.target.value)}
+                            className="w-full px-3 py-2 border border-[oklch(0.88_0.04_145)] rounded-lg text-sm focus:outline-none focus:border-[oklch(0.35_0.10_145)] bg-white"
+                        >
+                            <option value="general">🌐 Comunidad General (Todos los estudiantes)</option>
+                            {coursesList.map(c => (
+                                <option key={c.id} value={c.id}>📚 {c.title}</option>
+                            ))}
+                        </select>
+                    </div>
+                )}
                 <div>
                     <label className="block text-xs font-bold text-[oklch(0.40_0.08_145)] mb-1">Título del Tema</label>
                     <input 
@@ -54,7 +85,7 @@ export function CreateTopicForm({ courseId = null }: { courseId?: string | null 
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
                         className="w-full px-3 py-2 border border-[oklch(0.88_0.04_145)] rounded-lg text-sm focus:outline-none focus:border-[oklch(0.35_0.10_145)]"
-                        placeholder="Ej. ¿Cómo instalo el programa para la clase 1?"
+                        placeholder="Ej. Anuncio importante sobre el examen..."
                         required
                         maxLength={100}
                     />

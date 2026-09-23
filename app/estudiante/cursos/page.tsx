@@ -60,10 +60,13 @@ export default async function CursosPage() {
     const nextModuleIndex = Math.min(completedModules, totalModules - 1)
     const nextDocName = `Modulo ${nextModuleIndex + 1} - ${e.course_id}.pdf`
 
+    const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
+    const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+
     return { 
       ...e, 
-      courseTitle: course?.title ?? `Diplomado (${e.course_id})`, 
-      courseCategory: course?.category ?? "",
+      courseTitle: courseTitle ?? `Diplomado (${e.course_id})`, 
+      courseCategory: course?.category ?? "Gestión",
       completedModules,
       totalModules,
       progressPercent,

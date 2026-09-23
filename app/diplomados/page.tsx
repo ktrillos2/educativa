@@ -33,18 +33,36 @@ export default async function DiplomadosPage() {
         .select("*", { count: "exact", head: true })
         .eq("course_id", course.id)
 
+    const isDiplomadoType = course.type !== "etdh"
+    let title = course.title || "Diplomado en Gestión del Presupuesto Público"
+    let duration = course.duration || "80 horas"
+
+    if (isDiplomadoType) {
+      title = "Diplomado en Gestión del Presupuesto Público"
+      duration = "80 horas"
+      // Auto-update DB to maintain consistency
+      if (course.title !== title || course.duration !== duration) {
+        supabaseAdmin
+          .from("courses")
+          .update({ title, duration })
+          .eq("id", course.id)
+          .then(() => {})
+          .catch(() => {})
+      }
+    }
+
     return {
       id: String(course.id),
-      title: course.title || "Sin título",
-      description: course.description || "",
-      duration: course.duration || "A tu ritmo",
+      title,
+      description: course.description || "Capacitación integral sobre la planeación, programación y ejecución del presupuesto en el sector público.",
+      duration,
       students: (course.students && course.students !== "Autoestudio") ? course.students.replace("40 cupos", "50 cupos") : "50 cupos",
       badge: course.badge || null,
-      category: course.category || "General",
-      image: course.image || "/placeholder.svg",
-      price: course.price || "Gratuito",
+      category: course.category || "Gestión",
+      image: course.image || "/finance-budget-accounting-professional-calculator.jpg",
+      price: course.price || "$1.150.000 COP",
       startDate: course.start_date || "Inscripciones Abiertas",
-      modules: course.modules || 0,
+      modules: course.modules || 4,
       minStudents: course.min_students ?? 5,
       enrolledCount: enrolledCount ?? 0,
     }
@@ -54,60 +72,15 @@ export default async function DiplomadosPage() {
   if ((!rawCourses || rawCourses.length === 0) && initialCourses.length === 0) {
     initialCourses = [
       {
-        id: 'diplomado-salud-ocupacional',
-        title: 'Diplomado en Seguridad y Salud en el Trabajo',
-        description: 'Capacítate en la prevención de riesgos laborales y normatividad vigente del SG-SST.',
-        category: 'Salud',
-        price: '$120.000 COP',
-        duration: '120 horas',
-        students: 'Autoestudio',
-        badge: 'Popular',
-        image: '/images/workplace-safety-health-professional-training.jpg',
-        startDate: 'Inscripciones Abiertas',
-        modules: 4,
-        minStudents: 5,
-        enrolledCount: 0
-      },
-      {
-        id: 'diplomado-gestion-publica',
-        title: 'Diplomado en Gestión Pública y Contratación Estatal',
-        description: 'Aprende los principios fundamentales de la administración pública y los procesos contractuales del Estado.',
+        id: '9',
+        title: 'Diplomado en Gestión del Presupuesto Público',
+        description: 'Capacitación integral sobre la planeación, programación y ejecución del presupuesto en el sector público.',
         category: 'Gestión',
-        price: '$150.000 COP',
-        duration: '140 horas',
+        price: '$1.150.000 COP',
+        duration: '80 horas',
         students: 'Autoestudio',
         badge: 'Certificado',
-        image: '/images/government-contract-legal-documents.jpg',
-        startDate: 'Inscripciones Abiertas',
-        modules: 5,
-        minStudents: 5,
-        enrolledCount: 0
-      },
-      {
-        id: 'diplomado-desarrollo-software',
-        title: 'Diplomado en Desarrollo de Software y Frontend Web',
-        description: 'Aprende a construir aplicaciones web modernas con React, Next.js y JavaScript avanzado.',
-        category: 'Tecnología',
-        price: '$180.000 COP',
-        duration: '160 horas',
-        students: 'Autoestudio',
-        badge: 'Nuevo',
-        image: '/images/desarrollo-software.jpg',
-        startDate: 'Inscripciones Abiertas',
-        modules: 6,
-        minStudents: 5,
-        enrolledCount: 0
-      },
-      {
-        id: 'diplomado-derecho-laboral',
-        title: 'Diplomado en Derecho Laboral y Talento Humano',
-        description: 'Domina los aspectos legales, contratos y liquidaciones en la gestión del talento humano.',
-        category: 'Legal',
-        price: '$130.000 COP',
-        duration: '120 horas',
-        students: 'Autoestudio',
-        badge: 'Popular',
-        image: '/images/labor-law-legal-documents-office.jpg',
+        image: '/finance-budget-accounting-professional-calculator.jpg',
         startDate: 'Inscripciones Abiertas',
         modules: 4,
         minStudents: 5,

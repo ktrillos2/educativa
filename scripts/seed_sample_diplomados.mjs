@@ -16,59 +16,17 @@ const supabase = createClient(supabaseUrl, supabaseKey)
 
 const sampleDiplomados = [
   {
-    id: 'diplomado-salud-ocupacional',
-    title: 'Diplomado en Seguridad y Salud en el Trabajo',
-    description: 'Capacítate en la prevención de riesgos laborales y normatividad vigente del SG-SST.',
-    category: 'Salud',
-    price: '$120.000 COP',
-    duration: '120 horas',
+    id: '9',
+    title: 'Diplomado en Gestión del Presupuesto Público',
+    description: 'Capacitación integral sobre la planeación, programación y ejecución del presupuesto en el sector público.',
+    category: 'Gestión',
+    price: '$1.150.000 COP',
+    duration: '80 horas',
     modules: 4,
     students: 'Autoestudio',
-    image: '/images/workplace-safety-health-professional-training.jpg',
-    type: 'diplomado',
-    badge: 'Popular',
-    min_students: 5
-  },
-  {
-    id: 'diplomado-gestion-publica',
-    title: 'Diplomado en Gestión Pública y Contratación Estatal',
-    description: 'Aprende los principios fundamentales de la administración pública y los procesos contractuales del Estado.',
-    category: 'Gestión',
-    price: '$150.000 COP',
-    duration: '140 horas',
-    modules: 5,
-    students: 'Autoestudio',
-    image: '/images/government-contract-legal-documents.jpg',
+    image: '/finance-budget-accounting-professional-calculator.jpg',
     type: 'diplomado',
     badge: 'Certificado',
-    min_students: 5
-  },
-  {
-    id: 'diplomado-desarrollo-software',
-    title: 'Diplomado en Desarrollo de Software y Frontend Web',
-    description: 'Aprende a construir aplicaciones web modernas con React, Next.js y JavaScript avanzado.',
-    category: 'Tecnología',
-    price: '$180.000 COP',
-    duration: '160 horas',
-    modules: 6,
-    students: 'Autoestudio',
-    image: '/images/desarrollo-software.jpg',
-    type: 'diplomado',
-    badge: 'Nuevo',
-    min_students: 5
-  },
-  {
-    id: 'diplomado-derecho-laboral',
-    title: 'Diplomado en Derecho Laboral y Talento Humano',
-    description: 'Domina los aspectos legales, contratos y liquidaciones en la gestión del talento humano.',
-    category: 'Legal',
-    price: '$130.000 COP',
-    duration: '120 horas',
-    modules: 4,
-    students: 'Autoestudio',
-    image: '/images/labor-law-legal-documents-office.jpg',
-    type: 'diplomado',
-    badge: 'Popular',
     min_students: 5
   }
 ]

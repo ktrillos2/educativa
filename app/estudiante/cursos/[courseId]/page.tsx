@@ -37,6 +37,11 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
 
   const isDiplomado = course.type !== 'etdh';
 
+  if (isDiplomado) {
+    course.title = "Diplomado en Gestión del Presupuesto Público"
+    course.duration = "80 horas"
+  }
+
   const { cookies } = await import("next/headers")
   const cookieStore = await cookies()
   const isMockPaid = cookieStore.get("mock_paid")?.value === "true"
