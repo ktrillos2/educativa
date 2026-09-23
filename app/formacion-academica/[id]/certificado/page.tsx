@@ -63,11 +63,15 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   // Removed strict payment_verified redirect. Now it decides UI.
   const hasPaid = enrollment && enrollment.payment_verified
 
+  // Extraer datos del grupo si existe
+  const groupData = enrollment?.course_groups 
+    ? (Array.isArray(enrollment.course_groups) ? enrollment.course_groups[0] : enrollment.course_groups as any) 
+    : null
+
   // Evaluar expiración del certificado de 5 días (solo si no es admin)
   let certificateExpired = false
   let whatsappLink = "https://wa.me/1234567890?text=Hola,%20tengo%20problemas%20con%20mi%20certificado"
-  if (enrollment?.course_groups && !isAdmin) {
-    const groupData = Array.isArray(enrollment.course_groups) ? enrollment.course_groups[0] : enrollment.course_groups as any
+  if (groupData && !isAdmin) {
     if (groupData?.whatsapp_link) whatsappLink = groupData.whatsapp_link
     
     if (groupData?.first_certificate_download_at) {
@@ -116,10 +120,10 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
           body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: hidden; }
         }
       `}} />
-      <section className="pt-32 pb-16 print:p-0 print:m-0">
+      <section className="pt-28 md:pt-32 pb-12 print:p-0 print:m-0">
         <div className="container mx-auto px-4 max-w-4xl print:max-w-none print:w-[100vw] print:h-[100vh] print:p-0 print:m-0">
-          <Link href={`/diplomados/${course.id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors print:hidden">
-            <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Diplomado
+          <Link href={`/formacion-academica/${course.id}`} className="inline-flex items-center text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 px-3.5 py-1.5 rounded-md mb-6 transition-colors print:hidden">
+            <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Programa
           </Link>
 
           {!isEligible && !isAdmin ? (
@@ -138,7 +142,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </Link>
             </div>
           ) : !hasPaid && !isAdmin ? (
-            <CoursePayment courseId={course.id} programName={course.title} />
+            <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
           ) : certificateExpired ? (
             <div className="bg-red-50 shadow-sm border border-red-200 p-8 text-center">
               <div className="w-16 h-16 bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4">
@@ -154,13 +158,13 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </a>
             </div>
           ) : !userProfile.id_document_url && !isAdmin ? (
-            <div className="py-8">
+            <div className="py-4">
               <UploadDocumentForm existingDocumentUrl={userProfile.id_document_url}>
                 <div />
               </UploadDocumentForm>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-4">
               {!isAdmin && userProfile.id_document_url && (
                 <div className="print:hidden">
                   <UploadDocumentForm existingDocumentUrl={userProfile.id_document_url}>

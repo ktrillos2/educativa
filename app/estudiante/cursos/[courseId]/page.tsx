@@ -211,7 +211,7 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
       </div>
 
       {!enrollment.payment_verified ? (
-        <CoursePayment courseId={course.id} programName={course.title} />
+        <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
       ) : (
         <>
           {(isExpired || showWarning) && (

@@ -14,9 +14,14 @@ export default async function EstudiantePage() {
     .select("*", { count: "exact" })
     .eq("user_id", session?.userId ?? "")
 
-  // Enriquecer inscripciones con datos del diplomado estático
+  // Cursos desde Supabase
+  const { data: dbCourses } = await supabase
+    .from("courses")
+    .select("id, title, category, modules")
+
+  // Enriquecer inscripciones con datos de la DB o diplomado estático
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
-    const course = diplomados.find((d) => d.id === e.course_id)
+    const course = dbCourses?.find((c) => String(c.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
     return { ...e, courseTitle: course?.title ?? `Diplomado (${e.course_id})`, courseCategory: course?.category ?? "" }
   })
 
@@ -94,17 +99,17 @@ export default async function EstudiantePage() {
             </div>
           </div>
           <Link
-            href="/diplomados"
+            href="/estudiante/cursos"
             className="text-xs text-[oklch(0.35_0.10_145)] font-medium hover:underline flex items-center gap-1"
           >
-            Ver catálogo <ChevronRight className="w-3 h-3" />
+            Ver mis cursos <ChevronRight className="w-3 h-3" />
           </Link>
         </div>
 
         {enrichedEnrollments.length > 0 ? (
           <div className="divide-y divide-[oklch(0.94_0.01_145)]">
             {enrichedEnrollments.map((e) => (
-              <div key={e.id} className="px-5 py-4 flex items-center justify-between hover:bg-[oklch(0.97_0.01_145)] transition-colors">
+              <Link key={e.id} href={`/estudiante/cursos/${e.course_id}`} className="px-5 py-4 flex items-center justify-between hover:bg-[oklch(0.97_0.01_145)] transition-colors block">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg bg-[oklch(0.30_0.10_145)]/10 flex items-center justify-center flex-shrink-0">
                     <BookOpen className="w-5 h-5 text-[oklch(0.30_0.10_145)]" />
@@ -122,7 +127,7 @@ export default async function EstudiantePage() {
                   </div>
                 </div>
                 <ChevronRight className="w-4 h-4 text-[oklch(0.70_0.04_145)]" />
-              </div>
+              </Link>
             ))}
           </div>
         ) : (

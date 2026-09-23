@@ -58,16 +58,11 @@ export function UploadDocumentForm({ existingDocumentUrl, children }: UploadDocu
     // Si ya tiene el documento subido y no está forzando re-subida
     if (hasDocument && !isReuploading) {
         return (
-            <div className="flex flex-col items-center gap-6 w-full">
-                {/* Mostramos el botón original del certificado (children) */}
-                <div className="w-full flex justify-center">
-                    {children}
-                </div>
-                
+            <div className="flex flex-col items-center w-full">
                 {/* Tarjeta informando que la cédula está subida */}
-                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4 flex flex-col sm:flex-row items-center justify-between gap-4 w-full max-w-lg mt-4 shadow-sm">
+                <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-3.5 flex flex-col sm:flex-row items-center justify-between gap-3 w-full shadow-sm">
                     <div className="flex items-center gap-3">
-                        <CheckCircle className="w-8 h-8 text-emerald-500" />
+                        <CheckCircle className="w-6 h-6 text-emerald-500 flex-shrink-0" />
                         <div className="text-left">
                             <p className="font-bold text-emerald-800 text-sm">Documento de identidad verificado</p>
                             <a href={existingDocumentUrl} target="_blank" rel="noreferrer" className="text-xs text-emerald-600 hover:underline flex items-center gap-1 mt-0.5">

@@ -226,8 +226,8 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                                     <h3 className="font-bold text-2xl mb-2 text-primary">¡Inscripción Registrada!</h3>
                                                     <p className="text-muted-foreground text-sm">Estás a un paso de comenzar este programa.</p>
                                                 </div>
-                                                <div className="mt-6">
-                                                    <CoursePayment courseId={course.id} programName={course.title} />
+                                                <div className="mt-4">
+                                                    <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
                                                 </div>
                                             </>
                                         ) : (

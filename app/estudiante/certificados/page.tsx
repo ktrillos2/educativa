@@ -41,8 +41,12 @@ export default async function CertificadosPage(
     .eq("user_id", session?.userId ?? "")
     .eq("payment_verified", true)
 
+  const { data: dbCourses } = await supabase
+    .from("courses")
+    .select("id, title, category, modules")
+
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
-    const course = diplomados.find((d) => d.id === e.course_id)
+    const course = dbCourses?.find((c) => String(c.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
     return { ...e, courseTitle: course?.title ?? `Diplomado (${e.course_id})` }
   })
 

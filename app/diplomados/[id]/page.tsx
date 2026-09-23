@@ -193,8 +193,8 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                     <h3 className="font-bold text-2xl mb-2 text-primary">¡Inscripción Registrada!</h3>
                                                     <p className="text-muted-foreground text-sm">Estás a un paso de comenzar tu diplomado.</p>
                                                 </div>
-                                                <div className="mt-6">
-                                                    <CoursePayment courseId={course.id} programName={course.title} />
+                                                <div className="mt-4">
+                                                    <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
                                                 </div>
                                             </>
                                         ) : (

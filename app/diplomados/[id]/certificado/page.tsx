@@ -108,9 +108,9 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
           body { margin: 0; padding: 0; background: white; -webkit-print-color-adjust: exact; print-color-adjust: exact; overflow: hidden; }
         }
       `}} />
-      <section className="pt-32 pb-16 print:p-0 print:m-0">
+      <section className="pt-28 md:pt-32 pb-12 print:p-0 print:m-0">
         <div className="container mx-auto px-4 max-w-4xl print:max-w-none print:w-[100vw] print:h-[100vh] print:p-0 print:m-0">
-          <Link href={`/diplomados/${course.id}`} className="inline-flex items-center text-sm text-muted-foreground hover:text-primary mb-8 transition-colors print:hidden">
+          <Link href={`/diplomados/${course.id}`} className="inline-flex items-center text-sm font-semibold text-primary bg-primary/10 hover:bg-primary/20 px-3.5 py-1.5 rounded-md mb-6 transition-colors print:hidden">
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver al Diplomado
           </Link>
 
@@ -130,15 +130,15 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               </Link>
             </div>
           ) : !hasPaid && !isAdmin ? (
-            <CoursePayment courseId={course.id} programName={course.title} />
+            <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
           ) : !userProfile.id_document_url && !isAdmin ? (
-            <div className="py-8">
+            <div className="py-4">
               <UploadDocumentForm existingDocumentUrl={userProfile.id_document_url}>
                 <div />
               </UploadDocumentForm>
             </div>
           ) : (
-            <div className="space-y-8">
+            <div className="space-y-4">
               {!isAdmin && userProfile.id_document_url && (
                 <div className="print:hidden">
                   <UploadDocumentForm existingDocumentUrl={userProfile.id_document_url}>

@@ -1,5 +1,6 @@
 import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
+import { diplomados } from "@/lib/data"
 import { BookOpen, ChevronRight, GraduationCap, Trophy } from "lucide-react"
 import Link from "next/link"
 
@@ -15,7 +16,7 @@ export default async function CursosPage() {
   const isMockPaid = cookieStore.get("mock_paid")?.value === "true"
 
   // Inscripciones reales del estudiante
-  let enrollments = []
+  let enrollments: any[] = []
   if (session?.userId) {
     const { data } = await supabase
         .from("enrollments")
@@ -48,12 +49,12 @@ export default async function CursosPage() {
     .eq("user_id", session?.userId ?? "")
     .eq("completed", true)
 
-  // Enriquecer inscripciones con progreso y datos del diplomado
+  // Enriquecer inscripciones con progreso y datos del diplomado (DB o estático)
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
-    const course = courses?.find((d) => d.id === e.course_id)
-    const courseProgress = progress?.filter(p => p.course_id === e.course_id) || []
+    const course = courses?.find((d) => String(d.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
+    const courseProgress = progress?.filter(p => String(p.course_id) === String(e.course_id)) || []
     const completedModules = courseProgress.length
-    const totalModules = course?.modules || 1
+    const totalModules = course?.modules || 4
     const progressPercent = Math.min(100, Math.round((completedModules / totalModules) * 100))
 
     const nextModuleIndex = Math.min(completedModules, totalModules - 1)
@@ -69,12 +70,6 @@ export default async function CursosPage() {
       nextDocName
     }
   })
-
-  // Auto-redirect to the course classroom if the student is only enrolled in 1 course
-  if (enrichedEnrollments.length === 1) {
-    const { redirect } = await import("next/navigation")
-    redirect(`/estudiante/cursos/${enrichedEnrollments[0].course_id}`)
-  }
 
   return (
     <div className="space-y-8 animate-fade-up">
