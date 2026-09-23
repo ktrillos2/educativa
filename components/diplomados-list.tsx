@@ -71,10 +71,10 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
   })
 
   return (
-    <section className="py-[1cm] min-h-[100dvh] bg-muted/30 flex flex-col">
+    <section className="py-6 bg-muted/30 flex flex-col">
       <div className="container mx-auto px-4 h-full flex flex-col justify-between flex-grow">
         {/* Filters */}
-        <div className="flex flex-col md:flex-row gap-4 mb-8">
+        <div className="flex flex-col md:flex-row gap-4 mb-4">
           <div className="relative flex-1 max-w-md">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
@@ -108,7 +108,7 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
         </div>
 
         {/* Results count */}
-        <p className="text-sm text-muted-foreground mb-6">
+        <p className="text-sm text-muted-foreground mb-4">
           Mostrando <span className="font-semibold text-foreground">{filteredDiplomados.length}</span> diplomados
         </p>
 

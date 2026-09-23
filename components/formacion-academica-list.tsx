@@ -33,11 +33,17 @@ export function FormacionAcademicaList({ initialCourses, initialCategories }: Fo
     const [searchTerm, setSearchTerm] = useState("")
     const [activeCategory, setActiveCategory] = useState("Todos")
 
-    const filteredPrograms = initialCourses.filter(program =>
-        (activeCategory === "Todos" || program.category === activeCategory) &&
-        (program.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            program.description.toLowerCase().includes(searchTerm.toLowerCase()))
-    )
+    const filteredPrograms = initialCourses.filter(program => {
+        const programCat = (program.category || "").toLowerCase()
+        const activeCat = activeCategory.toLowerCase()
+        const matchesCategory = activeCategory === "Todos" ||
+            programCat === activeCat ||
+            (activeCategory === "Administración" && (programCat.includes("admin") || programCat.includes("gesti") || program.title.toLowerCase().includes("admin"))) ||
+            (activeCategory === "Educación" && (programCat.includes("educa") || programCat.includes("pedag") || program.title.toLowerCase().includes("educa")))
+        const matchesSearch = program.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            program.description.toLowerCase().includes(searchTerm.toLowerCase())
+        return matchesCategory && matchesSearch
+    })
 
     return (
         <section className="py-[1cm] bg-muted/20">

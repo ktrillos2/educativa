@@ -22,7 +22,7 @@ interface NavItem {
 }
 
 const ADMIN_NAV: NavItem[] = [
-  { label: "Dashboard", href: "/admin",           icon: LayoutDashboard },
+  { label: "Panel de Control", href: "/admin",           icon: LayoutDashboard },
   { label: "Usuarios",  href: "/admin/usuarios",  icon: Users },
   { label: "Cursos",    href: "/admin/cursos",     icon: BookOpen },
   { label: "Grupos",    href: "/admin/grupos",     icon: Users },
@@ -32,7 +32,7 @@ const ADMIN_NAV: NavItem[] = [
 ]
 
 const ESTUDIANTE_NAV: NavItem[] = [
-  { label: "Mi Dashboard",  href: "/estudiante",                   icon: LayoutDashboard },
+  { label: "Mi Panel",      href: "/estudiante",                   icon: LayoutDashboard },
   { label: "Mis Cursos",    href: "/estudiante/cursos",            icon: BookOpen },
   { label: "Comunidad",     href: "/estudiante/comunidad",         icon: Users },
   { label: "Certificados",  href: "/estudiante/certificados",      icon: Award },

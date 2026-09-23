@@ -179,7 +179,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             className="lg:col-span-2 space-y-6"
                         >
                             <div className="inline-flex px-4 py-1.5 bg-secondary/20 border border-secondary/30 backdrop-blur-sm text-sm font-bold text-secondary tracking-wide uppercase">
-                                {course.category}
+                                {course.category === 'Tecnología' ? 'Administración' : course.category}
                             </div>
 
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
@@ -193,8 +193,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             <div className="flex flex-wrap gap-4 pt-6">
                                 {[
                                     { icon: Clock, text: "160 horas", label: "Duración" },
-                                    { icon: Users, text: course.students, label: "Cupos" },
-                                    { icon: BookOpen, text: `${course.modules} Módulos`, label: "Contenido" }
+                                    { icon: Users, text: "50 cupos", label: "Cupos" }
                                 ].map((stat, i) => (
                                     <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 border border-white/10">
                                         <div className="p-2 bg-secondary/20">
@@ -282,7 +281,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         <div className="flex items-center justify-between mb-8 pb-6 border-b border-border/60">
                                             <div>
                                                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Valor del Programa</p>
-                                                <span className="text-4xl font-extrabold text-primary">{course.price}</span>
+                                                <span className="text-4xl font-extrabold text-primary">{course.price ? course.price.replace(/\s*\/\s*Semestre/gi, "").replace(/\$2[0-9]{2}\.000/g, "$350.000") : "$350.000 COP"}</span>
                                             </div>
                                         </div>
 
@@ -301,38 +300,6 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         ) : (
                                             <EnrollmentDialog courseId={course.id} courseName={course.title} />
                                         )}
-
-                                        {/* ── Indicador de cupos persuasivo ── */}
-                                        <div className={`my-6 p-4 border-2 ${isReadyToStart ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
-                                            <div className="flex items-center justify-between mb-2">
-                                                <div className="flex items-center gap-2">
-                                                    <Flame className={`w-4 h-4 ${isReadyToStart ? 'text-green-600' : 'text-amber-600'}`} />
-                                                    <span className={`text-xs font-bold uppercase tracking-wider ${isReadyToStart ? 'text-green-700' : 'text-amber-700'}`}>
-                                                        {isReadyToStart ? '¡Cupos completos! Inicia pronto' : 'Grupo formándose'}
-                                                    </span>
-                                                </div>
-                                                <span className={`text-xs font-bold ${isReadyToStart ? 'text-green-700' : 'text-amber-700'}`}>
-                                                    {enrolledCount}/{minStudents}
-                                                </span>
-                                            </div>
-
-                                            {/* Barra de progreso */}
-                                            <div className="w-full bg-white/80 rounded-full h-2.5 mb-2 overflow-hidden border border-black/5">
-                                                <div
-                                                    className={`h-2.5 rounded-full transition-all duration-700 ${isReadyToStart ? 'bg-green-500' : 'bg-amber-500'}`}
-                                                    style={{ width: `${progressPercent}%` }}
-                                                />
-                                            </div>
-
-                                            <p className={`text-xs ${isReadyToStart ? 'text-green-700' : 'text-amber-700'}`}>
-                                                {isReadyToStart
-                                                    ? `✓ El grupo ya tiene los cupos mínimos. ¡Asegura tu lugar antes de que arranque!`
-                                                    : spotsNeeded === 1
-                                                        ? `¡Solo falta 1 persona más para arrancar! Sé quien completa el grupo.`
-                                                        : `Faltan ${spotsNeeded} estudiantes para que el grupo comience. ¡Sé parte de los primeros!`
-                                                }
-                                            </p>
-                                        </div>
 
                                         <p className="text-xs text-center text-muted-foreground mt-4 flex items-center justify-center gap-1.5">
                                             <CheckCircle className="w-3.5 h-3.5 opacity-70" /> Proceso de matrícula seguro y en línea
@@ -358,7 +325,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                         viewport={{ once: true }}
                         className="mb-16 text-center"
                     >
-                        <h2 className="text-4xl font-extrabold text-primary mb-4">Programa Académico</h2>
+                        <h2 className="text-4xl font-extrabold text-primary mb-4">Formación Continua y Actualización Integral</h2>
                         <div className="h-1.5 w-20 bg-secondary mx-auto mb-4"></div>
                         <p className="text-muted-foreground text-lg">Estructura detallada diseñada para tu formación profesional.</p>
                     </motion.div>
@@ -548,7 +515,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             <h3 className="text-2xl font-bold mb-4">Certificación Disponible</h3>
                             <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Has completado los requisitos de este programa. Ya puedes descargar tu certificado oficial y acta de finalización.</p>
                             <Link href={`/formacion-academica/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
-                                Ver Documentos de Grado <ChevronRight className="ml-2 w-5 h-5" />
+                                Descargar Certificado <ChevronRight className="ml-2 w-5 h-5" />
                             </Link>
                         </motion.div>
                     )}

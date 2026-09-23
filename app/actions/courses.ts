@@ -18,7 +18,7 @@ export async function createCourse(formData: FormData) {
   const min_students = Number(formData.get("min_students") || 0)
   const image = (formData.get("image") as string) || "/placeholder.svg"
   // Para la columna 'students' que originalmente indicaba modalidad o número de cupos
-  const students = type === 'etdh' ? `${min_students} cupos` : "Autoestudio"
+  const students = type === 'etdh' ? `${min_students} cupos` : "50 cupos"
 
   if (!id || !title || !type) {
     return { error: "ID, Título y Tipo son campos requeridos." }

@@ -21,37 +21,83 @@ function useTranslateLiveKit() {
     const translate = () => {
       const translations: Record<string, string> = {
         "Leave": "Salir",
+        "Leave Room": "Salir de la clase",
+        "Leave room": "Salir de la clase",
         "Microphone": "Micrófono",
         "Camera": "Cámara",
         "Chat": "Chat",
         "Share Screen": "Compartir pantalla",
+        "Share screen": "Compartir pantalla",
         "Stop sharing": "Dejar de compartir",
+        "Stop Sharing": "Dejar de compartir",
         "Unmute": "Activar Micrófono",
         "Mute": "Silenciar Micrófono",
         "Start video": "Iniciar Cámara",
+        "Start Video": "Iniciar Cámara",
         "Stop video": "Detener Cámara",
-        "Send": "Enviar"
+        "Stop Video": "Detener Cámara",
+        "Send": "Enviar",
+        "Settings": "Configuración",
+        "Audio": "Audio",
+        "Video": "Video",
+        "Speaker": "Altavoz",
+        "Screen share": "Compartir pantalla",
+        "Toggle Chat": "Chat",
+        "Toggle Microphone": "Micrófono",
+        "Toggle Camera": "Cámara",
+        "Select a Microphone": "Seleccionar Micrófono",
+        "Select a Camera": "Seleccionar Cámara",
+        "Select a Speaker": "Seleccionar Altavoz",
+        "System Default": "Predeterminado del sistema",
+        "No video": "Sin video",
+        "You": "Tú",
+        "Cancel": "Cancelar",
+        "Confirm": "Confirmar",
+        "Participants": "Participantes",
+        "Enter a message...": "Escribe un mensaje...",
+        "Connecting...": "Conectando...",
+        "Reconnecting...": "Reconectando...",
+        "Connection Lost": "Conexión perdida",
+        "Host": "Anfitrión",
+        "Presenter": "Presentador",
+        "Audio Settings": "Configuración de audio",
+        "Video Settings": "Configuración de video"
       };
 
-      document.querySelectorAll('.lk-button').forEach(el => {
+      document.querySelectorAll('.lk-button, [data-lk-theme] button, [data-lk-theme] span, [data-lk-theme] label, [data-lk-theme] a').forEach(el => {
         const title = el.getAttribute('title');
-        if (title && translations[title]) {
-          el.setAttribute('title', translations[title]);
+        if (title && translations[title.trim()]) {
+          el.setAttribute('title', translations[title.trim()]);
         }
+        const ariaLabel = el.getAttribute('aria-label');
+        if (ariaLabel && translations[ariaLabel.trim()]) {
+          el.setAttribute('aria-label', translations[ariaLabel.trim()]);
+        }
+        
         const textEl = el.querySelector('.lk-button-text');
         if (textEl && textEl.textContent && translations[textEl.textContent.trim()]) {
           textEl.textContent = translations[textEl.textContent.trim()];
+        } else if (el.children.length === 0 && el.textContent && translations[el.textContent.trim()]) {
+          el.textContent = translations[el.textContent.trim()];
         }
       });
       
-      document.querySelectorAll('.lk-chat-form-input').forEach(el => {
-        if (el.getAttribute('placeholder') === 'Enter a message...') {
-           el.setAttribute('placeholder', 'Escribe un mensaje...');
+      document.querySelectorAll('.lk-chat-form-input, [data-lk-theme] input, [data-lk-theme] textarea').forEach(el => {
+        const ph = el.getAttribute('placeholder');
+        if (ph && translations[ph.trim()]) {
+          el.setAttribute('placeholder', translations[ph.trim()]);
+        } else if (ph === 'Enter a message...') {
+          el.setAttribute('placeholder', 'Escribe un mensaje...');
         }
       });
       
-      document.querySelectorAll('.lk-participant-placeholder').forEach(el => {
-          if (el.textContent === 'No video') el.textContent = 'Sin video';
+      document.querySelectorAll('.lk-participant-placeholder, [data-lk-theme] .lk-participant-name').forEach(el => {
+        if (el.textContent && el.textContent.trim() === 'No video') {
+          el.textContent = 'Sin video';
+        }
+        if (el.textContent && el.textContent.trim().endsWith('(You)')) {
+          el.textContent = el.textContent.replace('(You)', '(Tú)');
+        }
       });
     };
 
@@ -59,7 +105,7 @@ function useTranslateLiveKit() {
       translate();
     });
 
-    observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+    observer.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true });
     translate();
 
     return () => observer.disconnect();

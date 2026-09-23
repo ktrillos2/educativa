@@ -38,7 +38,7 @@ export default async function DiplomadosPage() {
       title: course.title || "Sin título",
       description: course.description || "",
       duration: course.duration || "A tu ritmo",
-      students: course.students || "Autoestudio",
+      students: (course.students && course.students !== "Autoestudio") ? course.students.replace("40 cupos", "50 cupos") : "50 cupos",
       badge: course.badge || null,
       category: course.category || "General",
       image: course.image || "/placeholder.svg",
@@ -158,7 +158,13 @@ export default async function DiplomadosPage() {
                   <div className="p-2.5 bg-white/10 rounded-none border border-white/20">
                     <GraduationCap className="h-6 w-6 text-secondary" />
                   </div>
-                  <span className="text-secondary text-sm font-semibold uppercase tracking-wider">Educación informal</span>
+                  <Image
+                    src="/merito.svg"
+                    alt="Líderes del Mérito"
+                    width={162}
+                    height={40}
+                    className="h-8 md:h-10 w-auto object-contain"
+                  />
                 </div>
                 
                 <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-4 tracking-tight">Diplomados</h1>
@@ -226,10 +232,10 @@ export default async function DiplomadosPage() {
       <DiplomadosList initialCourses={initialCourses} initialCategories={uniqueCategories} />
 
       {/* Sección de Videos Motivacionales */}
-      <section className="py-16 bg-muted/30 border-t border-border/50 mt-12">
+      <section className="py-8 bg-muted/30 border-t border-border/50 mt-4">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-[oklch(0.25_0.10_145)] mb-4">¿Por qué estudiar un Diplomado con nosotros?</h2>
+          <div className="text-center mb-6">
+            <h2 className="text-3xl font-bold text-[oklch(0.25_0.10_145)] mb-2">¿Por qué estudiar un Diplomado con nosotros?</h2>
             <p className="text-[oklch(0.55_0.04_145)] max-w-2xl mx-auto">
               Conoce la experiencia de nuestros estudiantes y descubre cómo nuestros programas han impulsado sus carreras profesionales.
             </p>

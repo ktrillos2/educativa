@@ -8,7 +8,7 @@ interface ProgramInfoDialogProps {
 export function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
   const isDiplomado = type === "diplomados"
   
-  const title = isDiplomado ? "Programa de Formación Académica" : "Programas de Educación para el Trabajo"
+  const title = isDiplomado ? "Programa de Formación Académica" : "PROGRAMA ACADEMICO ETDH 160 Horas"
   
   return (
     <div className="w-full mb-12 flex justify-center">

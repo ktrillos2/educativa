@@ -6,7 +6,7 @@ export const diplomados = [
         title: "Diplomado en Presupuesto Público",
         description: "Capacitación integral sobre la planeación, programación y ejecución del presupuesto en el sector público.",
         duration: "120 horas",
-        students: "40 cupos",
+        students: "50 cupos",
         badge: "Nuevo",
         category: "Gestión",
         image: "/finance-budget-accounting-professional-calculator.jpg",

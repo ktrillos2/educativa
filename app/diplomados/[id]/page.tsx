@@ -159,7 +159,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                             <div className="flex flex-wrap gap-4 pt-6">
                                 {[
                                     { icon: Clock, text: course.duration, label: "Duración" },
-                                    { icon: Users, text: course.students, label: "Modalidad" },
+                                    { icon: Users, text: (course.students && course.students !== "Autoestudio") ? course.students.replace("40 cupos", "50 cupos") : "50 cupos", label: "Modalidad" },
                                     { icon: BookOpen, text: `${course.modules} Módulos`, label: "Contenido" }
                                 ].map((stat, i) => (
                                     <div key={i} className="flex items-center gap-3 bg-white/10 backdrop-blur-md px-5 py-3 border border-white/10">
@@ -273,7 +273,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                 viewport={{ once: true }}
                                 className="mb-16 text-center"
                             >
-                                <h2 className="text-4xl font-extrabold text-primary mb-4">Programa Académico</h2>
+                                <h2 className="text-4xl font-extrabold text-primary mb-4">Formación Continua y Actualización Integral</h2>
                                 <div className="h-1.5 w-20 bg-secondary mx-auto mb-4"></div>
                                 <p className="text-muted-foreground text-lg">Estudia a tu propio ritmo. Tienes 30 días para completar el programa una vez te inscribas.</p>
                             </motion.div>
@@ -447,7 +447,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                     <h3 className="text-2xl font-bold mb-4">Certificación Disponible</h3>
                                     <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Has completado los requisitos de este diplomado. Ya puedes descargar tu certificado oficial y acta de finalización.</p>
                                     <Link href={`/diplomados/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
-                                        Ver Documentos de Grado <ChevronRight className="ml-2 w-5 h-5" />
+                                        Descargar Certificado <ChevronRight className="ml-2 w-5 h-5" />
                                     </Link>
                                 </motion.div>
                             )}

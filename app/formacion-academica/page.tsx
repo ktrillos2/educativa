@@ -1,6 +1,7 @@
 import { FormacionAcademicaList } from "@/components/formacion-academica-list"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { BookOpen, GraduationCap, Trophy, Users } from "@/components/ui/icons"
+import Image from "next/image"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { ProgramInfoDialog } from "@/components/program-info-dialog"
@@ -39,14 +40,14 @@ export default async function FormacionAcademicaPage() {
             title: course.title || "Programa ETDH",
             description: course.description || "",
             duration: course.duration || "160 horas",
-            students: course.students || "15 cupos",
+            students: course.students || "50 cupos",
             badge: course.badge || null,
             category: course.category || "General",
             image: course.image || "/placeholder.svg",
-            price: course.price || "Consultar",
+            price: course.price ? course.price.replace(/\s*\/\s*Semestre/gi, "").replace(/\$2[0-9]{2}\.000/g, "$350.000") : "$350.000 COP",
             startDate: course.start_date || "Inscripciones Abiertas",
             modules: course.modules || 4,
-            minStudents: course.min_students ?? 15,
+            minStudents: course.min_students ?? 50,
             enrolledCount: enrolledCount ?? 0,
         }
     }))
@@ -57,27 +58,42 @@ export default async function FormacionAcademicaPage() {
                 id: 'programa-tecnico-sistemas',
                 title: 'Técnico en Sistemas y Computación (ETDH)',
                 description: 'Programa técnico laboral por competencias en sistemas y mantenimiento de equipos de cómputo.',
-                category: 'Tecnología',
-                price: '$200.000 COP / Semestre',
+                category: 'Administración',
+                price: '$350.000 COP',
                 duration: '3 Semestres',
-                students: '15 cupos',
+                students: '50 cupos',
                 badge: 'Popular',
                 image: '/images/desarrollo-software.jpg',
                 startDate: 'Próxima cohorte',
                 modules: 4,
-                minStudents: 15,
+                minStudents: 50,
                 enrolledCount: 0
             },
             {
                 id: 'programa-auxiliar-administrativo',
                 title: 'Técnico Auxiliar Administrativo y Financiero (ETDH)',
                 description: 'Formación profesional en gestión documental, servicio al cliente y procesos administrativos.',
-                category: 'Gestión',
-                price: '$220.000 COP / Semestre',
+                category: 'Administración',
+                price: '$350.000 COP',
                 duration: '3 Semestres',
-                students: '15 cupos',
+                students: '50 cupos',
                 badge: 'Certificado',
                 image: '/images/administracion.jpg',
+                startDate: 'Próxima cohorte',
+                modules: 4,
+                minStudents: 50,
+                enrolledCount: 0
+            },
+            {
+                id: 'programa-educacion-infantil',
+                title: 'Técnico en Atención a la Primera Infancia y Educación (ETDH)',
+                description: 'Formación técnico laboral en pedagogía, desarrollo infantil y estrategias educativas.',
+                category: 'Educación',
+                price: '$350.000 COP',
+                duration: '3 Semestres',
+                students: '50 cupos',
+                badge: 'Nuevo',
+                image: '/images/primera-infancia.jpg',
                 startDate: 'Próxima cohorte',
                 modules: 4,
                 minStudents: 15,
@@ -86,10 +102,11 @@ export default async function FormacionAcademicaPage() {
         ]
     }
 
-    const uniqueCategories = [
-        "Todos",
-        ...Array.from(new Set(initialCourses.map((c) => c.category).filter((cat): cat is string => Boolean(cat)))),
-    ]
+    const defaultCategories = ["Todos", "Tecnología", "Gestión", "Administración", "Educación"]
+    const uniqueCategories = Array.from(new Set([
+        ...defaultCategories,
+        ...initialCourses.map((c) => c.category).filter((cat): cat is string => Boolean(cat))
+    ]))
 
     return (
         <main className="flex-grow bg-muted/20">
@@ -126,7 +143,14 @@ export default async function FormacionAcademicaPage() {
                                 </div>
                             </div>
 
-                            <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[52px] flex justify-end">
+                            <div className="w-full lg:w-[420px] flex-shrink-0 mt-4 lg:mt-[52px] flex flex-col items-end gap-3">
+                                <Image
+                                    src="/merito.svg"
+                                    alt="Líderes del Mérito"
+                                    width={260}
+                                    height={65}
+                                    className="h-14 md:h-20 w-auto object-contain self-start -translate-y-[2cm] -translate-x-[5cm]"
+                                />
                                 <Dialog>
                                     <DialogTrigger className="w-full text-left px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors border-l-4 border-yellow-400 backdrop-blur-xl shadow-lg outline-none rounded-none cursor-pointer">
                                         <strong className="text-yellow-300 text-sm block">Información Legal Importante</strong>

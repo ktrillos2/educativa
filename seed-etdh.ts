@@ -18,11 +18,11 @@ async function seed() {
     id: 'programa-tecnico-sistemas',
     title: 'Técnico en Sistemas y Computación (ETDH)',
     description: 'Programa técnico laboral por competencias en sistemas y mantenimiento de equipos de cómputo.',
-    category: 'Tecnología',
-    price: '$200.000 COP / Semestre',
+    category: 'Administración',
+    price: '$350.000 COP',
     duration: '3 Semestres',
     modules: 4,
-    students: '15 cupos',
+    students: '50 cupos',
     image: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=1000&auto=format&fit=crop',
     type: 'etdh'
   })
