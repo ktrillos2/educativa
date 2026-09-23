@@ -58,18 +58,18 @@ export default async function VerifyPage(props: { params: Promise<{ id: string }
   const isValid = enrollment.payment_verified && isEligible
 
   return (
-    <div className="min-h-screen bg-muted/10 pt-32 pb-12 px-4 flex flex-col items-center">
-      <div className="w-full max-w-2xl bg-white rounded-2xl shadow-xl border border-border overflow-hidden">
+    <div className="min-h-screen bg-muted/10 pt-36 pb-16 px-4 flex flex-col items-center justify-center">
+      <div className="w-full max-w-lg bg-white rounded-xl shadow-xl border border-border overflow-hidden">
         
         {/* Header */}
-        <div className={`p-8 text-white text-center ${isValid ? 'bg-primary' : 'bg-red-600'}`}>
-          <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-4 backdrop-blur-sm">
-            {isValid ? <CheckCircle className="w-10 h-10 text-white" /> : <XCircle className="w-10 h-10 text-white" />}
+        <div className={`p-6 text-white text-center ${isValid ? 'bg-primary' : 'bg-red-600'}`}>
+          <div className="w-14 h-14 bg-white/20 rounded-full flex items-center justify-center mx-auto mb-3 backdrop-blur-sm">
+            {isValid ? <CheckCircle className="w-7 h-7 text-white" /> : <XCircle className="w-7 h-7 text-white" />}
           </div>
-          <h1 className="text-3xl font-extrabold mb-2">
+          <h1 className="text-2xl font-extrabold mb-1">
             {isValid ? 'Certificado Válido' : 'Certificado Inválido'}
           </h1>
-          <p className="text-white/90 text-sm">
+          <p className="text-white/90 text-xs max-w-sm mx-auto">
             {isValid 
               ? 'Este documento fue emitido oficialmente por la Academia de Formación Líderes del Mérito.' 
               : 'Este certificado no cumple con los requisitos de graduación o el pago no está verificado.'}
@@ -77,52 +77,52 @@ export default async function VerifyPage(props: { params: Promise<{ id: string }
         </div>
 
         {/* Content */}
-        <div className="p-8 space-y-6">
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-primary/10 rounded-lg shrink-0">
-              <User className="w-6 h-6 text-primary" />
+        <div className="p-6 space-y-4">
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 bg-primary/10 rounded-lg shrink-0">
+              <User className="w-5 h-5 text-primary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground font-bold uppercase tracking-wider">Otorgado a</p>
-              <p className="text-xl font-bold">{user?.name}</p>
-              <p className="text-sm text-muted-foreground">Documento: {user?.document}</p>
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Otorgado a</p>
+              <p className="text-lg font-bold">{user?.name}</p>
+              <p className="text-xs text-muted-foreground">Documento: {user?.document}</p>
             </div>
           </div>
 
-          <div className="flex items-start gap-4">
-            <div className="p-3 bg-secondary/10 rounded-lg shrink-0">
-              <Award className="w-6 h-6 text-secondary" />
+          <div className="flex items-start gap-3">
+            <div className="p-2.5 bg-secondary/10 rounded-lg shrink-0">
+              <Award className="w-5 h-5 text-secondary" />
             </div>
             <div>
-              <p className="text-sm text-muted-foreground font-bold uppercase tracking-wider">Programa</p>
-              <p className="text-xl font-bold text-secondary-dark">{course?.title}</p>
+              <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Programa</p>
+              <p className="text-lg font-bold text-secondary-dark">{course?.title}</p>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4 mt-4 pt-6 border-t border-border">
+          <div className="grid grid-cols-2 gap-4 mt-2 pt-4 border-t border-border">
             <div className="flex items-center gap-2">
-              <Calendar className="w-4 h-4 text-muted-foreground" />
-              <div className="text-sm">
-                <span className="block text-xs text-muted-foreground">Fecha de Emisión</span>
+              <Calendar className="w-4 h-4 text-muted-foreground shrink-0" />
+              <div className="text-xs">
+                <span className="block text-[11px] text-muted-foreground">Fecha de Emisión</span>
                 <span className="font-semibold">{new Date(enrollment.created_at).toLocaleDateString('es-CO')}</span>
               </div>
             </div>
             <div className="flex items-center gap-2">
-              <BookOpen className="w-4 h-4 text-muted-foreground" />
-              <div className="text-sm">
-                <span className="block text-xs text-muted-foreground">Intensidad</span>
-                <span className="font-semibold">{course?.duration || '70 horas'}</span>
+              <BookOpen className="w-4 h-4 text-muted-foreground shrink-0" />
+              <div className="text-xs">
+                <span className="block text-[11px] text-muted-foreground">Intensidad</span>
+                <span className="font-semibold">{course?.duration || '80 horas'}</span>
               </div>
             </div>
           </div>
         </div>
 
         {/* Footer */}
-        <div className="bg-gray-50 p-6 border-t border-border text-center">
-          <p className="text-xs text-muted-foreground mb-4">
+        <div className="bg-gray-50 p-5 border-t border-border text-center">
+          <p className="text-xs text-muted-foreground mb-3 max-w-sm mx-auto">
             Para dudas sobre la autenticidad de este certificado, por favor contáctanos al correo academiadeformacion@lideresdelmerito.edu.co.
           </p>
-          <Link href="/" className="inline-flex items-center justify-center px-6 py-2 bg-primary text-white text-sm font-bold rounded-lg hover:bg-primary/90 transition-colors">
+          <Link href="/" className="inline-flex items-center justify-center px-5 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors">
             Conocer la Academia
           </Link>
         </div>

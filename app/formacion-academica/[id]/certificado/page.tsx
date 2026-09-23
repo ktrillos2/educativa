@@ -312,10 +312,9 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                             rel="noreferrer"
                             className="absolute inset-0 bg-black/80 text-white text-xs flex items-center justify-center text-center p-1 opacity-0 group-hover:opacity-100 transition-opacity print:hidden pointer-events-auto"
                           >
-                            Probar <br/> Link
+                            Ir al <br/> Enlace
                           </a>
                         </div>
-                        <p className="text-[12px] text-black mt-1" style={{ fontFamily: 'Arial, sans-serif' }}>(Insertar aquí)</p>
                       </div>
                       
                       {/* Signature */}
