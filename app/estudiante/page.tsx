@@ -9,10 +9,19 @@ export default async function EstudiantePage() {
   const supabase = createAdminClient()
 
   // Inscripciones reales del estudiante
-  const { data: enrollments, count: enrollmentCount } = await supabase
+  const { data: enrollments } = await supabase
     .from("enrollments")
-    .select("*", { count: "exact" })
+    .select("*")
     .eq("user_id", session?.userId ?? "")
+
+  // Deduplicar inscripciones por course_id
+  const uniqueEnrollmentsMap = new Map()
+  enrollments?.forEach(e => {
+    if (!uniqueEnrollmentsMap.has(e.course_id)) {
+      uniqueEnrollmentsMap.set(e.course_id, e)
+    }
+  })
+  const uniqueEnrollments = Array.from(uniqueEnrollmentsMap.values())
 
   // Cursos desde Supabase
   const { data: dbCourses } = await supabase
@@ -20,7 +29,7 @@ export default async function EstudiantePage() {
     .select("id, title, category, modules")
 
   // Enriquecer inscripciones con datos de la DB o diplomado estático
-  const enrichedEnrollments = (enrollments ?? []).map((e) => {
+  const enrichedEnrollments = uniqueEnrollments.map((e) => {
     const course = dbCourses?.find((c) => String(c.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
     const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
     const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
@@ -30,7 +39,7 @@ export default async function EstudiantePage() {
   const stats = [
     {
       label: "Cursos Activos",
-      value: enrollmentCount ?? 0,
+      value: uniqueEnrollments.length,
       description: "Matriculados actualmente",
       icon: BookOpen,
       color: "bg-[oklch(0.30_0.10_145)]",

@@ -3,6 +3,7 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { Users, Mail, Phone, Calendar, BookOpen, FileText } from "lucide-react"
 import Link from "next/link"
 import { ForceApproveButton } from "./force-approve-button"
+import { UserProgressDialog } from "./user-progress-dialog"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -59,16 +60,19 @@ export default async function AdminUsuariosPage() {
             <tbody className="divide-y divide-[oklch(0.94_0.01_145)]">
               {users?.map((u) => {
                 const uEnrollments = userEnrollments.get(u.id) || []
+                const uProgressList = progress?.filter(p => p.user_id === u.id) || []
                 return (
                   <tr key={u.id} className="hover:bg-[oklch(0.98_0.01_145)] transition-colors align-top">
                     <td className="px-6 py-4">
                       <p className="font-bold text-[oklch(0.25_0.10_145)]">{u.name}</p>
-                      <p className="text-xs text-[oklch(0.55_0.04_145)] mt-0.5 mb-2">CC: {u.document || 'N/A'}</p>
+                      <p className="text-xs text-[oklch(0.55_0.04_145)] mt-0.5">CC: {u.document || 'N/A'}</p>
                       {u.id_document_url && (
-                        <a href={u.id_document_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold uppercase rounded-md transition-colors border border-gray-200">
-                          <FileText className="w-3.5 h-3.5" />
-                          Ver Cédula
-                        </a>
+                        <div className="mt-2">
+                          <a href={u.id_document_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold uppercase rounded-md transition-colors border border-gray-200">
+                            <FileText className="w-3.5 h-3.5" />
+                            Ver Cédula
+                          </a>
+                        </div>
                       )}
                     </td>
                     <td className="px-6 py-4">
@@ -89,8 +93,11 @@ export default async function AdminUsuariosPage() {
                           {uEnrollments.map(e => {
                             const course = courseMap.get(e.course_id)
                             const prog = userProgress.get(`${u.id}-${e.course_id}`) || []
-                            const completedModules = prog.filter(p => p.completed).length
-                            const totalModules = course?.modules || 5
+                            const totalModules = course?.modules || 4
+                            const uniqueCompletedModules = new Set(
+                              prog.filter(p => p.completed).map(p => String(p.module_id).replace('modulo-', 'mod-'))
+                            ).size
+                            const completedModules = Math.min(uniqueCompletedModules, totalModules)
                             const isCompleted = completedModules >= totalModules
                             
                             return (
@@ -107,13 +114,26 @@ export default async function AdminUsuariosPage() {
                                   }`}>
                                     {e.payment_verified ? 'Pago Verificado' : 'Pago Pendiente'}
                                   </span>
-                                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border ${
-                                    isCompleted 
-                                      ? 'bg-blue-50 text-blue-700 border-blue-200'
-                                      : 'bg-gray-50 text-gray-600 border-gray-200'
-                                  }`}>
-                                    Progreso: {completedModules}/{totalModules}
-                                  </span>
+                                  
+                                  <UserProgressDialog 
+                                    user={u} 
+                                    enrollments={uEnrollments} 
+                                    coursesMap={courseMap} 
+                                    progressList={uProgressList}
+                                    trigger={
+                                      <button 
+                                        className={`px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide border transition-all cursor-pointer flex items-center gap-1 hover:scale-105 ${
+                                          isCompleted 
+                                            ? 'bg-blue-50 text-blue-700 border-blue-200 hover:bg-blue-100'
+                                            : 'bg-gray-100 text-gray-700 border-gray-300 hover:bg-gray-200'
+                                        }`}
+                                        title="Haz clic para ver el desglose detallado de exámenes y respuestas"
+                                      >
+                                        <BookOpen className="w-3 h-3" />
+                                        Progreso: {completedModules}/{totalModules}
+                                      </button>
+                                    }
+                                  />
                                   {isCompleted && e.payment_verified && (
                                     <>
                                       <Link 
@@ -144,11 +164,11 @@ export default async function AdminUsuariosPage() {
                     </td>
                     <td className="px-6 py-4">
                       <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider mb-2 inline-block ${
-                        u.role === 'admin' 
+                        (u.role === 'admin' || u.role === 'ADMIN')
                           ? 'bg-[oklch(0.30_0.10_145)] text-white' 
                           : 'bg-[oklch(0.90_0.02_145)] text-[oklch(0.40_0.08_145)]'
                       }`}>
-                        {u.role || 'estudiante'}
+                        {(u.role === 'admin' || u.role === 'ADMIN') ? 'Administrador' : 'Estudiante'}
                       </span>
                       <div className="flex items-center gap-1.5 text-xs text-[oklch(0.50_0.04_145)]">
                         <Calendar className="w-3.5 h-3.5" />

@@ -59,22 +59,33 @@ export async function submitExam(courseId: string, moduleId: string, answers: Re
         }
 
         if (existingProgress) {
-            // Only keep the highest score
-            const oldScore = Number(existingProgress.score)
-            if (score > oldScore) {
-                const { error: updateError } = await supabase
+            const oldScore = Number(existingProgress.score || 0)
+            const currentAttempts = Number((existingProgress as any).attempts || 1)
+            const newScore = Math.max(score, oldScore)
+            const newlyCompleted = isCompleted || Boolean((existingProgress as any).completed)
+
+            const { error: updateError } = await supabase
+                .from("progress")
+                .update({
+                    score: newScore,
+                    completed: newlyCompleted,
+                    attempts: currentAttempts + 1,
+                    last_score: score,
+                    updated_at: new Date().toISOString()
+                } as any)
+                .eq("id", existingProgress.id)
+
+            if (updateError) {
+                console.error("Error updating progress:", updateError)
+                // Fallback attempt update if custom columns don't exist in schema
+                await supabase
                     .from("progress")
                     .update({
-                        score: score,
-                        completed: isCompleted,
+                        score: newScore,
+                        completed: newlyCompleted,
                         updated_at: new Date().toISOString()
                     })
                     .eq("id", existingProgress.id)
-
-                if (updateError) {
-                    console.error("Error updating progress:", updateError)
-                    return { error: "Error al actualizar la calificación." }
-                }
             }
         } else {
             const { error: insertError } = await supabase
@@ -84,12 +95,22 @@ export async function submitExam(courseId: string, moduleId: string, answers: Re
                     course_id: courseId,
                     module_id: moduleId,
                     score: score,
-                    completed: isCompleted
-                })
+                    completed: isCompleted,
+                    attempts: 1,
+                    last_score: score
+                } as any)
 
             if (insertError) {
-                console.error("Error inserting progress:", insertError)
-                return { error: "Error al guardar la calificación." }
+                // Fallback insert if custom columns don't exist
+                await supabase
+                    .from("progress")
+                    .insert({
+                        user_id: session.userId,
+                        course_id: courseId,
+                        module_id: moduleId,
+                        score: score,
+                        completed: isCompleted
+                    })
             }
         }
 

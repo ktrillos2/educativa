@@ -42,6 +42,15 @@ export default async function CursosPage() {
       enrollments = [...enrollments, ...mockEnrollments]
   }
 
+  // Deduplicar inscripciones por course_id para evitar duplicados
+  const uniqueEnrollmentsMap = new Map()
+  enrollments.forEach(e => {
+    if (!uniqueEnrollmentsMap.has(e.course_id)) {
+      uniqueEnrollmentsMap.set(e.course_id, e)
+    }
+  })
+  enrollments = Array.from(uniqueEnrollmentsMap.values())
+
   // Progreso del estudiante
   const { data: progress } = await supabase
     .from("progress")
@@ -53,8 +62,9 @@ export default async function CursosPage() {
   const enrichedEnrollments = (enrollments ?? []).map((e) => {
     const course = courses?.find((d) => String(d.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
     const courseProgress = progress?.filter(p => String(p.course_id) === String(e.course_id)) || []
-    const completedModules = courseProgress.length
     const totalModules = course?.modules || 4
+    const uniqueModulesCount = new Set(courseProgress.map(p => p.module_id)).size
+    const completedModules = Math.min(uniqueModulesCount, totalModules)
     const progressPercent = Math.min(100, Math.round((completedModules / totalModules) * 100))
 
     const nextModuleIndex = Math.min(completedModules, totalModules - 1)
