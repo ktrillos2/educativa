@@ -34,7 +34,7 @@ export function CoursePayment({ courseId, programName, price, compact = true }: 
     }
   }
 
-  const amountInCents = numericPrice * 100
+  // numericPrice is already in COP pesos
 
   const handlePaymentClick = async () => {
     setLoading(true)
@@ -45,7 +45,7 @@ export function CoursePayment({ courseId, programName, price, compact = true }: 
         body: JSON.stringify({
           courseId,
           programName,
-          amount: amountInCents
+          amount: numericPrice
         })
       })
 

@@ -13,15 +13,16 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
   const studentIdParam = searchParams?.studentId as string | undefined
   const autoDownload = searchParams?.download === "true"
   const supabaseUser = await createClient()
+  const courseId = decodeURIComponent(params.id)
 
   const session = await getSession()
   if (!session?.userId) {
-    redirect(`/formacion-academica/${params.id}`)
+    redirect(`/formacion-academica/${courseId}`)
   }
 
   const isAdmin = session.role === "admin"
   if (!isAdmin) {
-    redirect(`/formacion-academica/${params.id}/certificado`)
+    redirect(`/formacion-academica/${courseId}/certificado`)
   }
 
   const supabase = createAdminClient()
@@ -30,7 +31,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
   const { data: course } = await supabase
     .from("courses")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", courseId)
     .maybeSingle()
 
   if (!course) {

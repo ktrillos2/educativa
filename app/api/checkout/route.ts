@@ -45,6 +45,9 @@ export async function POST(request: Request) {
     // Generar referencia única
     const reference = `CERT-${crypto.randomUUID().substring(0, 8).toUpperCase()}-${Date.now()}`
 
+    // amount comes in as pesos (e.g. 460000000). Keep it as pesos.
+    const amountPesos = parseInt(amount, 10)
+
     // Crear la orden en la tabla orders de Supabase
     const { error: orderError } = await supabase
       .from("orders")
@@ -57,13 +60,14 @@ export async function POST(request: Request) {
         document_id: user.document,
         phone: user.phone || '',
         program_name: programName,
-        amount: parseInt(amount, 10),
+        amount: amountPesos,
         status: 'PENDING'
       })
 
     if (orderError) {
       console.error('Error creating order in database:', orderError)
-      return NextResponse.json({ error: 'Error al registrar la orden de pago' }, { status: 500 })
+      const detail = orderError.message || orderError.details || JSON.stringify(orderError)
+      return NextResponse.json({ error: `Error al registrar la orden: ${detail}` }, { status: 500 })
     }
 
     // Configuración de Openpay
@@ -83,7 +87,7 @@ export async function POST(request: Request) {
     const openpayPayload = {
       method: "card",
       confirm: false,
-      amount: parseInt(amount, 10) / 100, // Openpay espera decimales, Wompi usaba centavos. Si es 150000000 cents -> 1500000 COP
+      amount: amountPesos, // Openpay Colombia espera el valor en COP (pesos)
       currency: "COP",
       description: `Certificado Academico - ${cleanProgramName}`.substring(0, 250),
       order_id: reference,

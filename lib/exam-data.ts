@@ -571,10 +571,32 @@ export const COURSE_9_QUESTIONS: Record<string, Question[]> = {
     ]
 };
 
+import fs from "fs"
+import path from "path"
+
+export function getFullQuestionsForCourse(courseId: string, moduleId: string): Question[] {
+    try {
+        const filePath = path.join(process.cwd(), "diplomados", `exams_${courseId}.json`)
+        if (fs.existsSync(filePath)) {
+            const content = fs.readFileSync(filePath, "utf-8")
+            const examsMap = JSON.parse(content)
+            if (examsMap && examsMap[moduleId] && Array.isArray(examsMap[moduleId]) && examsMap[moduleId].length > 0) {
+                return examsMap[moduleId]
+            }
+        }
+    } catch (e) {
+        console.error("Error reading course exam JSON file:", e)
+    }
+
+    if (courseId === "9" && COURSE_9_QUESTIONS[moduleId]) {
+        return COURSE_9_QUESTIONS[moduleId]
+    }
+
+    return FALLBACK_QUESTIONS
+}
+
 export function getQuestionsForClient(courseId: string, moduleId: string) {
-    const questionsList = courseId === "9" && COURSE_9_QUESTIONS[moduleId] 
-        ? COURSE_9_QUESTIONS[moduleId] 
-        : FALLBACK_QUESTIONS;
+    const questionsList = getFullQuestionsForCourse(courseId, moduleId)
 
     // Retornamos sin correct, feedbackCorrect, feedbackIncorrect
     return questionsList.map(q => ({
@@ -583,3 +605,4 @@ export function getQuestionsForClient(courseId: string, moduleId: string) {
         options: q.options
     }));
 }
+

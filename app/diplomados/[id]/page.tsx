@@ -29,21 +29,17 @@ export const revalidate = 0
 export default async function DiplomadoDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params
     const supabase = await createClient()
+    const courseId = decodeURIComponent(params.id)
 
     // Buscar curso en Supabase
     const { data: course } = await supabase
         .from("courses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", courseId)
         .maybeSingle()
 
     if (!course) {
         notFound()
-    }
-
-    if (course.type !== 'etdh') {
-        course.title = "Diplomado en Gestión del Presupuesto Público"
-        course.duration = "80 horas"
     }
 
     const session = await getSession()

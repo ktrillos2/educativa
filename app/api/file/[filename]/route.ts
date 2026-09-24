@@ -20,31 +20,33 @@ export async function GET(
             return new NextResponse("Unauthorized", { status: 401 })
         }
 
-        const { searchParams } = new URL(request.url)
-        const courseId = searchParams.get("courseId")
-        const supabase = await createClient()
+        if (session.role !== "admin") {
+            const { searchParams } = new URL(request.url)
+            const courseId = searchParams.get("courseId")
+            const supabase = await createClient()
 
-        // Material is free for enrolled users
-        let isEnrolled = false
-        if (courseId) {
-            const { data } = await supabase
-                .from("enrollments")
-                .select("user_id")
-                .eq("user_id", session.userId)
-                .eq("course_id", courseId)
-                .maybeSingle()
-            if (data) isEnrolled = true
-        } else {
-            const { data } = await supabase
-                .from("enrollments")
-                .select("user_id")
-                .eq("user_id", session.userId)
-                .limit(1)
-            if (data && data.length > 0) isEnrolled = true
-        }
+            // Material is free for enrolled users
+            let isEnrolled = false
+            if (courseId) {
+                const { data } = await supabase
+                    .from("enrollments")
+                    .select("user_id")
+                    .eq("user_id", session.userId)
+                    .eq("course_id", courseId)
+                    .maybeSingle()
+                if (data) isEnrolled = true
+            } else {
+                const { data } = await supabase
+                    .from("enrollments")
+                    .select("user_id")
+                    .eq("user_id", session.userId)
+                    .limit(1)
+                if (data && data.length > 0) isEnrolled = true
+            }
 
-        if (!isEnrolled) {
-            return new NextResponse("Enrollment Required", { status: 403 })
+            if (!isEnrolled) {
+                return new NextResponse("Enrollment Required", { status: 403 })
+            }
         }
     }
 

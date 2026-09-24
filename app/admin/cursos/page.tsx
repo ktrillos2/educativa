@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { BookOpen, GraduationCap, Clock, Banknote, Flame, CheckCircle } from "lucide-react"
+import { CourseActions } from "./course-actions"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -73,7 +74,7 @@ export default async function AdminCursosPage() {
                   </div>
                 </div>
 
-                <div className="mt-auto">
+                <div className="mt-auto space-y-3">
                   <div className="bg-[oklch(0.97_0.01_145)] p-3 rounded-lg border border-[oklch(0.92_0.02_145)]">
                     <div className="flex justify-between items-center mb-1.5">
                       <div className="flex items-center gap-1.5">
@@ -88,6 +89,14 @@ export default async function AdminCursosPage() {
                       <div className={`h-1.5 rounded-full transition-all duration-700 ${ready ? 'bg-green-500' : 'bg-amber-400'}`} style={{ width: `${pct}%` }} />
                     </div>
                   </div>
+
+                  <a
+                    href={`/admin/cursos/${encodeURIComponent(c.id)}/modulos`}
+                    className="w-full py-2 px-3 bg-primary/10 text-primary hover:bg-primary/20 rounded-lg text-xs font-bold transition-colors flex items-center justify-center gap-1.5 border border-primary/20"
+                  >
+                    <BookOpen className="w-3.5 h-3.5" /> Gestionar Módulos y Evaluaciones
+                  </a>
+                  <CourseActions id={c.id} />
                 </div>
               </div>
             </div>

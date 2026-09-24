@@ -13,12 +13,13 @@ export const revalidate = 0
 export default async function ExamPage(props: { params: Promise<{ id: string; moduleId: string }> }) {
     const params = await props.params
     const supabase = await createClient()
+    const courseId = decodeURIComponent(params.id)
 
     // Obtener diplomado desde Supabase
     const { data: course } = await supabase
         .from("courses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", courseId)
         .maybeSingle()
 
     if (!course) {

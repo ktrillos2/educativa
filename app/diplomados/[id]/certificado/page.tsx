@@ -19,10 +19,11 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   const searchParams = await props.searchParams
   const studentIdParam = searchParams?.studentId as string | undefined
   const supabaseUser = await createClient()
+  const courseId = decodeURIComponent(params.id)
 
   const session = await getSession()
   if (!session?.userId) {
-    redirect(`/diplomados/${params.id}`)
+    redirect(`/diplomados/${courseId}`)
   }
 
   const isAdmin = session.role === "admin"
@@ -32,7 +33,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   const { data: course } = await supabase
     .from("courses")
     .select("*")
-    .eq("id", params.id)
+    .eq("id", courseId)
     .maybeSingle()
 
   if (!course) {

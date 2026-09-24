@@ -135,7 +135,7 @@ export function FormacionAcademicaList({ initialCourses, initialCategories }: Fo
                                         </div>
 
                                         <Button asChild className="w-full rounded-none group/btn overflow-hidden relative shadow-[4px_4px_0_0_#C5A059]">
-                                            <Link href={`/formacion-academica/${program.id}`} className="flex items-center justify-center">
+                                            <Link href={`/formacion-academica/${encodeURIComponent(program.id)}`} className="flex items-center justify-center">
                                                 <span className="relative z-10 font-semibold">Ver Detalles</span>
                                                 <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform relative z-10" />
                                                 <div className="absolute inset-0 bg-primary/10 scale-x-0 origin-left group-hover/btn:scale-x-100 transition-transform duration-300 ease-out" />

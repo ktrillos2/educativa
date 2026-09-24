@@ -11,8 +11,9 @@ export const revalidate = 0
 export default async function DocumentViewerPage(props: { params: Promise<{ id: string, filename: string }> }) {
     const params = await props.params
     const session = await getSession()
+    const courseId = decodeURIComponent(params.id)
     if (!session?.userId) {
-        redirect(`/diplomados/${params.id}`)
+        redirect(`/diplomados/${courseId}`)
     }
 
     const supabase = await createClient()
@@ -21,7 +22,7 @@ export default async function DocumentViewerPage(props: { params: Promise<{ id: 
     const { data: course } = await supabase
         .from("courses")
         .select("*")
-        .eq("id", params.id)
+        .eq("id", courseId)
         .maybeSingle()
 
     if (!course) {

@@ -4,14 +4,28 @@ import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronLeft, BookOpen, Save } from "lucide-react"
 import Link from "next/link"
-import { createCourse } from "@/app/actions/courses"
+import { updateCourse } from "@/app/actions/courses"
 import { ImageUploadZone } from "@/components/image-upload-zone"
 
-export default function CrearCursoPage() {
+export function EditCourseForm({ course }: { course: any }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
-  const [courseType, setCourseType] = useState("diplomado")
+  const [courseType, setCourseType] = useState(course.type || "diplomado")
+  const [title, setTitle] = useState(course.title || "")
+  const [description, setDescription] = useState(course.description || "")
+  const [category, setCategory] = useState(course.category || "")
+  const [price, setPrice] = useState(course.price || "")
+  const [duration, setDuration] = useState(course.duration || "")
+  
+  // Extract min_students from 'students' if it's etdh
+  let minStudentsDefault = 15
+  if (course.type === 'etdh' && course.students) {
+    const match = course.students.match(/(\d+)/)
+    if (match) {
+      minStudentsDefault = parseInt(match[1], 10)
+    }
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -21,14 +35,16 @@ export default function CrearCursoPage() {
     const formData = new FormData(e.currentTarget)
     
     try {
-      const result = await createCourse(formData)
+      const result = await updateCourse(formData)
       if (result?.error) {
         setError(result.error)
         setIsPending(false)
       }
-      // Si no hay error, el action hace redirect
-    } catch (err) {
-      setError("Ocurrió un error inesperado.")
+    } catch (err: any) {
+      if (err?.message === 'NEXT_REDIRECT' || err?.digest?.startsWith('NEXT_REDIRECT')) {
+        throw err
+      }
+      setError("Ocurrió un error inesperado al guardar.")
       setIsPending(false)
     }
   }
@@ -45,8 +61,8 @@ export default function CrearCursoPage() {
         <div className="bg-[oklch(0.30_0.10_145)] px-6 py-5 text-white flex items-center gap-3">
           <BookOpen className="w-6 h-6" />
           <div>
-            <h1 className="text-xl font-bold">Crear Nuevo Curso</h1>
-            <p className="text-white/70 text-sm">Añade un diplomado o programa ETDH al catálogo</p>
+            <h1 className="text-xl font-bold">Editar Curso</h1>
+            <p className="text-white/70 text-sm">Modifica los detalles del curso {course.title}</p>
           </div>
         </div>
 
@@ -57,11 +73,9 @@ export default function CrearCursoPage() {
             </div>
           )}
 
+          <input type="hidden" name="id" value={course.id} />
+          
           <div className="grid md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              {/* ID se genera automáticamente en el backend */}
-            </div>
-
             <div className="space-y-2">
               <label htmlFor="type" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
                 Tipo de Curso *
@@ -89,7 +103,8 @@ export default function CrearCursoPage() {
               id="title"
               name="title"
               required
-              placeholder="ej: Diplomado en Salud Ocupacional"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
             />
           </div>
@@ -102,7 +117,8 @@ export default function CrearCursoPage() {
               id="description"
               name="description"
               rows={3}
-              placeholder="Describe de qué trata el curso..."
+              value={description}
+              onChange={(e) => setDescription(e.target.value)}
               className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm resize-none"
             />
           </div>
@@ -116,7 +132,8 @@ export default function CrearCursoPage() {
                 type="text"
                 id="category"
                 name="category"
-                placeholder="ej: Salud y Bienestar"
+                value={category}
+                onChange={(e) => setCategory(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               />
             </div>
@@ -129,7 +146,8 @@ export default function CrearCursoPage() {
                 type="text"
                 id="price"
                 name="price"
-                placeholder="ej: $150.000 COP"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               />
             </div>
@@ -142,7 +160,8 @@ export default function CrearCursoPage() {
                 type="text"
                 id="duration"
                 name="duration"
-                placeholder="ej: 120 horas"
+                value={duration}
+                onChange={(e) => setDuration(e.target.value)}
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               />
             </div>
@@ -156,7 +175,7 @@ export default function CrearCursoPage() {
                 id="modules"
                 name="modules"
                 min="1"
-                defaultValue="4"
+                defaultValue={course.modules}
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               />
             </div>
@@ -173,14 +192,14 @@ export default function CrearCursoPage() {
                   id="min_students"
                   name="min_students"
                   min="1"
-                  defaultValue="15"
+                  defaultValue={minStudentsDefault}
                   className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
                 />
               </div>
             )}
             
             <div className="md:col-span-2">
-              <ImageUploadZone />
+              <ImageUploadZone defaultUrl={course.image || ""} />
             </div>
           </div>
 
@@ -198,7 +217,7 @@ export default function CrearCursoPage() {
               className="px-6 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-70"
             >
               <Save className="w-4 h-4" />
-              {isPending ? "Guardando..." : "Crear Curso"}
+              {isPending ? "Guardando..." : "Guardar Cambios"}
             </button>
           </div>
         </form>

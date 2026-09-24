@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/server"
 import { getSession } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
-import { COURSE_9_QUESTIONS, FALLBACK_QUESTIONS } from "@/lib/exam-data"
+import { getFullQuestionsForCourse } from "@/lib/exam-data"
 
 export async function submitExam(courseId: string, moduleId: string, answers: Record<string, number>) {
     const session = await getSession()
@@ -12,9 +12,7 @@ export async function submitExam(courseId: string, moduleId: string, answers: Re
     }
 
     // Calcular puntaje en el servidor usando los datos verdaderos
-    const questionsList = courseId === "9" && COURSE_9_QUESTIONS[moduleId] 
-        ? COURSE_9_QUESTIONS[moduleId] 
-        : FALLBACK_QUESTIONS;
+    const questionsList = getFullQuestionsForCourse(courseId, moduleId);
 
     let correctCount = 0;
     const results = [];
