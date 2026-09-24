@@ -48,79 +48,80 @@ export function CTASection() {
           style={{ backgroundImage: "url('/modern-university-campus-with-students-walking--pr.jpg')" }}
         />
       </div>
-
-      <div className="container mx-auto px-4 relative z-20">
+      <div className="container mx-auto px-4 relative z-20 overflow-hidden">
         <div className="max-w-6xl mx-auto">
-          <div className={`grid lg:grid-cols-[1.2fr_1fr] gap-12 lg:gap-16 items-center ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
+          <div className={`grid lg:grid-cols-[1.2fr_1fr] gap-8 lg:gap-16 items-center ${isVisible ? "animate-fade-up" : "opacity-0"}`}>
             
             {/* Left Content */}
-            <div className="text-center lg:text-left">
-              <span className="inline-flex items-center gap-2 px-4 py-2 bg-secondary text-primary font-bold text-xs uppercase tracking-wider mb-6">
-                <Headphones className="h-4 w-4" />
-                Estamos para orientarte
+            <div className="text-center lg:text-left min-w-0">
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-secondary text-primary font-bold text-xs uppercase tracking-wider mb-6 max-w-full">
+                <Headphones className="h-4 w-4 shrink-0" />
+                <span>Estamos para orientarte</span>
               </span>
               
-              <h2 className="text-3xl md:text-5xl lg:text-6xl font-black text-white mb-4 uppercase leading-[1.1] tracking-tight">
+              <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white mb-4 uppercase leading-[1.1] tracking-tight break-words">
                 Resuelve tus dudas sobre nuestra oferta académica
               </h2>
               
               <div className="w-16 h-1 bg-secondary mx-auto lg:mx-0 mb-6 mt-4"></div>
               
-              <p className="text-white/90 text-lg mb-10 max-w-xl font-light">
+              <p className="text-white/90 text-base sm:text-lg mb-8 sm:mb-10 max-w-xl font-light leading-relaxed">
                 Te orientamos para que conozcas nuestros programas, sus objetivos, duración, requisitos y condiciones de inscripción.
               </p>
 
               {/* Features - Grid de 3 columnas */}
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 pt-8 mt-8 border-t border-white/20">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 pt-6 sm:pt-8 mt-6 sm:mt-8 border-t border-white/20">
                 {features.map((feature, index) => (
-                  <div key={index} className={`flex items-center gap-4 text-left ${index !== 2 ? 'sm:border-r border-white/20 sm:pr-6' : ''}`}>
-                    <div className="bg-secondary p-3 rounded-full shrink-0 flex items-center justify-center">
-                      <feature.icon className="h-5 w-5 text-primary" />
+                  <div key={index} className={`flex items-center gap-3 sm:gap-4 text-left ${index !== 2 ? 'sm:border-r border-white/20 sm:pr-6' : ''}`}>
+                    <div className="bg-secondary p-2.5 sm:p-3 rounded-full shrink-0 flex items-center justify-center">
+                      <feature.icon className="h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                     </div>
-                    <span className="text-white text-sm font-medium leading-tight">{feature.text}</span>
+                    <span className="text-white text-xs sm:text-sm font-medium leading-tight">{feature.text}</span>
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Right - Contact Card */}
-            <div className="bg-white p-8 rounded-none shadow-[8px_8px_0_0_#C5A059] border-2 border-border relative">
-              <h3 className="text-xl font-bold text-primary mb-2">Solicita asesoría académica</h3>
+            <div className="bg-white p-5 sm:p-8 rounded-none shadow-[4px_4px_0_0_#C5A059] sm:shadow-[8px_8px_0_0_#C5A059] border-2 border-border relative w-full overflow-hidden min-w-0">
+              <h3 className="text-lg sm:text-xl font-bold text-primary mb-2">Solicita asesoría académica</h3>
               <div className="w-10 h-0.5 bg-secondary mb-6 mt-2"></div>
 
-              <div className="space-y-4 mb-8">
-                <div className="flex items-center gap-4 p-4 bg-muted/30 border border-muted">
-                  <div className="p-2 bg-primary/10">
+              <div className="space-y-4 mb-6 sm:mb-8">
+                <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted/30 border border-muted min-w-0">
+                  <div className="p-2 bg-primary/10 shrink-0">
                     <PhoneCall className="h-5 w-5 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground font-medium">Llámanos</p>
-                    <p className="font-bold text-foreground">+57 (1) 234 5678</p>
+                    <p className="font-bold text-foreground text-sm sm:text-base break-words">+57 (1) 234 5678</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-4 p-4 bg-muted/30 border border-muted">
-                  <div className="p-2 bg-primary/10">
+                <div className="flex items-center gap-3 sm:gap-4 p-3 sm:p-4 bg-muted/30 border border-muted min-w-0">
+                  <div className="p-2 bg-primary/10 shrink-0">
                     <Mail className="h-5 w-5 text-primary" />
                   </div>
-                  <div>
+                  <div className="min-w-0 flex-1 overflow-hidden">
                     <p className="text-xs text-muted-foreground font-medium">Escríbenos</p>
-                    <p className="font-bold text-foreground text-sm">direccionacademica@lideresdelmerito.edu.co</p>
+                    <p className="font-bold text-foreground text-xs sm:text-sm break-all leading-tight">
+                      direccionacademica@lideresdelmerito.edu.co
+                    </p>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white rounded-none h-12 uppercase font-bold text-sm tracking-wider shadow-[4px_4px_0_0_#C5A059]">
+              <div className="space-y-3 sm:space-y-4">
+                <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white rounded-none h-11 sm:h-12 uppercase font-bold text-xs sm:text-sm tracking-wider shadow-[3px_3px_0_0_#C5A059] sm:shadow-[4px_4px_0_0_#C5A059]">
                   <a href="https://wa.me/573000000000?text=Hola,%20quisiera%20solicitar%20asesor%C3%ADa%20sobre%20los%20programas." target="_blank" rel="noopener noreferrer">
-                    Solicitar Asesoría
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <span>Solicitar Asesoría</span>
+                    <ArrowRight className="ml-2 h-4 w-4 shrink-0" />
                   </a>
                 </Button>
-                <Button asChild variant="outline" className="w-full rounded-none h-12 border-border hover:bg-muted bg-transparent uppercase font-bold text-sm tracking-wider shadow-[4px_4px_0_0_#000]">
+                <Button asChild variant="outline" className="w-full rounded-none h-11 sm:h-12 border-border hover:bg-muted bg-transparent uppercase font-bold text-xs sm:text-sm tracking-wider shadow-[3px_3px_0_0_#000] sm:shadow-[4px_4px_0_0_#000]">
                   <Link href="/diplomados">
-                    Conocer Programas
-                    <ArrowRight className="ml-2 h-4 w-4" />
+                    <span>Conocer Programas</span>
+                    <ArrowRight className="ml-2 h-4 w-4 shrink-0" />
                   </Link>
                 </Button>
               </div>
@@ -128,11 +129,12 @@ export function CTASection() {
           </div>
 
           {/* Info Alert Banner en el fondo */}
-          <div className="mt-16 bg-primary/80 border border-white/20 p-4 lg:p-5 flex items-center justify-center gap-3 text-sm lg:text-base text-white/90">
-            <CheckCircle2 className="h-5 w-5 text-secondary shrink-0" />
-            <p>La orientación brindada tiene carácter informativo sobre la oferta académica de la institución.</p>
+          <div className="mt-12 sm:mt-16 bg-primary/80 border border-white/20 p-4 lg:p-5 flex items-start sm:items-center justify-center gap-3 text-xs sm:text-sm lg:text-base text-white/90">
+            <CheckCircle2 className="h-5 w-5 text-secondary shrink-0 mt-0.5 sm:mt-0" />
+            <p className="leading-relaxed">La orientación brindada tiene carácter informativo sobre la oferta académica de la institución.</p>
           </div>
         </div>
+      </div>
       </div>
     </section>
   )

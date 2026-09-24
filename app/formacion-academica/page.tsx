@@ -162,7 +162,7 @@ export default async function FormacionAcademicaPage() {
                                     alt="Líderes del Mérito"
                                     width={260}
                                     height={65}
-                                    className="h-14 md:h-20 w-auto object-contain self-start -translate-y-[2cm] -translate-x-[5cm]"
+                                    className="h-12 sm:h-16 md:h-20 w-auto object-contain self-start lg:-translate-y-6 lg:-translate-x-12 mb-2 lg:mb-0"
                                 />
                                 <Dialog>
                                     <DialogTrigger className="w-full text-left px-4 py-3 bg-yellow-500/20 hover:bg-yellow-500/30 transition-colors border-l-4 border-yellow-400 backdrop-blur-xl shadow-lg outline-none rounded-none cursor-pointer">

@@ -37,7 +37,7 @@ export default async function RootLayout({
         <link rel="icon" href="/images/image.png" type="image/png" sizes="any" />
         <link rel="apple-touch-icon" href="/images/image.png" />
       </head>
-      <body className={`font-sans antialiased`}>
+      <body className={`font-sans antialiased overflow-x-hidden w-full max-w-full`}>
         <div className="print:hidden">
           <Header session={session} />
         </div>
