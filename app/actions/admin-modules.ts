@@ -5,7 +5,7 @@ import { getSession } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
 import fs from "fs"
 import path from "path"
-import { Question, COURSE_9_QUESTIONS, FALLBACK_QUESTIONS } from "@/lib/exam-data"
+import { Question, COURSE_9_QUESTIONS, FALLBACK_QUESTIONS } from "@/lib/exam-constants"
 import { extractTextFromPdfBuffer } from "@/lib/pdf-parser"
 
 export async function checkAdminSession() {
@@ -162,7 +162,7 @@ export async function parsePdfFileAction(formData: FormData, moduleIndex: number
     const targetFilePath = path.join(diplomadosDir, targetFileName)
     fs.writeFileSync(targetFilePath, buffer)
 
-    // Parse the PDF
+    // Parse the PDF text on the server
     const text = await extractTextFromPdfBuffer(buffer)
 
     if (!text || text.trim().length === 0) {
@@ -171,6 +171,7 @@ export async function parsePdfFileAction(formData: FormData, moduleIndex: number
       }
     }
 
+    // Call the text-based parser
     const parseResult = await parseExamTextAction(text, moduleIndex)
 
     return {
@@ -178,7 +179,7 @@ export async function parsePdfFileAction(formData: FormData, moduleIndex: number
       text,
       questions: parseResult.questions || [],
       message: parseResult.questions && parseResult.questions.length > 0
-        ? `Evaluación guardada. Se extrajeron ${parseResult.questions.length} preguntas del archivo PDF.`
+        ? `Evaluación guardada. Se extrajeron ${parseResult.questions.length} preguntas del archivo PDF (Procesado como Texto).`
         : "Evaluación guardada. Se extrajo el texto, pero no se detectaron preguntas con formato A/B/C/D.",
     }
   } catch (err: any) {
@@ -242,7 +243,7 @@ export async function parseExamTextAction(rawText: string, moduleIndex: number) 
     try {
       const { GoogleGenerativeAI } = await import("@google/generative-ai")
       const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY)
-      const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" })
+      const model = genAI.getGenerativeModel({ model: "gemini-3.8-flash" })
 
       const prompt = `Extrae todas las preguntas de opción múltiple del siguiente texto y devuélvelas en un JSON array estricto con el formato especificado.
 Ignora índices, tablas de contenido u otros textos que no sean preguntas de opción múltiple (una pregunta con 2 o más alternativas). Si no encuentras ninguna pregunta, devuelve un array vacío [].
@@ -262,7 +263,29 @@ ${rawText}
 """
 Solo responde con el código JSON, sin formato markdown ni texto adicional.`;
 
-      const result = await model.generateContent(prompt)
+      let result;
+      let retries = 3;
+      let delay = 2000;
+      
+      while (retries > 0) {
+        try {
+          result = await model.generateContent(prompt)
+          break;
+        } catch (error: any) {
+          if (error?.message?.includes("503") || error?.status === 503) {
+            retries--;
+            if (retries === 0) throw error;
+            console.log(`[Gemini 503 Error] Reintentando en ${delay}ms... (${retries} intentos restantes)`);
+            await new Promise(resolve => setTimeout(resolve, delay));
+            delay *= 2;
+          } else {
+            throw error;
+          }
+        }
+      }
+      
+      if (!result) throw new Error("No se pudo obtener respuesta de la IA.");
+
       let responseText = result.response.text().trim()
       
       // Clean markdown formatting if present

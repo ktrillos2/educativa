@@ -115,13 +115,23 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
     (progressData || []).map(p => [p.module_id, p.score])
   )
 
+  // Load exams data to check if exams are configured
+  let examsData: Record<string, any[]> | null = null
+  const examsFilePath = path.join(process.cwd(), "diplomados", `exams_${course.id}.json`)
+  if (fs.existsSync(examsFilePath)) {
+    try {
+      examsData = JSON.parse(fs.readFileSync(examsFilePath, "utf8"))
+    } catch(e) {}
+  }
+
   // 5. Build modules list
   const totalModules = course.modules || 1
   const courseModules = Array.from({ length: totalModules }).map((_, i) => {
     const docName = `Modulo ${i + 1} - ${course.id}.pdf`
     const filePath = path.join(process.cwd(), "diplomados", docName)
     const fileExists = fs.existsSync(filePath)
-    return { id: `mod-${i + 1}`, index: i, title: `Módulo ${i + 1}`, docName, fileExists }
+    const examExists = !!(examsData && examsData[`mod-${i + 1}`] && examsData[`mod-${i + 1}`].length > 0)
+    return { id: `mod-${i + 1}`, index: i, title: `Módulo ${i + 1}`, docName, fileExists, examExists }
   })
 
   const completedCount = approvedModuleIds.size
@@ -439,12 +449,18 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
                         <CheckCircle className="w-4 h-4" /> Completado exitosamente
                       </span>
                     ) : isPreviousApproved ? (
-                      <Link 
-                        href={`/diplomados/${course.id}/exam/${mod.id}`}
-                        className="inline-flex items-center justify-center gap-2 w-full text-xs font-bold text-white bg-secondary hover:bg-secondary/90 py-2.5 rounded-lg transition-colors shadow-sm"
-                      >
-                        <Award className="w-4 h-4" /> Iniciar Examen
-                      </Link>
+                      mod.examExists ? (
+                        <Link 
+                          href={`/diplomados/${course.id}/exam/${mod.id}`}
+                          className="inline-flex items-center justify-center gap-2 w-full text-xs font-bold text-white bg-secondary hover:bg-secondary/90 py-2.5 rounded-lg transition-colors shadow-sm"
+                        >
+                          <Award className="w-4 h-4" /> Iniciar Examen
+                        </Link>
+                      ) : (
+                        <span className="inline-flex items-center justify-center gap-2 w-full text-xs font-bold text-[#b48c48] py-2.5 rounded-lg">
+                          <Clock className="w-4 h-4" /> Examen próximamente
+                        </span>
+                      )
                     ) : (
                       <span className="inline-flex items-center justify-center gap-2 w-full text-xs font-bold text-gray-500 bg-gray-200 py-2.5 rounded-lg opacity-70 cursor-not-allowed">
                         <Lock className="w-4 h-4" /> Bloqueado

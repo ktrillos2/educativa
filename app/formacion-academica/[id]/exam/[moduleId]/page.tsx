@@ -127,6 +127,7 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
             .eq("user_id", session.userId)
             .eq("course_id", course.id)
             .eq("module_id", params.moduleId)
+            .limit(1)
             .maybeSingle()
 
         if (progressCheck) {

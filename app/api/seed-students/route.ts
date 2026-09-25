@@ -15,7 +15,7 @@ export async function GET() {
       password_hash: 'test-hash',
     }));
 
-    const actualCourseId = "3"; // ID exacto del diplomado de Seguridad Social según la base de datos
+    const actualCourseId = "seguridad-social"; // ID exacto del diplomado de Seguridad Social según la base de datos
 
     const { data: course, error: courseErr } = await supabase
       .from('courses')

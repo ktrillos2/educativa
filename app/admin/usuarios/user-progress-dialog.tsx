@@ -27,7 +27,7 @@ import {
   AlertTriangle,
   RotateCcw
 } from "lucide-react"
-import { COURSE_9_QUESTIONS, FALLBACK_QUESTIONS, Question } from "@/lib/exam-data"
+import { COURSE_9_QUESTIONS, FALLBACK_QUESTIONS, Question } from "@/lib/exam-constants"
 import { getQualitativeEquivalence } from "@/lib/utils"
 
 interface ProgressRow {

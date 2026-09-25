@@ -25,7 +25,7 @@ import {
   parsePdfFileAction,
   deleteModulePdfAction,
 } from "@/app/actions/admin-modules"
-import { Question } from "@/lib/exam-data"
+import { Question } from "@/lib/exam-constants"
 
 interface ModuleManagerProps {
   course: {
@@ -56,12 +56,6 @@ export function ModuleManager({
 
   const [uploadingModule, setUploadingModule] = useState<number | null>(null)
   const [uploadMessage, setUploadMessage] = useState<{ text: string; error?: boolean } | null>(null)
-
-  const [parseText, setParseText] = useState<string>("")
-  const [showParseModal, setShowParseModal] = useState<boolean>(false)
-  const [parsingPdfFile, setParsingPdfFile] = useState<boolean>(false)
-  const [isParsingText, setIsParsingText] = useState<boolean>(false)
-  const [modalMode, setModalMode] = useState<"file" | "text">("file")
 
   const [isPending, startTransition] = useTransition()
   const [saveMessage, setSaveMessage] = useState<{ text: string; error?: boolean } | null>(null)
@@ -143,60 +137,11 @@ export function ModuleManager({
       setUploadMessage({ text: result.error, error: true })
     } else {
       setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
-
-      if (result.extractedQuestions && result.extractedQuestions.length > 0) {
-        setExamsData((prev) => ({
-          ...prev,
-          [`mod-${modIdx}`]: result.extractedQuestions!,
-        }))
-        setUploadMessage({
-          text: `PDF cargado con éxito. ¡Se extrajeron automáticamente ${result.extractedQuestions.length} preguntas de evaluación!`,
-          error: false,
-        })
-      } else {
-        setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
-      }
+      setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
     }
     setUploadingModule(null)
   }
 
-  // Handle parsing a PDF file directly from PC inside the modal
-  const handleDirectPdfParse = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files
-    if (!files || files.length === 0) return
-
-    const file = files[0]
-    setParsingPdfFile(true)
-    setSaveMessage(null)
-
-    const formData = new FormData()
-    formData.append("file", file)
-
-    const result = await parsePdfFileAction(formData, selectedModule, course.id)
-
-    if (result.error) {
-      setSaveMessage({ text: result.error, error: true })
-    } else {
-      setExamPdfStatus((prev) => ({ ...prev, [activeModuleKey]: true }))
-      
-      if (result.text) {
-        setParseText(result.text)
-      }
-      if (result.questions && result.questions.length > 0) {
-        setExamsData((prev) => ({
-          ...prev,
-          [activeModuleKey]: result.questions,
-        }))
-        setSaveMessage({ text: result.message, error: false })
-        setShowParseModal(false)
-      } else {
-        setSaveMessage({ text: result.message, error: false })
-        setModalMode("text")
-      }
-    }
-
-    setParsingPdfFile(false)
-  }
 
   // Delete PDF file
   const handleDeletePdf = async (type: "content" | "exam", moduleNum: number) => {
@@ -207,7 +152,7 @@ export function ModuleManager({
       if (result.error) {
         setSaveMessage({ text: result.error, error: true })
       } else {
-        setSaveMessage({ text: result.message, error: false })
+        setSaveMessage({ text: result.message || "PDF eliminado exitosamente", error: false })
         const targetKey = `mod-${moduleNum}`
         if (type === "content") {
           setPdfStatus(prev => ({ ...prev, [targetKey]: false }))
@@ -215,31 +160,6 @@ export function ModuleManager({
           setExamPdfStatus(prev => ({ ...prev, [targetKey]: false }))
         }
       }
-    }
-  }
-
-  // Parse text to extract questions
-  const handleParseTextSubmit = async () => {
-    if (!parseText.trim()) return
-    setSaveMessage(null)
-    setIsParsingText(true)
-
-    try {
-      const result = await parseExamTextAction(parseText, selectedModule)
-
-      if (result.error) {
-        setSaveMessage({ text: result.error, error: true })
-      } else if (result.questions) {
-        setExamsData((prev) => ({
-          ...prev,
-          [activeModuleKey]: result.questions!,
-        }))
-        setSaveMessage({ text: `Se extrajeron ${result.questions.length} preguntas correctamente.`, error: false })
-        setShowParseModal(false)
-        setParseText("")
-      }
-    } finally {
-      setIsParsingText(false)
     }
   }
 
@@ -328,7 +248,7 @@ export function ModuleManager({
 
         <div className="flex items-center gap-3">
           <Link
-            href={`/diplomados/${course.id}`}
+            href={course.type === "etdh" ? `/formacion-academica/${course.id}` : `/diplomados/${course.id}`}
             target="_blank"
             className="px-4 py-2.5 rounded-lg border border-[oklch(0.88_0.04_145)] text-xs font-bold text-[oklch(0.35_0.10_145)] hover:bg-gray-50 transition-colors flex items-center gap-2"
           >
@@ -542,37 +462,7 @@ export function ModuleManager({
             </div>
           </div>
 
-          {/* Evaluation PDF Upload Box */}
-          <div className="bg-gradient-to-br from-primary/5 to-secondary/10 rounded-xl border border-primary/20 p-6 space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-secondary text-white rounded-lg shadow-sm">
-                <Sparkles className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="font-bold text-base text-[oklch(0.25_0.10_145)]">Archivo PDF de Evaluación</h3>
-                <p className="text-xs text-[oklch(0.55_0.04_145)]">Sube el PDF con las preguntas del módulo</p>
-              </div>
-            </div>
 
-            <p className="text-xs text-[oklch(0.35_0.10_145)] leading-relaxed">
-              Sube el archivo PDF de la evaluación. El sistema guardará el archivo y extraerá automáticamente el cuestionario estructurado.
-            </p>
-
-            {examPdfStatus[activeModuleKey] && (
-              <div className="flex items-center gap-3">
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-green-700 bg-green-100 px-3 py-1.5 rounded-full">
-                  <FileCheck className="w-4 h-4" /> PDF Guardado
-                </div>
-              </div>
-            )}
-
-            <button
-              onClick={() => setShowParseModal(true)}
-              className="w-full py-2.5 px-4 rounded-lg bg-white border border-primary/30 text-primary font-bold text-xs hover:bg-primary hover:text-white transition-colors flex items-center justify-center gap-2 shadow-sm"
-            >
-              <Upload className="w-4 h-4" /> {examPdfStatus[activeModuleKey] ? "Actualizar Evaluación" : "Subir Evaluación"}
-            </button>
-          </div>
         </section>
 
         {/* Right Column: Evaluations Editor */}
@@ -704,113 +594,7 @@ export function ModuleManager({
         </section>
       </div>
 
-      {/* Parse PDF / Text Modal */}
-      {showParseModal && (
-        <div className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl animate-fade-in border border-border">
-            <div className="flex justify-between items-center border-b pb-3">
-              <h3 className="text-lg font-bold text-[oklch(0.25_0.10_145)] flex items-center gap-2">
-                <Upload className="w-5 h-5 text-secondary" /> Subir PDF de Evaluación (Módulo {selectedModule})
-              </h3>
-              <button
-                onClick={() => setShowParseModal(false)}
-                className="text-gray-400 hover:text-gray-600 font-bold text-lg"
-              >
-                ✕
-              </button>
-            </div>
 
-            <div className="flex items-center gap-2 border-b pb-3 text-xs font-bold">
-              <button
-                type="button"
-                onClick={() => setModalMode("file")}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
-                  modalMode === "file" ? "bg-primary text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                Subir Archivo PDF desde PC
-              </button>
-              <button
-                type="button"
-                onClick={() => setModalMode("text")}
-                className={`px-3 py-1.5 rounded-lg transition-colors ${
-                  modalMode === "text" ? "bg-primary text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                }`}
-              >
-                Pegar Texto Manualmente
-              </button>
-            </div>
-
-            {modalMode === "file" ? (
-              <div className="p-8 border-2 border-dashed border-primary/30 rounded-xl bg-primary/5 text-center space-y-4">
-                <Upload className="w-12 h-12 text-primary mx-auto" />
-                <div>
-                  <p className="text-sm font-bold text-[oklch(0.25_0.10_145)]">
-                    Selecciona o arrastra el archivo PDF del cuestionario o módulo
-                  </p>
-                  <p className="text-xs text-[oklch(0.55_0.04_145)] mt-1">
-                    El servidor leerá el archivo directamente y estructurará las preguntas para el Módulo {selectedModule}.
-                  </p>
-                </div>
-
-                <label className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg bg-primary text-white font-bold text-xs hover:bg-primary/90 transition-colors cursor-pointer shadow-sm">
-                  <Upload className="w-4 h-4" />
-                  {parsingPdfFile ? "Extrayendo preguntas..." : "Seleccionar PDF desde PC"}
-                  <input
-                    type="file"
-                    accept=".pdf"
-                    onChange={handleDirectPdfParse}
-                    className="hidden"
-                    disabled={parsingPdfFile}
-                  />
-                </label>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                <p className="text-xs text-[oklch(0.55_0.04_145)]">
-                  Pega el texto copiado de tu PDF o documento Word. El sistema reconocerá automáticamente los enunciados y alternativas A, B, C, D.
-                </p>
-
-                <textarea
-                  rows={9}
-                  value={parseText}
-                  onChange={(e) => setParseText(e.target.value)}
-                  placeholder={`Ejemplo:
-PREGUNTA 1 · La alcaldía prepara el anteproyecto de presupuesto...
-A. Formular únicamente el presupuesto anual.
-B. Articular desde la programación el Plan Financiero.
-C. Sustituir el Plan Financiero.
-D. Preparar solamente el POAI.
-Clave: B`}
-                  className="w-full p-4 rounded-xl border border-[oklch(0.88_0.04_145)] text-xs font-mono bg-[oklch(0.99_0.005_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 resize-none"
-                />
-
-                {saveMessage && (
-                  <div className={`p-3 rounded-lg text-xs font-bold ${saveMessage.error ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
-                    {saveMessage.text}
-                  </div>
-                )}
-
-                <div className="flex justify-end gap-3 pt-2">
-                  <button
-                    onClick={() => setShowParseModal(false)}
-                    className="px-4 py-2 rounded-lg border text-xs font-bold text-[oklch(0.55_0.04_145)] hover:bg-gray-50"
-                  >
-                    Cancelar
-                  </button>
-                  <button
-                    onClick={handleParseTextSubmit}
-                    disabled={isParsingText}
-                    className="px-5 py-2 rounded-lg bg-primary text-white font-bold text-xs hover:bg-primary/90 flex items-center gap-2 disabled:opacity-70"
-                  >
-                    <Sparkles className="w-4 h-4" /> {isParsingText ? "Procesando..." : "Procesar Texto y Cargar Preguntas"}
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      )}
 
       {/* Footer Signature */}
       <footer className="pt-8 text-center text-xs text-[oklch(0.65_0.04_145)] border-t border-[oklch(0.88_0.04_145)]">

@@ -33,29 +33,11 @@ export default async function DiplomadosPage() {
         .select("*", { count: "exact", head: true })
         .eq("course_id", course.id)
 
-    const isDiplomadoType = course.type !== "etdh"
-    let title = course.title || "Diplomado en Gestión del Presupuesto Público"
-    let duration = course.duration || "80 horas"
-
-    if (isDiplomadoType) {
-      title = "Diplomado en Gestión del Presupuesto Público"
-      duration = "80 horas"
-      // Auto-update DB to maintain consistency
-      if (course.title !== title || course.duration !== duration) {
-        supabaseAdmin
-          .from("courses")
-          .update({ title, duration })
-          .eq("id", course.id)
-          .then(() => {})
-          .catch(() => {})
-      }
-    }
-
     return {
       id: String(course.id),
-      title,
+      title: course.title || "Diplomado en Gestión del Presupuesto Público",
       description: course.description || "Capacitación integral sobre la planeación, programación y ejecución del presupuesto en el sector público.",
-      duration,
+      duration: course.duration || "80 horas",
       students: (course.students && course.students !== "Autoestudio") ? course.students.replace("40 cupos", "50 cupos") : "50 cupos",
       badge: course.badge || null,
       category: course.category || "Gestión",

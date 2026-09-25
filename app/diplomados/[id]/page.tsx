@@ -63,6 +63,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
             .select("payment_verified, created_at")
             .eq("user_id", session.userId)
             .eq("course_id", course.id)
+            .limit(1)
             .maybeSingle()
 
         if (enrollment) {

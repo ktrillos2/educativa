@@ -61,6 +61,7 @@ export async function forceApproveStudent(userId: string, courseId: string, tota
                 .eq("user_id", userId)
                 .eq("course_id", courseId)
                 .eq("module_id", moduleId)
+                .limit(1)
                 .maybeSingle()
             if (selectError && selectError.code !== 'PGRST116') throw selectError;
 

@@ -35,22 +35,9 @@ export default async function FormacionAcademicaPage() {
             .select("*", { count: "exact", head: true })
             .eq("course_id", course.id)
 
-        let title = "PROGRAMA ACADÉMICO CONTROL INTERNO CON ENFOQUE EN LA GESTIÓN PÚBLICA"
-        if (course.type === 'etdh' || title.toLowerCase().includes("sistemas") || course.id === 'programa-tecnico-sistemas') {
-            title = 'PROGRAMA ACADÉMICO CONTROL INTERNO CON ENFOQUE EN LA GESTIÓN PÚBLICA'
-            if (course.title !== title) {
-                supabaseAdmin
-                    .from("courses")
-                    .update({ title })
-                    .eq("id", course.id)
-                    .then(() => {})
-                    .catch(() => {})
-            }
-        }
-
         return {
             id: String(course.id),
-            title: title,
+            title: course.title,
             description: course.description || "",
             duration: course.duration || "160 horas",
             students: course.students || "50 cupos",

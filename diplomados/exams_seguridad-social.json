@@ -2,7 +2,7 @@
   "mod-1": [
     {
       "id": "q1",
-      "question": "¿Cuál es el objetivo principal de este módulo?",
+      "question": "¿Cuál es el objetivo principal de este módulo LOS?",
       "options": [
         "Mejorar procesos",
         "Ignorar protocolos",
@@ -43,74 +43,21 @@
         "El becario"
       ],
       "correct": 2
-    },
-    {
-      "id": "q5",
-      "question": "El éxito del proyecto se mide por:",
-      "options": [
-        "Cantidad de horas",
-        "Cumplimiento de KPIs",
-        "Número de empleados",
-        "Ninguna"
-      ],
-      "correct": 1
     }
   ],
   "mod-2": [
     {
-      "id": "q1",
-      "question": "¿Cuál es el objetivo principal de este módulo?",
+      "id": "m2-q1",
+      "question": "jancjasbdhcbsdacjhb",
       "options": [
-        "Mejorar procesos",
-        "Ignorar protocolos",
-        "Aumentar gastos",
-        "Ninguna de las anteriores"
+        "Opción A",
+        "Opción B",
+        "Opción C",
+        "Opción D"
       ],
-      "correct": 0
-    },
-    {
-      "id": "q2",
-      "question": "¿Qué herramienta es fundamental para el seguimiento?",
-      "options": [
-        "Calculadora",
-        "Software de Gestión",
-        "Papel y lápiz",
-        "Calendario físico"
-      ],
-      "correct": 1
-    },
-    {
-      "id": "q3",
-      "question": "La normativa actual exige:",
-      "options": [
-        "Reportes anuales",
-        "No exige reportes",
-        "Reportes mensuales",
-        "Reportes diarios"
-      ],
-      "correct": 2
-    },
-    {
-      "id": "q4",
-      "question": "¿Quién es el responsable directo de la implementación?",
-      "options": [
-        "El cliente",
-        "El proveedor",
-        "El gerente de proyecto",
-        "El becario"
-      ],
-      "correct": 2
-    },
-    {
-      "id": "q5",
-      "question": "El éxito del proyecto se mide por:",
-      "options": [
-        "Cantidad de horas",
-        "Cumplimiento de KPIs",
-        "Número de empleados",
-        "Ninguna"
-      ],
-      "correct": 1
+      "correct": 0,
+      "feedbackCorrect": "¡Respuesta correcta!",
+      "feedbackIncorrect": "Revisa el material del módulo."
     }
   ],
   "mod-3": [

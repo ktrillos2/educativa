@@ -65,6 +65,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
             .select("payment_verified, group_id")
             .eq("user_id", session.userId)
             .eq("course_id", course.id)
+            .limit(1)
             .maybeSingle()
 
         if (enrollment) {

@@ -49,11 +49,12 @@ export async function submitExam(courseId: string, moduleId: string, answers: Re
             .eq("user_id", session.userId)
             .eq("course_id", courseId)
             .eq("module_id", moduleId)
+            .limit(1)
             .maybeSingle()
 
         if (fetchError) {
             console.error("Error fetching progress:", fetchError)
-            return { error: "Error al verificar el progreso existente." }
+            return { error: `Error al verificar el progreso existente: ${fetchError.message || JSON.stringify(fetchError)}` }
         }
 
         if (existingProgress) {

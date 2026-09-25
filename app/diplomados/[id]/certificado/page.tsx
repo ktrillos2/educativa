@@ -316,18 +316,9 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                       </div>
                     </div>
                     
-                    {/* Additional Footer Texts */}
-                    <div className="absolute bottom-[calc(35px+1mm)] left-0 right-0 text-center z-10">
-                      <p className="font-bold text-[15px] text-black uppercase tracking-wide" style={{ fontFamily: 'Times New Roman, serif' }}>
-                        WWW.ACADEMIADEFORMACIONLIDERESDELMERITO.EDU.CO
-                      </p>
-                    </div>
+                    {/* Additional Footer Texts (URL removed as requested) */}
                     
-                    <div className="absolute bottom-[calc(18px+1mm)] left-0 right-0 text-center z-10">
-                      <p className="text-[11px] text-black px-16" style={{ fontFamily: 'Arial, sans-serif' }}>
-                        La autenticidad de este diploma puede verificarse escaneando el código QR o escribiendo al correo academiadeformacion@lideresdelmerito.edu.co indicando el número de acta.
-                      </p>
-                    </div>
+                    {/* Authenticity text removed as requested */}
 
                   </div>
                 </div>
