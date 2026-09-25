@@ -40,10 +40,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
     notFound()
   }
 
-  if (course.type !== 'etdh') {
-    course.title = "Diplomado en Gestión del Presupuesto Público"
-    course.duration = "80 horas"
-  }
+  // Use actual course title and duration
 
   // Si el curso es ETDH, redirigir a la ruta correcta para que apliquen las lógicas de expiración
   if (course.type === 'etdh') {

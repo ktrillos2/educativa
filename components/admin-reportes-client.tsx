@@ -173,8 +173,7 @@ export function AdminReportesClient({ users, enrollments, courses }: Props) {
     return enrollments.map(e => {
       const student = users.find(u => u.id === e.user_id)
       const course = courseMap.get(e.course_id)
-        const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
-        const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+        const courseTitle = course?.title || enrollment.course_id
         return {
           ...e,
           studentName: student?.name || "Estudiante desconocido",

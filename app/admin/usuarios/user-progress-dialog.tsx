@@ -201,7 +201,7 @@ export function UserProgressDialog({ user, enrollments, coursesMap, progressList
                     {currentCourse?.category || "Gestión Pública"}
                   </span>
                   <h3 className="text-lg font-bold text-primary mt-1">
-                    {currentCourse?.title || "Diplomado en Gestión del Presupuesto Público"}
+                    {currentCourse?.title}
                   </h3>
                 </div>
 

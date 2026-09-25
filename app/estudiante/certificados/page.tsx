@@ -45,10 +45,14 @@ export default async function CertificadosPage(
     .from("courses")
     .select("id, title, category, modules")
 
-  const enrichedEnrollments = (enrollments ?? []).map((e) => {
+  const validEnrollments = (enrollments ?? []).filter(e => 
+    dbCourses?.some((c) => String(c.id) === String(e.course_id)) || 
+    diplomados.some((d) => String(d.id) === String(e.course_id))
+  )
+
+  const enrichedEnrollments = validEnrollments.map((e) => {
     const course = dbCourses?.find((c) => String(c.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
-    const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
-    const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+    const courseTitle = course?.title || e.course_id
     return { ...e, courseTitle: courseTitle ?? `Diplomado (${e.course_id})` }
   })
 

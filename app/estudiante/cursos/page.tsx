@@ -58,8 +58,13 @@ export default async function CursosPage() {
     .eq("user_id", session?.userId ?? "")
     .eq("completed", true)
 
-  // Enriquecer inscripciones con progreso y datos del diplomado (DB o estático)
-  const enrichedEnrollments = (enrollments ?? []).map((e) => {
+  // Filtrar inscripciones huerfanas (cursos eliminados) y luego enriquecer
+  const validEnrollments = (enrollments ?? []).filter(e => 
+    courses?.some((d) => String(d.id) === String(e.course_id)) || 
+    diplomados.some((d) => String(d.id) === String(e.course_id))
+  )
+
+  const enrichedEnrollments = validEnrollments.map((e) => {
     const course = courses?.find((d) => String(d.id) === String(e.course_id)) || diplomados.find((d) => String(d.id) === String(e.course_id))
     const courseProgress = progress?.filter(p => String(p.course_id) === String(e.course_id)) || []
     const totalModules = course?.modules || 4
@@ -70,8 +75,7 @@ export default async function CursosPage() {
     const nextModuleIndex = Math.min(completedModules, totalModules - 1)
     const nextDocName = `Modulo ${nextModuleIndex + 1} - ${e.course_id}.pdf`
 
-    const isEtdh = course?.title?.includes("PROGRAMA ACADÉMICO") || (course as any)?.type === "etdh"
-    const courseTitle = isEtdh ? course?.title : "Diplomado en Gestión del Presupuesto Público"
+    const courseTitle = course?.title || `Diplomado en Gestión del Presupuesto Público`
 
     return { 
       ...e, 
