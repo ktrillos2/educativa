@@ -6,6 +6,7 @@ import { Award, Download, ArrowLeft, FileSpreadsheet } from "@/components/ui/ico
 import Link from "next/link"
 import { CoursePayment } from "@/components/course-payment"
 import { DownloadCertificateButton } from "@/components/download-certificate-button"
+import { UploadDocumentForm } from "@/components/upload-document-form"
 import { headers } from "next/headers"
 
 export const dynamic = "force-dynamic";
