@@ -74,7 +74,7 @@ export function UserProgressDialog({ user, enrollments, coursesMap, progressList
   const uniqueModulesCount = new Set(courseProgress.map(p => String(p.module_id).replace('modulo-', 'mod-'))).size
   const completedCount = Math.min(uniqueModulesCount, totalModules)
   const progressPercent = Math.min(100, Math.round((completedCount / totalModules) * 100))
-  const isCompleted = completedCount >= totalModules
+  const isCompleted = totalModules > 0 && (completedCount / totalModules) >= 0.8
 
   // Map progress rows by module_id
   const progressByModule = new Map<string, ProgressRow>()

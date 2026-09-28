@@ -173,7 +173,7 @@ export function AdminReportesClient({ users, enrollments, courses }: Props) {
     return enrollments.map(e => {
       const student = users.find(u => u.id === e.user_id)
       const course = courseMap.get(e.course_id)
-        const courseTitle = course?.title || enrollment.course_id
+      const courseTitle = course?.title || e.course_id
         return {
           ...e,
           studentName: student?.name || "Estudiante desconocido",

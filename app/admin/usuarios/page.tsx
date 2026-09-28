@@ -98,7 +98,7 @@ export default async function AdminUsuariosPage() {
                               prog.filter(p => p.completed).map(p => String(p.module_id).replace('modulo-', 'mod-'))
                             ).size
                             const completedModules = Math.min(uniqueCompletedModules, totalModules)
-                            const isCompleted = completedModules >= totalModules
+                            const isCompleted = totalModules > 0 && (completedModules / totalModules) >= 0.8
                             
                             return (
                               <div key={e.id} className="p-2.5 bg-[oklch(0.97_0.01_145)] border border-[oklch(0.90_0.02_145)] rounded-lg">

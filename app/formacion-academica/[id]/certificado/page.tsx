@@ -7,6 +7,7 @@ import Link from "next/link"
 import { CoursePayment } from "@/components/course-payment"
 import { DownloadCertificateButton } from "@/components/download-certificate-button"
 import { UploadDocumentForm } from "@/components/upload-document-form"
+import { headers } from "next/headers"
 
 export const dynamic = "force-dynamic";
 
@@ -123,10 +124,11 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
 
   const hasDownloadedCert = previousDownloads?.some(d => d.type === "CERTIFICATE") || false;
 
-  // Base URL for QR
-  // Usamos localhost:3000 por defecto para que las pruebas locales funcionen, pero en producción 
-  // se debe configurar NEXT_PUBLIC_APP_URL en el archivo .env
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'
+  // Base URL for QR dynamically generated from request headers or environment
+  const headersList = await headers()
+  const host = headersList.get("x-forwarded-host") || headersList.get("host")
+  const proto = headersList.get("x-forwarded-proto") || (host?.includes("localhost") || host?.includes("127.0.0.1") || host?.startsWith("192.168.") ? "http" : "https")
+  const baseUrl = host ? `${proto}://${host}` : (process.env.NEXT_PUBLIC_APP_URL || 'https://educativa.vercel.app')
   const verificationUrl = enrollment ? `${baseUrl}/verify/${enrollment.id}` : baseUrl;
   const qrImageUrl = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(verificationUrl)}&format=svg`;
 
@@ -333,6 +335,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                         <div className="border-t border-black w-full pt-2 relative z-20">
                           <p className="font-bold text-[18px] text-black uppercase" style={{ fontFamily: 'Times New Roman, serif' }}>AUDEN VILORIA TORRES</p>
                           <p className="text-[16px] text-black" style={{ fontFamily: 'Times New Roman, serif' }}>Director Académico</p>
+                          <p className="text-[12px] text-black italic mt-1" style={{ fontFamily: 'Times New Roman, serif' }}>La autenticidad de este diploma puede verificarse escaneando el código QR</p>
                         </div>
                       </div>
                       
