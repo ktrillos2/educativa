@@ -4,8 +4,46 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-import fs from "fs"
-import path from "path"
+/** Bucket name in Supabase Storage where course cover images are stored. */
+const COVERS_BUCKET = "course-covers"
+
+/**
+ * Uploads an image File to Supabase Storage and returns its public URL.
+ * Throws an Error with a user-friendly message on failure.
+ */
+async function uploadCoverImage(imageFile: File, courseId: string): Promise<string> {
+  const validTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"]
+  if (!validTypes.includes(imageFile.type)) {
+    throw new Error(`Formato no soportado: "${imageFile.type}". Usa JPG, PNG o WebP.`)
+  }
+
+  const maxSizeBytes = 5 * 1024 * 1024
+  if (imageFile.size > maxSizeBytes) {
+    throw new Error(
+      `La imagen pesa ${(imageFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 5 MB.`
+    )
+  }
+
+  const ext = imageFile.name.split(".").pop() || "jpg"
+  const filePath = `${courseId}-${Date.now()}.${ext}`
+  const arrayBuffer = await imageFile.arrayBuffer()
+
+  const supabase = createAdminClient()
+
+  const { error: uploadError } = await supabase.storage
+    .from(COVERS_BUCKET)
+    .upload(filePath, arrayBuffer, {
+      contentType: imageFile.type,
+      upsert: true,
+    })
+
+  if (uploadError) {
+    throw new Error(`Error al subir la imagen: ${uploadError.message}`)
+  }
+
+  const { data } = supabase.storage.from(COVERS_BUCKET).getPublicUrl(filePath)
+  return data.publicUrl
+}
 
 export async function createCourse(formData: FormData) {
   const supabase = createAdminClient()
@@ -29,32 +67,10 @@ export async function createCourse(formData: FormData) {
   const imageFile = formData.get("image_file") as File | null
 
   if (imageFile && imageFile.size > 0) {
-    // Validate file type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml", "image/gif"]
-    if (!validTypes.includes(imageFile.type)) {
-      return { error: `Formato de imagen no soportado: "${imageFile.type}". Usa JPG, PNG, WebP o SVG.` }
-    }
-
-    // Validate file size (max 5MB)
-    const maxSizeBytes = 5 * 1024 * 1024
-    if (imageFile.size > maxSizeBytes) {
-      return { error: `La imagen es demasiado grande (${(imageFile.size / 1024 / 1024).toFixed(1)} MB). El límite es 5 MB.` }
-    }
-
     try {
-      const publicCoursesDir = path.join(process.cwd(), "public", "courses")
-      if (!fs.existsSync(publicCoursesDir)) {
-        fs.mkdirSync(publicCoursesDir, { recursive: true })
-      }
-      const ext = path.extname(imageFile.name) || ".jpg"
-      const fileName = `${id}-${Date.now()}${ext}`
-      const filePath = path.join(publicCoursesDir, fileName)
-      const arrayBuffer = await imageFile.arrayBuffer()
-      fs.writeFileSync(filePath, Buffer.from(arrayBuffer))
-      image = `/courses/${fileName}`
+      image = await uploadCoverImage(imageFile, id)
     } catch (err: any) {
-      console.error("Error saving course cover image file:", err)
-      return { error: `No se pudo guardar la imagen de portada: ${err?.message || "Error desconocido"}. Intenta de nuevo.` }
+      return { error: err?.message || "No se pudo guardar la imagen de portada." }
     }
   }
 
@@ -117,32 +133,10 @@ export async function updateCourse(formData: FormData) {
   const imageFile = formData.get("image_file") as File | null
 
   if (imageFile && imageFile.size > 0) {
-    // Validate file type
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml", "image/gif"]
-    if (!validTypes.includes(imageFile.type)) {
-      return { error: `Formato de imagen no soportado: "${imageFile.type}". Usa JPG, PNG, WebP o SVG.` }
-    }
-
-    // Validate file size (max 5MB)
-    const maxSizeBytes = 5 * 1024 * 1024
-    if (imageFile.size > maxSizeBytes) {
-      return { error: `La imagen es demasiado grande (${(imageFile.size / 1024 / 1024).toFixed(1)} MB). El límite es 5 MB.` }
-    }
-
     try {
-      const publicCoursesDir = path.join(process.cwd(), "public", "courses")
-      if (!fs.existsSync(publicCoursesDir)) {
-        fs.mkdirSync(publicCoursesDir, { recursive: true })
-      }
-      const ext = path.extname(imageFile.name) || ".jpg"
-      const fileName = `${id}-${Date.now()}${ext}`
-      const filePath = path.join(publicCoursesDir, fileName)
-      const arrayBuffer = await imageFile.arrayBuffer()
-      fs.writeFileSync(filePath, Buffer.from(arrayBuffer))
-      image = `/courses/${fileName}`
+      image = await uploadCoverImage(imageFile, id)
     } catch (err: any) {
-      console.error("Error saving course cover image file:", err)
-      return { error: `No se pudo guardar la imagen de portada: ${err?.message || "Error desconocido"}. Intenta de nuevo.` }
+      return { error: err?.message || "No se pudo guardar la imagen de portada." }
     }
   }
 

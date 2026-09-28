@@ -59,13 +59,16 @@ export function ExamForm({ courseId, moduleId, initialQuestions }: { courseId: s
             return
         }
 
-        if (result.score >= 60) {
-            toast.success(`¡Examen aprobado con ${result.score.toFixed(0)}% en el intento #${newAttempts}!`, { duration: 6000 })
+        // Type narrowing: after the error guard, score is guaranteed to be a number
+        const score = result.score ?? 0
+
+        if (score >= 60) {
+            toast.success(`¡Examen aprobado con ${score.toFixed(0)}% en el intento #${newAttempts}!`, { duration: 6000 })
         } else {
-            toast.error(`Suspendido (${result.score.toFixed(0)}%). No alcanzaste el puntaje mínimo de 60%.`, { duration: 8000 })
+            toast.error(`Suspendido (${score.toFixed(0)}%). No alcanzaste el puntaje mínimo de 60%.`, { duration: 8000 })
         }
 
-        setFinalScore(result.score)
+        setFinalScore(score)
         setFeedbackData(result.results || [])
         setAttemptsCount(newAttempts)
         setSubmitted(true)
