@@ -1,17 +1,18 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronLeft, BookOpen, Save } from "lucide-react"
 import Link from "next/link"
 import { createCourse } from "@/app/actions/courses"
-import { ImageUploadZone } from "@/components/image-upload-zone"
+import { ImageUploadZone, ImageUploadZoneRef } from "@/components/image-upload-zone"
 
 export default function CrearCursoPage() {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [courseType, setCourseType] = useState("diplomado")
+  const imageZoneRef = useRef<ImageUploadZoneRef>(null)
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -19,6 +20,12 @@ export default function CrearCursoPage() {
     setError(null)
 
     const formData = new FormData(e.currentTarget)
+
+    // Append the file from the ImageUploadZone ref (works for both drag & drop and file picker)
+    const selectedFile = imageZoneRef.current?.getSelectedFile()
+    if (selectedFile) {
+      formData.set("image_file", selectedFile)
+    }
     
     try {
       const result = await createCourse(formData)
@@ -180,7 +187,7 @@ export default function CrearCursoPage() {
             )}
             
             <div className="md:col-span-2">
-              <ImageUploadZone />
+              <ImageUploadZone ref={imageZoneRef} />
             </div>
           </div>
 

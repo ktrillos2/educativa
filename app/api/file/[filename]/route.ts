@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server"
 import { getSession } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/server"
-import fs from "fs"
-import path from "path"
+import { createAdminClient } from "@/utils/supabase/admin"
+
+const MODULES_BUCKET = "course-modules"
 
 export async function GET(
     request: NextRequest,
@@ -25,7 +26,6 @@ export async function GET(
             const courseId = searchParams.get("courseId")
             const supabase = await createClient()
 
-            // Material is free for enrolled users
             let isEnrolled = false
             if (courseId) {
                 const { data } = await supabase
@@ -50,27 +50,41 @@ export async function GET(
         }
     }
 
-    const filePath = path.join(process.cwd(), "diplomados", filename)
+    // Parse the filename to extract courseId and moduleIndex
+    // Expected formats:
+    //   "Modulo {N} - {courseId}.pdf"
+    //   "Cuestionario Modulo {N} - {courseId}.pdf"
+    const decodedFilename = decodeURIComponent(filename)
+    const examMatch = decodedFilename.match(/^Cuestionario Modulo (\d+) - (.+)\.pdf$/i)
+    const moduleMatch = decodedFilename.match(/^Modulo (\d+) - (.+)\.pdf$/i)
 
-    if (!fs.existsSync(filePath)) {
+    let storagePath: string | null = null
+
+    if (examMatch) {
+        const moduleIndex = examMatch[1]
+        const courseId = examMatch[2]
+        storagePath = `${courseId}/cuestionario-modulo-${moduleIndex}.pdf`
+    } else if (moduleMatch) {
+        const moduleIndex = moduleMatch[1]
+        const courseId = moduleMatch[2]
+        storagePath = `${courseId}/modulo-${moduleIndex}.pdf`
+    }
+
+    if (!storagePath) {
         return new NextResponse("File not found", { status: 404 })
     }
 
-    const fileBuffer = fs.readFileSync(filePath)
+    // Generate a short-lived signed URL and redirect to it
+    const adminSupabase = createAdminClient()
+    const { data, error } = await adminSupabase.storage
+        .from(MODULES_BUCKET)
+        .createSignedUrl(storagePath, 3600) // 1 hour
 
-    const ext = path.extname(filename).toLowerCase()
-    let contentType = "application/octet-stream"
-
-    if (ext === ".pdf") {
-        contentType = "application/pdf"
-    } else if (ext === ".doc" || ext === ".docx") {
-        contentType = "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+    if (error || !data?.signedUrl) {
+        console.error("Error creating signed URL:", error)
+        return new NextResponse("File not found", { status: 404 })
     }
 
-    return new NextResponse(fileBuffer, {
-        headers: {
-            "Content-Type": contentType,
-            "Content-Disposition": `inline; filename="${filename}"`,
-        },
-    })
+    // Redirect to the signed URL — the browser will stream the PDF directly from Supabase Storage
+    return NextResponse.redirect(data.signedUrl)
 }

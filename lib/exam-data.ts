@@ -1,19 +1,28 @@
 import { Question, FALLBACK_QUESTIONS, COURSE_9_QUESTIONS } from "./exam-constants";
-import fs from "fs"
-import path from "path"
+import { createAdminClient } from "@/utils/supabase/admin";
 
-export function getFullQuestionsForCourse(courseId: string, moduleId: string): Question[] {
+/**
+ * Returns the full questions (including correct answers) for a given course module.
+ * Reads from the exams_data JSONB column in the courses table (Supabase).
+ * Falls back to hardcoded questions if none are configured.
+ */
+export async function getFullQuestionsForCourse(courseId: string, moduleId: string): Promise<Question[]> {
     try {
-        const filePath = path.join(process.cwd(), "diplomados", `exams_${courseId}.json`)
-        if (fs.existsSync(filePath)) {
-            const content = fs.readFileSync(filePath, "utf-8")
-            const examsMap = JSON.parse(content)
-            if (examsMap && examsMap[moduleId] && Array.isArray(examsMap[moduleId]) && examsMap[moduleId].length > 0) {
+        const supabase = createAdminClient()
+        const { data: course, error } = await supabase
+            .from("courses")
+            .select("exams_data")
+            .eq("id", courseId)
+            .maybeSingle()
+
+        if (!error && course?.exams_data) {
+            const examsMap = course.exams_data as Record<string, Question[]>
+            if (examsMap[moduleId] && Array.isArray(examsMap[moduleId]) && examsMap[moduleId].length > 0) {
                 return examsMap[moduleId]
             }
         }
     } catch (e) {
-        console.error("Error reading course exam JSON file:", e)
+        console.error("Error reading course exam data from Supabase:", e)
     }
 
     if (courseId === "gestion-presupuesto-publico" && COURSE_9_QUESTIONS[moduleId]) {
@@ -23,15 +32,15 @@ export function getFullQuestionsForCourse(courseId: string, moduleId: string): Q
     return []
 }
 
-export function getQuestionsForClient(courseId: string, moduleId: string) {
-    const questionsList = getFullQuestionsForCourse(courseId, moduleId)
+/**
+ * Returns questions without sensitive fields (correct answer, feedback) for the client.
+ */
+export async function getQuestionsForClient(courseId: string, moduleId: string) {
+    const questionsList = await getFullQuestionsForCourse(courseId, moduleId)
 
-    // Retornamos sin correct, feedbackCorrect, feedbackIncorrect
     return questionsList.map(q => ({
         id: q.id,
         question: q.question,
         options: q.options
     }));
 }
-
-

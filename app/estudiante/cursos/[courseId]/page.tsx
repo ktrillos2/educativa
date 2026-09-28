@@ -11,9 +11,7 @@ import {
 } from "lucide-react"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
 import * as motion from "framer-motion/client"
-import path from "path"
 import { CoursePayment } from "@/components/course-payment"
-import fs from "fs"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -116,20 +114,14 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
   )
 
   // Load exams data to check if exams are configured
-  let examsData: Record<string, any[]> | null = null
-  const examsFilePath = path.join(process.cwd(), "diplomados", `exams_${course.id}.json`)
-  if (fs.existsSync(examsFilePath)) {
-    try {
-      examsData = JSON.parse(fs.readFileSync(examsFilePath, "utf8"))
-    } catch(e) {}
-  }
+  const examsData: Record<string, any[]> | null = (course as any).exams_data || null
+  const modulePdfs: Record<string, boolean> = (course as any).module_pdfs || {}
 
   // 5. Build modules list
   const totalModules = course.modules || 1
   const courseModules = Array.from({ length: totalModules }).map((_, i) => {
     const docName = `Modulo ${i + 1} - ${course.id}.pdf`
-    const filePath = path.join(process.cwd(), "diplomados", docName)
-    const fileExists = fs.existsSync(filePath)
+    const fileExists = Boolean(modulePdfs[`mod-${i + 1}`])
     const examExists = !!(examsData && examsData[`mod-${i + 1}`] && examsData[`mod-${i + 1}`].length > 0)
     return { id: `mod-${i + 1}`, index: i, title: `Módulo ${i + 1}`, docName, fileExists, examExists }
   })

@@ -1,11 +1,11 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
 import { ChevronLeft, BookOpen, Save } from "lucide-react"
 import Link from "next/link"
 import { updateCourse } from "@/app/actions/courses"
-import { ImageUploadZone } from "@/components/image-upload-zone"
+import { ImageUploadZone, ImageUploadZoneRef } from "@/components/image-upload-zone"
 
 export function EditCourseForm({ course }: { course: any }) {
   const router = useRouter()
@@ -17,6 +17,7 @@ export function EditCourseForm({ course }: { course: any }) {
   const [category, setCategory] = useState(course.category || "")
   const [price, setPrice] = useState(course.price || "")
   const [duration, setDuration] = useState(course.duration || "")
+  const imageZoneRef = useRef<ImageUploadZoneRef>(null)
   
   // Extract min_students from 'students' if it's etdh
   let minStudentsDefault = 15
@@ -33,6 +34,12 @@ export function EditCourseForm({ course }: { course: any }) {
     setError(null)
 
     const formData = new FormData(e.currentTarget)
+
+    // Append the file from the ImageUploadZone ref (works for both drag & drop and file picker)
+    const selectedFile = imageZoneRef.current?.getSelectedFile()
+    if (selectedFile) {
+      formData.set("image_file", selectedFile)
+    }
     
     try {
       const result = await updateCourse(formData)
@@ -199,7 +206,7 @@ export function EditCourseForm({ course }: { course: any }) {
             )}
             
             <div className="md:col-span-2">
-              <ImageUploadZone defaultUrl={course.image || ""} />
+              <ImageUploadZone ref={imageZoneRef} defaultUrl={course.image || ""} />
             </div>
           </div>
 

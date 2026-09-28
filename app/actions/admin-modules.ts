@@ -3,10 +3,16 @@
 import { createAdminClient } from "@/utils/supabase/admin"
 import { getSession } from "@/lib/auth"
 import { revalidatePath } from "next/cache"
-import fs from "fs"
-import path from "path"
 import { Question, COURSE_9_QUESTIONS, FALLBACK_QUESTIONS } from "@/lib/exam-constants"
 import { extractTextFromPdfBuffer } from "@/lib/pdf-parser"
+
+/** Supabase Storage bucket for module PDFs (private). */
+const MODULES_BUCKET = "course-modules"
+
+/** Builds the storage path for a module PDF. */
+function modulePdfPath(courseId: string, moduleIndex: number) {
+  return `${courseId}/modulo-${moduleIndex}.pdf`
+}
 
 export async function checkAdminSession() {
   const session = await getSession()
@@ -19,7 +25,7 @@ export async function getCourseModulesData(courseId: string) {
   await checkAdminSession()
   const supabase = createAdminClient()
 
-  // 1. Fetch course details
+  // 1. Fetch course details (including exams_data and module_pdfs columns)
   const { data: course, error } = await supabase
     .from("courses")
     .select("*")
@@ -32,36 +38,19 @@ export async function getCourseModulesData(courseId: string) {
 
   const modulesCount = Math.max(course.modules || 1, 1)
 
-  // 2. Check existing PDF files in diplomados directory
-  const diplomadosDir = path.join(process.cwd(), "diplomados")
-  if (!fs.existsSync(diplomadosDir)) {
-    fs.mkdirSync(diplomadosDir, { recursive: true })
-  }
+  // 2. Build PDF status from the module_pdfs JSONB column (stored in DB)
+  const storedPdfs: Record<string, boolean> = course.module_pdfs || {}
+  const storedExamPdfs: Record<string, boolean> = course.exam_pdfs || {}
 
   const pdfFilesStatus: Record<string, boolean> = {}
   const examPdfStatus: Record<string, boolean> = {}
   for (let i = 1; i <= modulesCount; i++) {
-    const docName = `Modulo ${i} - ${courseId}.pdf`
-    const filePath = path.join(diplomadosDir, docName)
-    pdfFilesStatus[`mod-${i}`] = fs.existsSync(filePath)
-
-    const examDocName = `Cuestionario Modulo ${i} - ${courseId}.pdf`
-    const examFilePath = path.join(diplomadosDir, examDocName)
-    examPdfStatus[`mod-${i}`] = fs.existsSync(examFilePath)
+    pdfFilesStatus[`mod-${i}`] = Boolean(storedPdfs[`mod-${i}`])
+    examPdfStatus[`mod-${i}`] = Boolean(storedExamPdfs[`mod-${i}`])
   }
 
-  // 3. Load exams data
-  let examsData: Record<string, Question[]> = {}
-  const examsFilePath = path.join(diplomadosDir, `exams_${courseId}.json`)
-
-  if (fs.existsSync(examsFilePath)) {
-    try {
-      const content = fs.readFileSync(examsFilePath, "utf-8")
-      examsData = JSON.parse(content)
-    } catch (e) {
-      console.error("Error parsing exams json:", e)
-    }
-  }
+  // 3. Load exams data from JSONB column
+  let examsData: Record<string, Question[]> = course.exams_data || {}
 
   // Fallbacks if not set
   for (let i = 1; i <= modulesCount; i++) {
@@ -96,48 +85,69 @@ export async function uploadModulePdfAction(formData: FormData) {
     return { error: "Faltan datos o el archivo PDF está vacío." }
   }
 
-  const diplomadosDir = path.join(process.cwd(), "diplomados")
-  if (!fs.existsSync(diplomadosDir)) {
-    fs.mkdirSync(diplomadosDir, { recursive: true })
+  if (file.type !== "application/pdf") {
+    return { error: "Solo se aceptan archivos PDF." }
   }
 
-  const targetFileName = `Modulo ${moduleIndex} - ${courseId}.pdf`
-  const targetFilePath = path.join(diplomadosDir, targetFileName)
+  const maxSizeBytes = 50 * 1024 * 1024 // 50 MB
+  if (file.size > maxSizeBytes) {
+    return { error: `El archivo pesa ${(file.size / 1024 / 1024).toFixed(1)} MB. El límite es 50 MB.` }
+  }
+
+  const supabase = createAdminClient()
+  const storagePath = modulePdfPath(courseId, moduleIndex)
 
   try {
     const arrayBuffer = await file.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-    fs.writeFileSync(targetFilePath, buffer)
 
-    // Update course modules count if needed
-    const supabase = createAdminClient()
-    const { data: course } = await supabase
+    // Upload to Supabase Storage (upsert = overwrite if exists)
+    const { error: uploadError } = await supabase.storage
+      .from(MODULES_BUCKET)
+      .upload(storagePath, arrayBuffer, {
+        contentType: "application/pdf",
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.error("Supabase Storage upload error:", uploadError)
+      return { error: `Error al subir el PDF: ${uploadError.message}` }
+    }
+
+    // Mark this module as having a PDF in the module_pdfs JSONB column
+    const { data: courseData } = await supabase
       .from("courses")
-      .select("modules")
+      .select("module_pdfs, modules")
       .eq("id", courseId)
       .single()
 
-    if (course && (course.modules || 0) < moduleIndex) {
-      await supabase
-        .from("courses")
-        .update({ modules: moduleIndex })
-        .eq("id", courseId)
-    }
+    const currentPdfs = (courseData?.module_pdfs as Record<string, boolean>) || {}
+    currentPdfs[`mod-${moduleIndex}`] = true
+
+    const newModulesCount = Math.max(courseData?.modules || 0, moduleIndex)
+
+    await supabase
+      .from("courses")
+      .update({
+        module_pdfs: currentPdfs,
+        modules: newModulesCount,
+      } as any)
+      .eq("id", courseId)
 
     revalidatePath(`/admin/cursos`)
     revalidatePath(`/admin/cursos/${courseId}/modulos`)
     revalidatePath(`/diplomados/${courseId}`)
     revalidatePath(`/estudiante/cursos/${courseId}`)
 
+    const targetFileName = `Modulo ${moduleIndex} - ${courseId}.pdf`
     return {
       success: true,
       message: `El archivo ${targetFileName} fue cargado correctamente.`,
       moduleIndex,
       fileName: targetFileName,
     }
-  } catch (err) {
-    console.error("Error saving PDF file:", err)
-    return { error: "No se pudo guardar el archivo PDF en el servidor." }
+  } catch (err: any) {
+    console.error("Error uploading PDF to Supabase Storage:", err)
+    return { error: `No se pudo guardar el archivo PDF en el servidor: ${err?.message || "Error desconocido"}` }
   }
 }
 
@@ -152,15 +162,37 @@ export async function parsePdfFileAction(formData: FormData, moduleIndex: number
   try {
     const arrayBuffer = await file.arrayBuffer()
     const buffer = Buffer.from(arrayBuffer)
-    
-    // Save the PDF
-    const diplomadosDir = path.join(process.cwd(), "diplomados")
-    if (!fs.existsSync(diplomadosDir)) {
-      fs.mkdirSync(diplomadosDir, { recursive: true })
+
+    // Upload the exam PDF to Supabase Storage
+    const supabase = createAdminClient()
+    const storagePath = `${courseId}/cuestionario-modulo-${moduleIndex}.pdf`
+
+    const { error: uploadError } = await supabase.storage
+      .from(MODULES_BUCKET)
+      .upload(storagePath, buffer, {
+        contentType: "application/pdf",
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.error("Supabase Storage exam PDF upload error:", uploadError)
+      return { error: `Error al subir el PDF del cuestionario: ${uploadError.message}` }
     }
-    const targetFileName = `Cuestionario Modulo ${moduleIndex} - ${courseId}.pdf`
-    const targetFilePath = path.join(diplomadosDir, targetFileName)
-    fs.writeFileSync(targetFilePath, buffer)
+
+    // Mark exam PDF as uploaded
+    const { data: courseData } = await supabase
+      .from("courses")
+      .select("exam_pdfs")
+      .eq("id", courseId)
+      .single()
+
+    const currentExamPdfs = ((courseData as any)?.exam_pdfs as Record<string, boolean>) || {}
+    currentExamPdfs[`mod-${moduleIndex}`] = true
+
+    await supabase
+      .from("courses")
+      .update({ exam_pdfs: currentExamPdfs } as any)
+      .eq("id", courseId)
 
     // Parse the PDF text on the server
     const text = await extractTextFromPdfBuffer(buffer)
@@ -199,22 +231,16 @@ export async function saveCourseExamsAction(
     return { error: "Parámetros inválidos." }
   }
 
-  const diplomadosDir = path.join(process.cwd(), "diplomados")
-  if (!fs.existsSync(diplomadosDir)) {
-    fs.mkdirSync(diplomadosDir, { recursive: true })
-  }
-
-  const examsFilePath = path.join(diplomadosDir, `exams_${courseId}.json`)
+  const supabase = createAdminClient()
 
   try {
-    // Write JSON file for exams
-    fs.writeFileSync(examsFilePath, JSON.stringify(examsData, null, 2), "utf-8")
-
-    // Update modules count in database
-    const supabase = createAdminClient()
+    // Save exams as JSONB in the courses table
     await supabase
       .from("courses")
-      .update({ modules: modulesCount })
+      .update({
+        exams_data: examsData,
+        modules: modulesCount,
+      } as any)
       .eq("id", courseId)
 
     revalidatePath(`/admin/cursos`)
@@ -226,7 +252,7 @@ export async function saveCourseExamsAction(
 
     return { success: true, message: "Módulos y evaluaciones guardados exitosamente." }
   } catch (err) {
-    console.error("Error saving exams data:", err)
+    console.error("Error saving exams data to Supabase:", err)
     return { error: "No se pudo guardar la configuración de evaluaciones." }
   }
 }
@@ -296,7 +322,6 @@ Solo responde con el código JSON, sin formato markdown ni texto adicional.`;
       const parsedAiQuestions = JSON.parse(responseText)
       
       if (!Array.isArray(parsedAiQuestions) || parsedAiQuestions.length === 0) {
-        // AI found no questions
         return { error: "No se pudieron identificar preguntas en este texto. Asegúrate de incluir los enunciados y sus opciones." }
       }
 
@@ -322,8 +347,7 @@ Solo responde con el código JSON, sin formato markdown ni texto adicional.`;
   try {
     const questions: Question[] = []
     
-    // Split by PREGUNTA or Pregunta or 1., 2. patterns
-    const questionBlocks = rawText.split(/(?:PREGUNTA\s+\d+|Pregunta\s+\d+|\b\d+[\.\)]\s+(?=[A-Z0-9¿¡]))/i)
+    const questionBlocks = rawText.split(/(?:PREGUNTA\s+\d+|Pregunta\s+\d+|\b\d+[\.]\s+(?=[A-Z0-9¿¡]))/i)
     
     let qCount = 1
     for (const rawBlock of questionBlocks) {
@@ -340,7 +364,6 @@ Solo responde con el código JSON, sin formato markdown ni texto adicional.`;
       for (let j = 0; j < lines.length; j++) {
         const line = lines[j]
         
-        // Match option line: A. , B. , C. , D. or a), b), c), d)
         const optionMatch = line.match(/^([A-D])[.)]\s*(.+)$/i)
         if (optionMatch) {
           options.push(optionMatch[2].trim())
@@ -359,7 +382,6 @@ Solo responde con el código JSON, sin formato markdown ni texto adicional.`;
       }
 
       if (qText && options.length >= 2) {
-        // Fill up to 4 options if fewer
         while (options.length < 4) {
           options.push(`Opción ${options.length + 1}`)
         }
@@ -392,27 +414,66 @@ Solo responde con el código JSON, sin formato markdown ni texto adicional.`;
 export async function deleteModulePdfAction(courseId: string, moduleIndex: number, type: "content" | "exam") {
   await checkAdminSession()
   
+  const supabase = createAdminClient()
+
+  const storagePath = type === "exam"
+    ? `${courseId}/cuestionario-modulo-${moduleIndex}.pdf`
+    : modulePdfPath(courseId, moduleIndex)
+
   try {
-    const fileName = type === "exam"
-      ? `Cuestionario Modulo ${moduleIndex} - ${courseId}.pdf`
-      : `Modulo ${moduleIndex} - ${courseId}.pdf`
-      
-    const targetFilePath = path.join(process.cwd(), "diplomados", fileName)
-    
-    if (fs.existsSync(targetFilePath)) {
-      fs.unlinkSync(targetFilePath)
-      
-      revalidatePath(`/admin/cursos`)
-      revalidatePath(`/admin/cursos/${courseId}/modulos`)
-      revalidatePath(`/diplomados/${courseId}`)
-      revalidatePath(`/estudiante/cursos/${courseId}`)
-      
-      return { success: true, message: "PDF eliminado correctamente." }
+    const { error: deleteError } = await supabase.storage
+      .from(MODULES_BUCKET)
+      .remove([storagePath])
+
+    if (deleteError) {
+      console.error("Supabase Storage delete error:", deleteError)
+      return { error: `Error al eliminar el archivo: ${deleteError.message}` }
     }
+
+    // Update the tracking column in the DB
+    const columnKey = type === "exam" ? "exam_pdfs" : "module_pdfs"
+    const { data: courseData } = await supabase
+      .from("courses")
+      .select(columnKey)
+      .eq("id", courseId)
+      .single()
+
+    const currentMap = ((courseData as any)?.[columnKey] as Record<string, boolean>) || {}
+    currentMap[`mod-${moduleIndex}`] = false
+
+    await supabase
+      .from("courses")
+      .update({ [columnKey]: currentMap } as any)
+      .eq("id", courseId)
+
+    revalidatePath(`/admin/cursos`)
+    revalidatePath(`/admin/cursos/${courseId}/modulos`)
+    revalidatePath(`/diplomados/${courseId}`)
+    revalidatePath(`/estudiante/cursos/${courseId}`)
     
-    return { error: "El archivo PDF no existe." }
-  } catch (err) {
-    console.error("Error eliminando PDF:", err)
+    return { success: true, message: "PDF eliminado correctamente." }
+  } catch (err: any) {
+    console.error("Error eliminando PDF de Supabase Storage:", err)
     return { error: "Ocurrió un error al eliminar el PDF." }
   }
+}
+
+/**
+ * Returns a short-lived signed URL (1 hour) for a module PDF stored in Supabase Storage.
+ * Used by the /api/file route to serve PDFs without exposing the storage path.
+ */
+export async function getModulePdfSignedUrl(courseId: string, moduleIndex: number): Promise<string | null> {
+  const supabase = createAdminClient()
+  const storagePath = modulePdfPath(courseId, moduleIndex)
+
+  const { data, error } = await supabase.storage
+    .from(MODULES_BUCKET)
+    .createSignedUrl(storagePath, 3600) // 1 hour
+
+  if (error || !data?.signedUrl) {
+    console.error("Error creating signed URL:", error)
+    return null
+  }
+
+  return data.signedUrl
 }

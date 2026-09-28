@@ -22,8 +22,6 @@ import {
 import Link from "next/link"
 import * as motion from "framer-motion/client"
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion"
-import fs from "fs"
-import path from "path"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -135,15 +133,14 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
     const totalModules = course.modules || 1;
     const isEligibleForCert = totalModules > 0 && (completedModules / totalModules) >= 0.8;
 
+    // Use module_pdfs JSONB column to check PDF status (no filesystem)
+    const modulePdfs: Record<string, boolean> = (course as any).module_pdfs || {}
+
     // Generate an array of modules based on course.modules length for visualization
     const courseModules = Array.from({ length: totalModules }).map((_, i) => {
-        // We use course ID in the filename to avoid collisions between courses
         const docName = `Modulo ${i + 1} - ${course.id}.pdf`
         const examName = `Cuestionario Modulo ${i + 1} - ${course.id}.docx`
-        
-        // Check if file exists in the diplomados folder
-        const filePath = path.join(process.cwd(), "diplomados", docName)
-        const fileExists = fs.existsSync(filePath)
+        const fileExists = Boolean(modulePdfs[`mod-${i + 1}`])
 
         return {
             id: `mod-${i + 1}`,

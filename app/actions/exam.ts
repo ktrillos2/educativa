@@ -12,7 +12,7 @@ export async function submitExam(courseId: string, moduleId: string, answers: Re
     }
 
     // Calcular puntaje en el servidor usando los datos verdaderos
-    const questionsList = getFullQuestionsForCourse(courseId, moduleId);
+    const questionsList = await getFullQuestionsForCourse(courseId, moduleId);
 
     let correctCount = 0;
     const results = [];
