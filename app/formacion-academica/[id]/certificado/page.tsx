@@ -231,25 +231,23 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                   >
                     
                     {/* Escudo/Mención (Izquierda) */}
-                    <div className="absolute top-8 left-2 pointer-events-none z-20">
-                      <div className="relative overflow-hidden" style={{ width: '180px', height: '180px', transform: 'scale(0.92)' }}>
+                    <div className="absolute top-8 left-6 pointer-events-none z-20">
+                      <div className="w-[160px] h-[160px] flex items-center justify-center">
                         <img 
                           src="/certificado-diplomado/liston-verde.svg" 
                           alt="Mención" 
-                          className="absolute max-w-none" 
-                          style={{ width: '1309px', height: '981px', left: '-22px', top: '-22px' }}
+                          className="w-full h-full object-contain mix-blend-multiply" 
                         />
                       </div>
                     </div>
                     
                     {/* Logo Academia (Derecha) */}
-                    <div className="absolute top-8 right-2 pointer-events-none z-20">
-                      <div className="relative overflow-hidden" style={{ width: '180px', height: '164px', transform: 'scale(0.92)' }}>
+                    <div className="absolute top-8 right-6 pointer-events-none z-20">
+                      <div className="w-[160px] h-[160px] flex items-center justify-center">
                         <img 
                           src="/certificado-diplomado/logo-diploma.svg" 
                           alt="Logo Academia" 
-                          className="absolute max-w-none" 
-                          style={{ width: '1232px', height: '924px', left: '-41px', top: '-57px' }}
+                          className="w-full h-full object-contain mix-blend-multiply" 
                         />
                       </div>
                     </div>

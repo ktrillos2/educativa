@@ -86,7 +86,7 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
                     user_id: userId,
                     course_id: courseId,
                     group_id: activeGroups?.[0]?.id || null,
-                    payment_verified: false // Reverted: payment is only for the diploma
+                    payment_verified: true
                 })
         }
 
@@ -139,7 +139,7 @@ export async function enrollAction(courseId: string) {
                 user_id: userId,
                 course_id: courseId,
                 group_id: activeGroups?.[0]?.id || null,
-                payment_verified: false // Reverted: payment is only for the diploma
+                payment_verified: true
             })
 
         if (error) {
