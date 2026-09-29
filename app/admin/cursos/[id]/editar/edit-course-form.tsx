@@ -2,7 +2,7 @@
 
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, BookOpen, Save } from "lucide-react"
+import { ChevronLeft, BookOpen, Save, Loader2 } from "lucide-react"
 import Link from "next/link"
 import { updateCourse } from "@/app/actions/courses"
 import { ImageUploadZone, ImageUploadZoneRef } from "@/components/image-upload-zone"
@@ -33,15 +33,40 @@ export function EditCourseForm({ course }: { course: any }) {
     setIsPending(true)
     setError(null)
 
-    const formData = new FormData(e.currentTarget)
-
-    // Append the file from the ImageUploadZone ref (works for both drag & drop and file picker)
-    const selectedFile = imageZoneRef.current?.getSelectedFile()
-    if (selectedFile) {
-      formData.set("image_file", selectedFile)
-    }
-    
     try {
+      const formData = new FormData(e.currentTarget)
+
+      // Append image_file from ImageUploadZone ref if present
+      const selectedFile = imageZoneRef.current?.getSelectedFile()
+      if (selectedFile) {
+        formData.set("image_file", selectedFile)
+      }
+
+      // 1. If a PDF file was selected, upload it via /api/upload-pdf first
+      const pdfFileInput = formData.get("pdf_file") as File | null
+      if (pdfFileInput && pdfFileInput.size > 0) {
+        const pdfFormData = new FormData()
+        pdfFormData.set("type", "course")
+        pdfFormData.set("course_id", course.id)
+        pdfFormData.set("pdf_file", pdfFileInput)
+
+        const pdfResponse = await fetch("/api/upload-pdf", {
+          method: "POST",
+          body: pdfFormData,
+        })
+
+        const pdfResult = await pdfResponse.json()
+        if (!pdfResponse.ok || pdfResult.error) {
+          setError(`[Error al Guardar PDF] ${pdfResult.error || "No se pudo procesar el documento PDF."}`)
+          setIsPending(false)
+          return
+        }
+
+        // Delete pdf_file from formData so server action does not upload it twice
+        formData.delete("pdf_file")
+      }
+
+      // 2. Execute course update server action
       const result = await updateCourse(formData)
       if (result?.error) {
         setError(result.error)
@@ -51,7 +76,8 @@ export function EditCourseForm({ course }: { course: any }) {
       if (err?.message === 'NEXT_REDIRECT' || err?.digest?.startsWith('NEXT_REDIRECT')) {
         throw err
       }
-      setError("Ocurrió un error inesperado al guardar.")
+      console.error("Error al guardar cambios del curso:", err)
+      setError(`Error al guardar los cambios: ${err?.message || "Ocurrió un error inesperado."}`)
       setIsPending(false)
     }
   }
@@ -144,10 +170,10 @@ export function EditCourseForm({ course }: { course: any }) {
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label htmlFor="price" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
-                Precio (Valor del Certificado)
+                Precio (ej: $150.000 COP)
               </label>
               <input
                 type="text"
@@ -161,7 +187,7 @@ export function EditCourseForm({ course }: { course: any }) {
 
             <div className="space-y-2">
               <label htmlFor="duration" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
-                Duración
+                Duración (ej: 120 horas)
               </label>
               <input
                 type="text"
@@ -173,22 +199,6 @@ export function EditCourseForm({ course }: { course: any }) {
               />
             </div>
 
-            <div className="space-y-2">
-              <label htmlFor="modules" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
-                Cantidad de Módulos
-              </label>
-              <input
-                type="number"
-                id="modules"
-                name="modules"
-                min="1"
-                defaultValue={course.modules}
-                className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm"
-              />
-            </div>
-          </div>
-
-          <div className="grid md:grid-cols-2 gap-6">
             {courseType === "etdh" && (
               <div className="space-y-2">
                 <label htmlFor="min_students" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
@@ -213,7 +223,7 @@ export function EditCourseForm({ course }: { course: any }) {
                 type="file"
                 id="pdf_file"
                 name="pdf_file"
-                accept="application/pdf"
+                accept="application/pdf,.pdf"
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
               />
               <p className="text-xs text-[oklch(0.55_0.04_145)]">
@@ -234,13 +244,21 @@ export function EditCourseForm({ course }: { course: any }) {
             >
               Cancelar
             </button>
+
             <button
               type="submit"
               disabled={isPending}
-              className="px-6 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-70"
+              className="px-6 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-70 shadow-md"
             >
-              <Save className="w-4 h-4" />
-              {isPending ? "Guardando..." : "Guardar Cambios"}
+              {isPending ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" /> Guardando...
+                </>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" /> Guardar Cambios
+                </>
+              )}
             </button>
           </div>
         </form>

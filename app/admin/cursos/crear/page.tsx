@@ -34,8 +34,12 @@ export default function CrearCursoPage() {
         setIsPending(false)
       }
       // Si no hay error, el action hace redirect
-    } catch (err) {
-      setError("Ocurrió un error inesperado.")
+    } catch (err: any) {
+      if (err?.message === 'NEXT_REDIRECT' || err?.digest?.startsWith('NEXT_REDIRECT')) {
+        throw err
+      }
+      console.error("Error al crear curso:", err)
+      setError("Ocurrió un error inesperado al crear el curso.")
       setIsPending(false)
     }
   }

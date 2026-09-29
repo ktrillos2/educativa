@@ -110,6 +110,8 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
         }
     }
 
+    const initialQuestions = await getQuestionsForClient(course.id, params.moduleId)
+
     return (
         <main className="flex-grow bg-muted/30">
             <section className="pt-[calc(6rem+1cm)] pb-[1cm] bg-primary text-white">
@@ -135,21 +137,17 @@ export default async function ExamPage(props: { params: Promise<{ id: string; mo
                             </div>
                         )}
 
-                        {(() => {
-                            const initialQuestions = getQuestionsForClient(course.id, params.moduleId)
-                            if (initialQuestions.length === 0) {
-                                return (
-                                    <div className="p-8 text-center bg-amber-50 text-amber-800 border border-amber-200 rounded-lg">
-                                        <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 mx-auto mb-4 text-amber-500 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                        <h3 className="text-xl font-bold mb-2">Examen en construcción</h3>
-                                        <p>Las preguntas para esta evaluación aún no han sido configuradas por el instructor. Por favor, vuelve más tarde.</p>
-                                    </div>
-                                )
-                            }
-                            return <ExamForm courseId={course.id} moduleId={params.moduleId} initialQuestions={initialQuestions} />
-                        })()}
+                        {initialQuestions.length === 0 ? (
+                            <div className="p-8 text-center bg-amber-50 text-amber-800 border border-amber-200 rounded-lg">
+                                <svg xmlns="http://www.w3.org/2000/svg" className="w-12 h-12 mx-auto mb-4 text-amber-500 opacity-50" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <h3 className="text-xl font-bold mb-2">Examen en construcción</h3>
+                                <p>Las preguntas para esta evaluación aún no han sido configuradas por el instructor. Por favor, vuelve más tarde.</p>
+                            </div>
+                        ) : (
+                            <ExamForm courseId={course.id} moduleId={params.moduleId} initialQuestions={initialQuestions} />
+                        )}
                     </div>
                 </div>
             </section>

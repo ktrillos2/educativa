@@ -248,7 +248,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
             </section>
 
             {/* Programa Académico Section */}
-            <section id="programa" className="py-20 bg-white">
+            <section id="programa" className="py-[1cm] bg-white">
                 <div className="container mx-auto px-4 max-w-7xl">
                     {(!isEnrolled || paymentVerified) && (
                         <>
@@ -256,16 +256,16 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                className="mb-16 text-center"
+                                className="mb-[1cm] text-center"
                             >
                                 <h2 className="text-4xl font-extrabold text-primary mb-4">Formación Continua y Actualización Integral</h2>
                                 <div className="h-1.5 w-20 bg-secondary mx-auto mb-4"></div>
-                                <p className="text-muted-foreground text-lg mb-8">Estudia a tu propio ritmo. Tienes 30 días para completar el programa una vez te inscribas.</p>
+                                <p className="text-muted-foreground text-lg mb-[1cm]">Estudia a tu propio ritmo. Tienes 30 días para completar el programa una vez te inscribas.</p>
                                 
                                 <CoursePdfButton type="diplomados" courseId={course.id} courseName={course.title} />
                             </motion.div>
 
-                            <Accordion type="multiple" className="w-full space-y-6">
+                            <Accordion type="multiple" className="w-full space-y-[1cm]">
                                 {/* Accordion Item: Módulos de Estudio */}
                                 <AccordionItem value="modulos" className="border border-border/50 bg-white">
                                     <AccordionTrigger className="hover:no-underline py-4 px-6 bg-primary/5">

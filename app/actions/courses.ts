@@ -4,12 +4,19 @@ import { createAdminClient } from "@/utils/supabase/admin"
 import { revalidatePath } from "next/cache"
 import { redirect } from "next/navigation"
 
-/** Bucket name in Supabase Storage where course cover images are stored. */
 const COVERS_BUCKET = "course-covers"
+
+function slugify(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "")
+}
 
 /**
  * Uploads an image File to Supabase Storage and returns its public URL.
- * Throws an Error with a user-friendly message on failure.
  */
 async function uploadCoverImage(imageFile: File, courseId: string): Promise<string> {
   const validTypes = ["image/jpeg", "image/png", "image/webp", "image/svg+xml"]
@@ -46,39 +53,90 @@ async function uploadCoverImage(imageFile: File, courseId: string): Promise<stri
 }
 
 /**
- * Uploads a PDF File to Supabase Storage and returns its public URL.
+ * Uploads a course info PDF directly to Supabase Storage and stores its URL in platform_settings.
  */
-async function uploadInfoPdf(pdfFile: File, courseId: string): Promise<string> {
-  const validTypes = ["application/pdf"]
-  if (!validTypes.includes(pdfFile.type)) {
-    throw new Error(`Formato no soportado: "${pdfFile.type}". Usa PDF.`)
-  }
+async function processCoursePdf(pdfFile: File, courseId: string): Promise<void> {
+  const isPdf =
+    pdfFile.type === "application/pdf" ||
+    pdfFile.type.includes("pdf") ||
+    pdfFile.name.toLowerCase().endsWith(".pdf")
 
-  const maxSizeBytes = 10 * 1024 * 1024 // 10MB limit
+  if (!isPdf || pdfFile.size === 0) return
+
+  const maxSizeBytes = 30 * 1024 * 1024
   if (pdfFile.size > maxSizeBytes) {
-    throw new Error(
-      `El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 10 MB.`
-    )
+    throw new Error(`El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 30 MB.`)
   }
 
-  const filePath = `pdf_info_${courseId}.pdf`
-  const arrayBuffer = await pdfFile.arrayBuffer()
+  try {
+    const arrayBuffer = await pdfFile.arrayBuffer()
 
-  const supabase = createAdminClient()
+    // Safety check: If arrayBuffer is empty/drained (< 500 bytes), skip to prevent overwriting a valid PDF URL
+    if (!arrayBuffer || arrayBuffer.byteLength < 500) {
+      console.warn("ArrayBuffer drains or is under 500 bytes. Skipping processCoursePdf to protect valid PDF record.")
+      return
+    }
 
-  const { error: uploadError } = await supabase.storage
-    .from(COVERS_BUCKET)
-    .upload(filePath, arrayBuffer, {
-      contentType: pdfFile.type,
-      upsert: true,
-    })
+    const supabase = createAdminClient()
+    const slugId = slugify(courseId)
+    const destinationPath = `course-${slugId}-${Date.now()}.pdf`
+    let publicUrl = ""
 
-  if (uploadError) {
-    throw new Error(`Error al subir el PDF: ${uploadError.message}`)
+    try {
+      const { data: b } = await supabase.storage.getBucket("info-documents")
+      if (!b) {
+        await supabase.storage.createBucket("info-documents", { public: true })
+      }
+    } catch (e) {}
+
+    try {
+      const { error: uploadError } = await supabase.storage
+        .from("info-documents")
+        .upload(destinationPath, arrayBuffer, {
+          contentType: "application/pdf",
+          upsert: true,
+        })
+
+      if (!uploadError) {
+        const { data } = supabase.storage.from("info-documents").getPublicUrl(destinationPath)
+        publicUrl = data.publicUrl
+      }
+    } catch (storageErr) {
+      console.warn("Storage upload in processCoursePdf failed, using Base64 fallback:", storageErr)
+    }
+
+    if (!publicUrl) {
+      const base64 = Buffer.from(arrayBuffer).toString("base64")
+      if (base64.length < 500) {
+        console.warn("Base64 string too short (< 500 chars). Skipping platform_settings update.")
+        return
+      }
+      publicUrl = `data:application/pdf;base64,${base64}`
+    }
+
+    const keysToSave = [`course_pdf_${courseId}`, `course_info_${courseId}`]
+    if (slugId !== courseId) {
+      keysToSave.push(`course_pdf_${slugId}`)
+      keysToSave.push(`course_info_${slugId}`)
+    }
+
+    for (const key of keysToSave) {
+      await supabase
+        .from("platform_settings")
+        .upsert(
+          { key, value: publicUrl, updated_at: new Date().toISOString() },
+          { onConflict: "key" }
+        )
+    }
+
+    revalidatePath("/diplomados")
+    revalidatePath("/formacion-academica")
+    revalidatePath(`/diplomados/${courseId}`)
+    revalidatePath(`/formacion-academica/${courseId}`)
+  } catch (err: any) {
+    console.error("Error procesando PDF de curso:", err)
+    throw new Error(`Error procesando PDF: ${err?.message || "Fallo interno"}`)
   }
-
-  const { data } = supabase.storage.from(COVERS_BUCKET).getPublicUrl(filePath)
-  return data.publicUrl
 }
 
 export async function createCourse(formData: FormData) {
@@ -88,7 +146,7 @@ export async function createCourse(formData: FormData) {
   const title = formData.get("title") as string
   
   if (!id && title) {
-    id = title.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+    id = slugify(title)
   }
 
   const type = formData.get("type") as string
@@ -113,9 +171,9 @@ export async function createCourse(formData: FormData) {
 
   if (pdfFile && pdfFile.size > 0) {
     try {
-      await uploadInfoPdf(pdfFile, id)
+      await processCoursePdf(pdfFile, id)
     } catch (err: any) {
-      return { error: err?.message || "No se pudo guardar el PDF de información." }
+      return { error: err?.message || "No se pudo procesar el PDF de información." }
     }
   }
 
@@ -123,7 +181,6 @@ export async function createCourse(formData: FormData) {
     image = "/placeholder.svg"
   }
 
-  // Para la columna 'students' que originalmente indicaba modalidad o número de cupos
   const students = type === 'etdh' ? `${min_students} cupos` : "50 cupos"
 
   if (!id || !title || !type) {
@@ -174,13 +231,16 @@ export async function updateCourse(formData: FormData) {
   const modules = Number(formData.get("modules") || 0)
   const min_students = Number(formData.get("min_students") || 0)
   
+  const newId = formData.get("new_id") as string
+  const finalId = newId && newId !== id ? newId : id
+  
   let image = (formData.get("image") as string) || ""
   const imageFile = formData.get("image_file") as File | null
   const pdfFile = formData.get("pdf_file") as File | null
 
   if (imageFile && imageFile.size > 0) {
     try {
-      image = await uploadCoverImage(imageFile, id)
+      image = await uploadCoverImage(imageFile, finalId)
     } catch (err: any) {
       return { error: err?.message || "No se pudo guardar la imagen de portada." }
     }
@@ -188,16 +248,13 @@ export async function updateCourse(formData: FormData) {
 
   if (pdfFile && pdfFile.size > 0) {
     try {
-      await uploadInfoPdf(pdfFile, id)
+      await processCoursePdf(pdfFile, finalId)
     } catch (err: any) {
-      return { error: err?.message || "No se pudo guardar el PDF de información." }
+      return { error: err?.message || "No se pudo procesar el PDF de información." }
     }
   }
 
   const students = type === 'etdh' ? `${min_students} cupos` : "50 cupos"
-
-  const newId = formData.get("new_id") as string
-  const finalId = newId && newId !== id ? newId : id
 
   const updateData: any = {
     title,
@@ -228,49 +285,29 @@ export async function updateCourse(formData: FormData) {
     return { error: "Error de base de datos al actualizar el curso. Quizás el ID ya existe." }
   }
 
-  // Si cambió el ID, renombrar los archivos relacionados
-  if (newId && newId !== id) {
-    try {
-      const diplomadosDir = path.join(process.cwd(), "diplomados")
-      if (fs.existsSync(diplomadosDir)) {
-        // exams_{id}.json -> exams_{new_id}.json
-        const oldJsonPath = path.join(diplomadosDir, `exams_${id}.json`)
-        if (fs.existsSync(oldJsonPath)) fs.renameSync(oldJsonPath, path.join(diplomadosDir, `exams_${newId}.json`))
-
-        // PDFs
-        const files = fs.readdirSync(diplomadosDir)
-        for (const file of files) {
-          if (file.endsWith(`- ${id}.pdf`)) {
-            const newFile = file.replace(`- ${id}.pdf`, `- ${newId}.pdf`)
-            fs.renameSync(path.join(diplomadosDir, file), path.join(diplomadosDir, newFile))
-          }
-        }
-      }
-    } catch (err) {
-      console.error("Error renombrando archivos de módulos:", err)
-    }
-  }
-
   revalidatePath("/admin/cursos")
   revalidatePath("/diplomados")
   revalidatePath("/formacion-academica")
+  revalidatePath(`/diplomados/${id}`)
   revalidatePath(`/diplomados/${finalId}`)
-  revalidatePath(`/admin/cursos/${finalId}/editar`)
-  revalidatePath(`/admin/cursos/${finalId}/modulos`)
+  revalidatePath(`/formacion-academica/${id}`)
+  revalidatePath(`/formacion-academica/${finalId}`)
   
   redirect("/admin/cursos")
 }
 
 export async function deleteCourse(id: string) {
   const supabase = createAdminClient()
-  const { error } = await supabase.from("courses").delete().eq('id', id)
-  
+  const { error } = await supabase.from("courses").delete().eq("id", id)
+
   if (error) {
     console.error("Error al eliminar el curso:", error)
-    return { error: "Error de base de datos al eliminar el curso." }
+    return { error: "No se pudo eliminar el curso." }
   }
 
   revalidatePath("/admin/cursos")
   revalidatePath("/diplomados")
   revalidatePath("/formacion-academica")
+
+  return { success: true }
 }
