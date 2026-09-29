@@ -205,6 +205,22 @@ export function EditCourseForm({ course }: { course: any }) {
               </div>
             )}
             
+            <div className="md:col-span-2 space-y-2">
+              <label htmlFor="pdf_file" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
+                Documento de Información (PDF) (Opcional - Reemplaza el actual si existe)
+              </label>
+              <input
+                type="file"
+                id="pdf_file"
+                name="pdf_file"
+                accept="application/pdf"
+                className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+              />
+              <p className="text-xs text-[oklch(0.55_0.04_145)]">
+                Sube un nuevo PDF si deseas actualizar la información de "¿Por qué cursar?".
+              </p>
+            </div>
+
             <div className="md:col-span-2">
               <ImageUploadZone ref={imageZoneRef} defaultUrl={course.image || ""} />
             </div>

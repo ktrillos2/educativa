@@ -58,10 +58,13 @@ export default async function CursosPage() {
     .eq("user_id", session?.userId ?? "")
     .eq("completed", true)
 
-  // Filtrar inscripciones huerfanas (cursos eliminados) y luego enriquecer
-  const validEnrollments = (enrollments ?? []).filter(e => 
-    courses?.some((d) => String(d.id) === String(e.course_id)) || 
-    diplomados.some((d) => String(d.id) === String(e.course_id))
+  // Filtrar inscripciones huerfanas (cursos eliminados) y sin pago verificado
+  const validEnrollments = (enrollments ?? []).filter(e =>
+    e.payment_verified === true &&
+    (
+      courses?.some((d) => String(d.id) === String(e.course_id)) ||
+      diplomados.some((d) => String(d.id) === String(e.course_id))
+    )
   )
 
   const enrichedEnrollments = validEnrollments.map((e) => {

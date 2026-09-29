@@ -48,11 +48,30 @@ export async function POST(request: Request) {
       const courseId = order.course_id
 
       if (userId && courseId) {
-        const { error: updateEnrollmentError } = await supabase
+        const { data: existingEnrollment } = await supabase
           .from("enrollments")
-          .update({ payment_verified: true })
+          .select("id")
           .eq("user_id", userId)
           .eq("course_id", courseId)
+          .maybeSingle()
+
+        let updateEnrollmentError = null
+        if (existingEnrollment) {
+          const { error } = await supabase
+            .from("enrollments")
+            .update({ payment_verified: true })
+            .eq("id", existingEnrollment.id)
+          updateEnrollmentError = error
+        } else {
+          const { error } = await supabase
+            .from("enrollments")
+            .insert({
+              user_id: userId,
+              course_id: courseId,
+              payment_verified: true
+            })
+          updateEnrollmentError = error
+        }
 
         if (updateEnrollmentError) {
           console.error('Error updating enrollment payment status:', updateEnrollmentError)

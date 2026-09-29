@@ -45,6 +45,42 @@ async function uploadCoverImage(imageFile: File, courseId: string): Promise<stri
   return data.publicUrl
 }
 
+/**
+ * Uploads a PDF File to Supabase Storage and returns its public URL.
+ */
+async function uploadInfoPdf(pdfFile: File, courseId: string): Promise<string> {
+  const validTypes = ["application/pdf"]
+  if (!validTypes.includes(pdfFile.type)) {
+    throw new Error(`Formato no soportado: "${pdfFile.type}". Usa PDF.`)
+  }
+
+  const maxSizeBytes = 10 * 1024 * 1024 // 10MB limit
+  if (pdfFile.size > maxSizeBytes) {
+    throw new Error(
+      `El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 10 MB.`
+    )
+  }
+
+  const filePath = `pdf_info_${courseId}.pdf`
+  const arrayBuffer = await pdfFile.arrayBuffer()
+
+  const supabase = createAdminClient()
+
+  const { error: uploadError } = await supabase.storage
+    .from(COVERS_BUCKET)
+    .upload(filePath, arrayBuffer, {
+      contentType: pdfFile.type,
+      upsert: true,
+    })
+
+  if (uploadError) {
+    throw new Error(`Error al subir el PDF: ${uploadError.message}`)
+  }
+
+  const { data } = supabase.storage.from(COVERS_BUCKET).getPublicUrl(filePath)
+  return data.publicUrl
+}
+
 export async function createCourse(formData: FormData) {
   const supabase = createAdminClient()
   
@@ -65,12 +101,21 @@ export async function createCourse(formData: FormData) {
   
   let image = (formData.get("image") as string) || ""
   const imageFile = formData.get("image_file") as File | null
+  const pdfFile = formData.get("pdf_file") as File | null
 
   if (imageFile && imageFile.size > 0) {
     try {
       image = await uploadCoverImage(imageFile, id)
     } catch (err: any) {
       return { error: err?.message || "No se pudo guardar la imagen de portada." }
+    }
+  }
+
+  if (pdfFile && pdfFile.size > 0) {
+    try {
+      await uploadInfoPdf(pdfFile, id)
+    } catch (err: any) {
+      return { error: err?.message || "No se pudo guardar el PDF de información." }
     }
   }
 
@@ -131,12 +176,21 @@ export async function updateCourse(formData: FormData) {
   
   let image = (formData.get("image") as string) || ""
   const imageFile = formData.get("image_file") as File | null
+  const pdfFile = formData.get("pdf_file") as File | null
 
   if (imageFile && imageFile.size > 0) {
     try {
       image = await uploadCoverImage(imageFile, id)
     } catch (err: any) {
       return { error: err?.message || "No se pudo guardar la imagen de portada." }
+    }
+  }
+
+  if (pdfFile && pdfFile.size > 0) {
+    try {
+      await uploadInfoPdf(pdfFile, id)
+    } catch (err: any) {
+      return { error: err?.message || "No se pudo guardar el PDF de información." }
     }
   }
 

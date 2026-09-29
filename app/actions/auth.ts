@@ -68,27 +68,8 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
             return { error: "Error al crear el perfil del usuario." }
         }
 
-        // 4. Attempt to enroll if courseId provided
-        if (courseId) {
-            // Find active group for this course (always take the most recently created one)
-            const { data: activeGroups, error: grpErr } = await supabaseAdmin
-                .from("course_groups")
-                .select("id")
-                .eq("course_id", courseId)
-                .order("created_at", { ascending: false })
-                .limit(1)
-            
-            if (grpErr) console.error("Error finding group:", grpErr);
-
-            await supabaseAdmin
-                .from("enrollments")
-                .insert({
-                    user_id: userId,
-                    course_id: courseId,
-                    group_id: activeGroups?.[0]?.id || null,
-                    payment_verified: true
-                })
-        }
+        // La inscripción se crea ÚNICAMENTE cuando Openpay confirma el pago (webhook).
+        // No se pre-crea aquí con payment_verified: false.
 
         revalidatePath("/")
         return { success: true }
@@ -100,58 +81,9 @@ export async function registerAction(data: z.infer<typeof registerSchema>, cours
     }
 }
 
-export async function enrollAction(courseId: string) {
-    try {
-        const supabase = await createClient()
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+// enrollAction eliminado: la inscripción se crea exclusivamente desde el webhook de Openpay
+// tras confirmación del pago. Ver: app/api/webhooks/openpay/route.ts
 
-        if (sessionError || !session?.user) {
-            return { error: "Debes iniciar sesión para inscribirte." }
-        }
-
-        const userId = session.user.id
-
-        // Check if already enrolled
-        const { data: existing } = await supabase
-            .from("enrollments")
-            .select("id")
-            .eq("user_id", userId)
-            .eq("course_id", courseId)
-            .maybeSingle()
-
-        if (existing) {
-            return { error: "Ya estás inscrito en este diplomado." }
-        }
-
-        // Find active group for this course (always take the most recently created one)
-        const { data: activeGroups, error: grpErr } = await supabase
-            .from("course_groups")
-            .select("id")
-            .eq("course_id", courseId)
-            .order("created_at", { ascending: false })
-            .limit(1)
-            
-        if (grpErr) console.error("Error finding group:", grpErr);
-
-        const { error } = await supabase
-            .from("enrollments")
-            .insert({
-                user_id: userId,
-                course_id: courseId,
-                group_id: activeGroups?.[0]?.id || null,
-                payment_verified: true
-            })
-
-        if (error) {
-            return { error: "Error al realizar la inscripción." }
-        }
-
-        revalidatePath("/")
-        return { success: true }
-    } catch (error: any) {
-        return { error: "Ocurrió un error inesperado al inscribirse." }
-    }
-}
 
 export async function loginAction(data: z.infer<typeof loginSchema>) {
     try {

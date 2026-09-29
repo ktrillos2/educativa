@@ -88,6 +88,15 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
       }
   }
 
+  // Si existe el enrollment pero no ha pagado, redirigir al curso para que pague
+  if (!enrollment.payment_verified) {
+      if (isDiplomado) {
+          redirect(`/diplomados/${course.id}`)
+      } else {
+          redirect(`/formacion-academica/${course.id}`)
+      }
+  }
+
   // 3. Fetch live classes for this group (only for ETDH)
   let liveClasses: any[] = []
   if (!isDiplomado && groupId) {
@@ -206,9 +215,6 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
               />
             </div>
           </div>
-          <span className={`flex-shrink-0 text-xs font-bold px-3 py-1 rounded-full ${enrollment.payment_verified ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'}`}>
-            {enrollment.payment_verified ? '✓ Pago verificado' : '⏳ Pago pendiente'}
-          </span>
         </div>
       </div>
 

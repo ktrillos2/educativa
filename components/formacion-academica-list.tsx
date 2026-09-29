@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import Image from "next/image"
+import { toTitleCase } from "@/lib/format"
 
 interface Course {
   id: string
@@ -99,7 +100,7 @@ export function FormacionAcademicaList({ initialCourses, initialCategories }: Fo
                                         <div className="absolute inset-0 bg-primary/20 z-10 group-hover:bg-transparent transition-colors duration-500" />
                                         <Image
                                             src={program.image || "/placeholder.svg"}
-                                            alt={program.title}
+                                            alt={toTitleCase(program.title)}
                                             fill
                                             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
                                             className="object-cover group-hover:scale-110 transition-transform duration-700"
@@ -113,7 +114,7 @@ export function FormacionAcademicaList({ initialCourses, initialCategories }: Fo
 
                                     <div className="p-6 flex flex-col flex-grow">
                                         <h3 className="text-xl font-bold mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                                            {program.title}
+                                            {toTitleCase(program.title)}
                                         </h3>
                                         <p className="text-muted-foreground text-sm line-clamp-3 mb-6 flex-grow">
                                             {program.description}

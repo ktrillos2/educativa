@@ -19,6 +19,7 @@ import {
   ChevronRight,
 } from "@/components/ui/icons"
 import Link from "next/link"
+import { toTitleCase } from "@/lib/format"
 
 const categories = ["Todos", "Gestión", "Legal", "Tecnología", "Salud"]
 
@@ -139,7 +140,7 @@ export function AcademicOffer() {
                   <div className="relative h-56 overflow-hidden">
                     <img
                       src={program.image || "/placeholder.svg"}
-                      alt={program.title}
+                      alt={toTitleCase(program.title)}
                       className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -173,7 +174,7 @@ export function AcademicOffer() {
                   {/* Content */}
                     <div className="p-6 flex flex-col flex-grow">
                       <h3 className="text-xl font-bold text-foreground mb-3 group-hover:text-primary transition-colors line-clamp-2">
-                        {program.title}
+                        {toTitleCase(program.title)}
                       </h3>
                       <p className="text-sm text-muted-foreground line-clamp-3 mb-6 flex-grow">
                         {program.description}

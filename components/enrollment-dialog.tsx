@@ -26,7 +26,7 @@ const loginSchema = z.object({
     password: z.string().min(1, "La contraseña es requerida"),
 })
 
-export function EnrollmentDialog({ courseId, courseName }: { courseId: string; courseName: string }) {
+export function EnrollmentDialog({ courseId, courseName, price }: { courseId: string; courseName: string; price?: string | number }) {
     const [open, setOpen] = useState(false)
     const [loading, setLoading] = useState(false)
     const [activeTab, setActiveTab] = useState("register")
@@ -42,33 +42,68 @@ export function EnrollmentDialog({ courseId, courseName }: { courseId: string; c
         defaultValues: { email: "", password: "" },
     })
 
+    async function triggerCheckout() {
+        let numericPrice = 350000
+        if (typeof price === 'number' && price > 0) {
+            numericPrice = price
+        } else if (typeof price === 'string' && price.trim()) {
+            const cleanDigits = price.replace(/[^0-9]/g, '')
+            if (cleanDigits) {
+                const parsed = parseInt(cleanDigits, 10)
+                if (!isNaN(parsed) && parsed > 0) {
+                    numericPrice = parsed
+                }
+            }
+        }
+
+        try {
+            const res = await fetch('/api/checkout', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    courseId,
+                    programName: courseName,
+                    amount: numericPrice
+                })
+            })
+
+            const data = await res.json()
+            if (data.success && data.checkoutUrl) {
+                toast.loading("Redirigiendo a la pasarela de pagos...")
+                window.location.href = data.checkoutUrl
+            } else {
+                toast.error(data.error || "No se pudo generar el enlace de pago.")
+                router.push("/estudiante")
+            }
+        } catch (err: any) {
+            toast.error(err.message || "Error al procesar el pago")
+            router.push("/estudiante")
+        }
+    }
+
     async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
         setLoading(true)
         const result = await registerAction(values, courseId)
-        setLoading(false)
 
         if (result.error) {
             toast.error(result.error)
+            setLoading(false)
         } else {
-            toast.success("¡Registro exitoso! Bienvenido a la plataforma.")
-            setOpen(false)
-            router.push("/estudiante")
+            toast.success("¡Registro exitoso! Redirigiendo al pago...")
+            await triggerCheckout()
         }
     }
 
     async function onLoginSubmit(values: z.infer<typeof loginSchema>) {
         setLoading(true)
         const result = await loginAction(values)
-        setLoading(false)
 
         if (result.error) {
             toast.error(result.error)
+            setLoading(false)
         } else {
-            toast.success("Inicio de sesión exitoso. Ahora puedes inscribirte o ver tus cursos.")
-            // Ideally here we also enroll the user if they aren't enrolled yet.
-            // For now, we just close the dialog and refresh.
-            setOpen(false)
-            router.refresh()
+            toast.success("Sesión iniciada. Redirigiendo al pago...")
+            await triggerCheckout()
         }
     }
 

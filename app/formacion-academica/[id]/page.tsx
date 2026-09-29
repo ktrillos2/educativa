@@ -4,10 +4,12 @@ import { notFound } from "next/navigation"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { EnrollmentDialog } from "@/components/enrollment-dialog"
 import { EnrollButton } from "@/components/enroll-button"
+import { CoursePdfButton } from "@/components/course-pdf-button"
 import { CoursePayment } from "@/components/course-payment"
 import { getSession } from "@/lib/auth"
 import { createClient } from "@/utils/supabase/server"
 import { createAdminClient } from "@/utils/supabase/admin"
+import { formatPrice, toTitleCase } from "@/lib/format"
 import {
     Clock,
     Users,
@@ -182,7 +184,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             </div>
 
                             <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-white to-white/70">
-                                {course.title}
+                                {toTitleCase(course.title)}
                             </h1>
 
                             <p className="text-lg md:text-xl text-white/80 max-w-2xl font-light leading-relaxed">
@@ -214,27 +216,15 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             transition={{ duration: 0.7, delay: 0.4 }}
                         >
                             <div className="bg-white/95 backdrop-blur-xl text-foreground p-8 shadow-2xl border border-white/20 sticky top-32">
-                                {isEnrolled ? (
+                                {isEnrolled && paymentVerified ? (
                                     <div className="text-center space-y-6">
                                         <div className="w-20 h-20 bg-green-100 text-green-600 flex items-center justify-center mx-auto shadow-inner">
                                             <CheckCircle className="w-10 h-10" />
                                         </div>
-                                        {!paymentVerified ? (
-                                            <>
-                                                <div>
-                                                    <h3 className="font-bold text-2xl mb-2 text-primary">¡Inscripción Registrada!</h3>
-                                                    <p className="text-muted-foreground text-sm">Estás a un paso de comenzar este programa.</p>
-                                                </div>
-                                                <div className="mt-4">
-                                                    <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
-                                                </div>
-                                            </>
-                                        ) : (
-                                            <>
-                                                <div>
-                                                    <h3 className="font-bold text-2xl mb-2 text-primary">¡Ya estás inscrito!</h3>
-                                                    <p className="text-muted-foreground text-sm">El acceso a este programa está activo en tu cuenta.</p>
-                                                </div>
+                                        <div>
+                                            <h3 className="font-bold text-2xl mb-2 text-primary">¡Ya estás inscrito!</h3>
+                                            <p className="text-muted-foreground text-sm">El acceso a este programa está activo en tu cuenta.</p>
+                                        </div>
                                                 <div className={`flex items-start gap-3 p-4 border text-left shadow-sm ${isReadyToStart ? 'bg-green-50 border-green-200 text-green-800' : 'bg-amber-50 border-amber-200 text-amber-800'}`}>
                                                     {isReadyToStart ? (
                                                         <>
@@ -272,15 +262,13 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                                         </a>
                                                     )}
                                                 </div>
-                                            </>
-                                        )}
-                                        </div>
+                                            </div>
                                 ) : (
                                     <>
                                         <div className="flex items-center justify-between mb-8 pb-6 border-b border-border/60">
                                             <div>
                                                 <p className="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-1">Valor del Programa</p>
-                                                <span className="text-4xl font-extrabold text-primary">{course.price ? course.price.replace(/\s*\/\s*Semestre/gi, "").replace(/\$2[0-9]{2}\.000/g, "$350.000") : "$350.000 COP"}</span>
+                                                <span className="text-4xl font-extrabold text-primary">{formatPrice(course.price)}</span>
                                             </div>
                                         </div>
 
@@ -295,9 +283,9 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                         </div>
 
                                         {session?.userId ? (
-                                            <EnrollButton courseId={course.id} />
+                                            <EnrollButton courseId={course.id} programName={course.title} price={course.price} />
                                         ) : (
-                                            <EnrollmentDialog courseId={course.id} courseName={course.title} />
+                                            <EnrollmentDialog courseId={course.id} courseName={course.title} price={course.price} />
                                         )}
 
                                         <p className="text-xs text-center text-muted-foreground mt-4 flex items-center justify-center gap-1.5">
@@ -326,7 +314,9 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                     >
                         <h2 className="text-4xl font-extrabold text-primary mb-4">Formación Continua y Actualización Integral</h2>
                         <div className="h-1.5 w-20 bg-secondary mx-auto mb-4"></div>
-                        <p className="text-muted-foreground text-lg">Estructura detallada diseñada para tu formación profesional.</p>
+                        <p className="text-muted-foreground text-lg mb-8">Estructura detallada diseñada para tu formación profesional.</p>
+                        
+                        <CoursePdfButton type="etdh" courseId={course.id} courseName={course.title} />
                     </motion.div>
 
                     <Accordion type="multiple" className="w-full space-y-6">

@@ -22,6 +22,7 @@ import {
   SlidersHorizontal,
 } from "@/components/ui/icons"
 import Link from "next/link"
+import { formatPrice, toTitleCase } from "@/lib/format"
 
 
 const categoryIcons: Record<string, React.ElementType> = {
@@ -125,7 +126,7 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
                 <div className="relative h-40 overflow-hidden">
                   <img
                     src={diplomado.image || "/placeholder.svg"}
-                    alt={diplomado.title}
+                    alt={toTitleCase(diplomado.title)}
                     className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
@@ -145,7 +146,7 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
                     <div>
                       <div className="flex items-center gap-1">
                         <Banknote className="h-4 w-4 text-secondary" />
-                        <span className="font-bold text-lg text-white">{diplomado.price}</span>
+                        <span className="font-bold text-lg text-white">{formatPrice(diplomado.price)}</span>
                       </div>
                     </div>
                     <div className="flex items-center gap-1.5 bg-white/95 px-2 py-1  text-xs">
@@ -157,7 +158,7 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
 
                 <CardContent className="p-4">
                   <h3 className="text-sm font-semibold text-foreground mb-2 group-hover:text-primary transition-colors line-clamp-2 leading-snug">
-                    {diplomado.title}
+                    {toTitleCase(diplomado.title)}
                   </h3>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{diplomado.description}</p>
 

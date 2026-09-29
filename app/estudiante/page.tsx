@@ -8,11 +8,12 @@ export default async function EstudiantePage() {
   const session = await getSession()
   const supabase = createAdminClient()
 
-  // Inscripciones reales del estudiante
+  // Inscripciones reales del estudiante (solo con pago verificado)
   const { data: enrollments } = await supabase
     .from("enrollments")
     .select("*")
     .eq("user_id", session?.userId ?? "")
+    .eq("payment_verified", true)
 
   // Deduplicar inscripciones por course_id
   const uniqueEnrollmentsMap = new Map()
@@ -135,9 +136,6 @@ export default async function EstudiantePage() {
                       {e.courseCategory && (
                         <span className="text-xs text-[oklch(0.55_0.04_145)]">{e.courseCategory}</span>
                       )}
-                      <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${e.payment_verified ? "bg-[oklch(0.30_0.10_145)]/10 text-[oklch(0.30_0.10_145)]" : "bg-[oklch(0.72_0.14_85)]/15 text-[oklch(0.50_0.14_85)]"}`}>
-                        {e.payment_verified ? "✓ Pago verificado" : "⏳ Pendiente de pago"}
-                      </span>
                     </div>
                   </div>
                 </div>

@@ -43,12 +43,33 @@ export async function POST(request: Request) {
         return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
       }
 
-      // 3. Mark the enrollment as payment_verified = true
-      const { error: updateEnrollmentError } = await supabase
+      // 3. Crear o actualizar enrollment con payment_verified = true (upsert)
+      // El enrollment se crea aquí por primera vez si el usuario no existía antes en la tabla,
+      // garantizando que SOLO se inscribe cuando el pago fue confirmado por Openpay.
+      const { data: existingEnrollment } = await supabase
         .from('enrollments')
-        .update({ payment_verified: true })
+        .select('id')
         .eq('user_id', order.user_id)
         .eq('course_id', order.course_id)
+        .maybeSingle()
+
+      let updateEnrollmentError = null
+      if (existingEnrollment) {
+        const { error } = await supabase
+          .from('enrollments')
+          .update({ payment_verified: true })
+          .eq('id', existingEnrollment.id)
+        updateEnrollmentError = error
+      } else {
+        const { error } = await supabase
+          .from('enrollments')
+          .insert({
+            user_id: order.user_id,
+            course_id: order.course_id,
+            payment_verified: true
+          })
+        updateEnrollmentError = error
+      }
 
       if (updateEnrollmentError) {
         console.error('Error updating enrollment:', updateEnrollmentError)
