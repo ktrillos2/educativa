@@ -64,7 +64,7 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30 p-4 md:p-8 animate-fade-in pt-32 pb-16">
+    <div className="min-h-screen flex flex-col items-center bg-muted/30 px-4 pt-28 pb-16 animate-fade-in">
       <Card className="w-full max-w-md shadow-lg border-muted-foreground/10 animate-fade-up">
         <CardHeader className="space-y-1 text-center">
           <CardTitle className="text-2xl font-bold tracking-tight">Crear Cuenta</CardTitle>

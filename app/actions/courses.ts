@@ -63,55 +63,35 @@ async function processCoursePdf(pdfFile: File, courseId: string): Promise<void> 
 
   if (!isPdf || pdfFile.size === 0) return
 
-  const maxSizeBytes = 30 * 1024 * 1024
+  const maxSizeBytes = 40 * 1024 * 1024
   if (pdfFile.size > maxSizeBytes) {
-    throw new Error(`El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 30 MB.`)
+    throw new Error(`El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 40 MB.`)
   }
 
   try {
     const arrayBuffer = await pdfFile.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
 
-    // Safety check: If arrayBuffer is empty/drained (< 500 bytes), skip to prevent overwriting a valid PDF URL
-    if (!arrayBuffer || arrayBuffer.byteLength < 500) {
-      console.warn("ArrayBuffer drains or is under 500 bytes. Skipping processCoursePdf to protect valid PDF record.")
+    if (!buffer || buffer.length < 500) {
+      console.warn("ArrayBuffer is under 500 bytes. Skipping processCoursePdf.")
       return
     }
 
     const supabase = createAdminClient()
     const slugId = slugify(courseId)
-    const destinationPath = `course-${slugId}-${Date.now()}.pdf`
-    let publicUrl = ""
+    const destinationPath = `${courseId}/info.pdf`
+    const viewerUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
 
-    try {
-      const { data: b } = await supabase.storage.getBucket("info-documents")
-      if (!b) {
-        await supabase.storage.createBucket("info-documents", { public: true })
-      }
-    } catch (e) {}
+    const { error: uploadError } = await supabase.storage
+      .from("course-modules")
+      .upload(destinationPath, buffer, {
+        contentType: "application/pdf",
+        upsert: true,
+      })
 
-    try {
-      const { error: uploadError } = await supabase.storage
-        .from("info-documents")
-        .upload(destinationPath, arrayBuffer, {
-          contentType: "application/pdf",
-          upsert: true,
-        })
-
-      if (!uploadError) {
-        const { data } = supabase.storage.from("info-documents").getPublicUrl(destinationPath)
-        publicUrl = data.publicUrl
-      }
-    } catch (storageErr) {
-      console.warn("Storage upload in processCoursePdf failed, using Base64 fallback:", storageErr)
-    }
-
-    if (!publicUrl) {
-      const base64 = Buffer.from(arrayBuffer).toString("base64")
-      if (base64.length < 500) {
-        console.warn("Base64 string too short (< 500 chars). Skipping platform_settings update.")
-        return
-      }
-      publicUrl = `data:application/pdf;base64,${base64}`
+    if (uploadError) {
+      console.error("Error uploading to course-modules in processCoursePdf:", uploadError)
+      throw new Error(`Error al subir el archivo PDF: ${uploadError.message}`)
     }
 
     const keysToSave = [`course_pdf_${courseId}`, `course_info_${courseId}`]
@@ -124,7 +104,7 @@ async function processCoursePdf(pdfFile: File, courseId: string): Promise<void> 
       await supabase
         .from("platform_settings")
         .upsert(
-          { key, value: publicUrl, updated_at: new Date().toISOString() },
+          { key, value: viewerUrl, updated_at: new Date().toISOString() },
           { onConflict: "key" }
         )
     }
@@ -215,7 +195,7 @@ export async function createCourse(formData: FormData) {
   revalidatePath("/formacion-academica")
   revalidatePath(`/diplomados/${id}`)
   
-  redirect("/admin/cursos")
+  return { success: true, id }
 }
 
 export async function updateCourse(formData: FormData) {
@@ -293,7 +273,7 @@ export async function updateCourse(formData: FormData) {
   revalidatePath(`/formacion-academica/${id}`)
   revalidatePath(`/formacion-academica/${finalId}`)
   
-  redirect("/admin/cursos")
+  return { success: true, finalId }
 }
 
 export async function deleteCourse(id: string) {

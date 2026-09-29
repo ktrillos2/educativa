@@ -25,6 +25,12 @@ import {
   parsePdfFileAction,
   deleteModulePdfAction,
 } from "@/app/actions/admin-modules"
+import {
+  uploadGeneralInfoPdf,
+  uploadCourseInfoPdf,
+  deleteGeneralInfoPdf,
+  deleteCourseInfoPdf,
+} from "@/app/actions/pdf-info"
 import { Question } from "@/lib/exam-constants"
 
 interface ModuleManagerProps {
@@ -39,6 +45,8 @@ interface ModuleManagerProps {
   initialPdfFilesStatus: Record<string, boolean>
   initialExamPdfStatus: Record<string, boolean>
   initialExamsData: Record<string, Question[]>
+  initialGeneralDiplomadosPdfUrl?: string | null
+  initialGeneralEtdhPdfUrl?: string | null
 }
 
 export function ModuleManager({
@@ -47,12 +55,27 @@ export function ModuleManager({
   initialPdfFilesStatus,
   initialExamPdfStatus,
   initialExamsData,
+  initialGeneralDiplomadosPdfUrl,
+  initialGeneralEtdhPdfUrl,
 }: ModuleManagerProps) {
   const [modulesCount, setModulesCount] = useState<number>(initialModulesCount)
   const [pdfStatus, setPdfStatus] = useState<Record<string, boolean>>(initialPdfFilesStatus)
   const [examPdfStatus, setExamPdfStatus] = useState<Record<string, boolean>>(initialExamPdfStatus)
   const [examsData, setExamsData] = useState<Record<string, Question[]>>(initialExamsData)
   const [selectedModule, setSelectedModule] = useState<number>(1)
+
+  // General Info PDFs state
+  const [generalDiplomadosPdfUrl, setGeneralDiplomadosPdfUrl] = useState<string | null>(initialGeneralDiplomadosPdfUrl || null)
+  const [generalEtdhPdfUrl, setGeneralEtdhPdfUrl] = useState<string | null>(initialGeneralEtdhPdfUrl || null)
+
+  const [isUploadingDiplomadosPdf, setIsUploadingDiplomadosPdf] = useState(false)
+  const [isUploadingEtdhPdf, setIsUploadingEtdhPdf] = useState(false)
+
+  const [diplomadosPdfMessage, setDiplomadosPdfMessage] = useState<{ text: string; error?: boolean } | null>(null)
+  const [etdhPdfMessage, setEtdhPdfMessage] = useState<{ text: string; error?: boolean } | null>(null)
+
+  const [confirmDeleteDiplomadosPdf, setConfirmDeleteDiplomadosPdf] = useState(false)
+  const [confirmDeleteEtdhPdf, setConfirmDeleteEtdhPdf] = useState(false)
 
   const [uploadingModule, setUploadingModule] = useState<number | null>(null)
   const [uploadMessage, setUploadMessage] = useState<{ text: string; error?: boolean } | null>(null)
@@ -62,6 +85,74 @@ export function ModuleManager({
 
   const activeModuleKey = `mod-${selectedModule}`
   const activeQuestions = examsData[activeModuleKey] || []
+
+  // Handlers for General Diplomados PDF
+  async function handleDiplomadosPdfSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsUploadingDiplomadosPdf(true)
+    setDiplomadosPdfMessage(null)
+
+    const formData = new FormData(e.currentTarget)
+    formData.set("type", "diplomados")
+
+    const res = await uploadGeneralInfoPdf(formData)
+    if (res.error) {
+      setDiplomadosPdfMessage({ text: res.error, error: true })
+    } else {
+      setDiplomadosPdfMessage({ text: "PDF General guardado exitosamente", error: false })
+      setGeneralDiplomadosPdfUrl(res.pdfUrl || "/api/file/General - diplomados.pdf")
+    }
+    setIsUploadingDiplomadosPdf(false)
+  }
+
+  async function handleDeleteDiplomadosPdf() {
+    setIsUploadingDiplomadosPdf(true)
+    setDiplomadosPdfMessage(null)
+
+    const res = await deleteGeneralInfoPdf("diplomados")
+    if (res.error) {
+      setDiplomadosPdfMessage({ text: res.error, error: true })
+    } else {
+      setDiplomadosPdfMessage({ text: "PDF General eliminado exitosamente", error: false })
+      setGeneralDiplomadosPdfUrl(null)
+    }
+    setIsUploadingDiplomadosPdf(false)
+    setConfirmDeleteDiplomadosPdf(false)
+  }
+
+  // Handlers for General ETDH Formación Académica PDF
+  async function handleEtdhPdfSubmit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setIsUploadingEtdhPdf(true)
+    setEtdhPdfMessage(null)
+
+    const formData = new FormData(e.currentTarget)
+    formData.set("type", "etdh")
+
+    const res = await uploadGeneralInfoPdf(formData)
+    if (res.error) {
+      setEtdhPdfMessage({ text: res.error, error: true })
+    } else {
+      setEtdhPdfMessage({ text: "PDF General guardado exitosamente", error: false })
+      setGeneralEtdhPdfUrl(res.pdfUrl || "/api/file/General - etdh.pdf")
+    }
+    setIsUploadingEtdhPdf(false)
+  }
+
+  async function handleDeleteEtdhPdf() {
+    setIsUploadingEtdhPdf(true)
+    setEtdhPdfMessage(null)
+
+    const res = await deleteGeneralInfoPdf("etdh")
+    if (res.error) {
+      setEtdhPdfMessage({ text: res.error, error: true })
+    } else {
+      setEtdhPdfMessage({ text: "PDF General eliminado exitosamente", error: false })
+      setGeneralEtdhPdfUrl(null)
+    }
+    setIsUploadingEtdhPdf(false)
+    setConfirmDeleteEtdhPdf(false)
+  }
 
   // Add a new empty question
   const handleAddQuestion = () => {
@@ -278,6 +369,181 @@ export function ModuleManager({
           <span className="text-sm font-medium">{saveMessage.text}</span>
         </div>
       )}
+
+      {/* Documentos de Información General */}
+      <section className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm overflow-hidden">
+        <div className="bg-[oklch(0.25_0.10_145)] px-6 py-4 text-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <FileText className="w-5 h-5 text-secondary" />
+            <div>
+              <h2 className="font-bold text-base text-white">Información General</h2>
+              <p className="text-white/80 text-xs">Carga y actualiza los documentos de información general que se muestran a los estudiantes</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Tarjeta 1: Información General - Diplomados */}
+          <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 space-y-4 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] text-[oklch(0.65_0.04_145)] font-medium mb-0.5">Información General</p>
+                <h3 className="font-bold text-[oklch(0.25_0.10_145)] text-base">
+                  Diplomados
+                </h3>
+              </div>
+              {generalDiplomadosPdfUrl ? (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={generalDiplomadosPdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-primary/30"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> Ver Documento
+                  </a>
+                  {confirmDeleteDiplomadosPdf ? (
+                    <div className="flex items-center gap-1 bg-red-100 border border-red-300 rounded px-2 py-0.5 text-xs">
+                      <span className="text-red-700 font-medium">¿Eliminar?</span>
+                      <button
+                        type="button"
+                        onClick={handleDeleteDiplomadosPdf}
+                        disabled={isUploadingDiplomadosPdf}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded"
+                      >
+                        Sí
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteDiplomadosPdf(false)}
+                        className="bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteDiplomadosPdf(true)}
+                      className="text-xs font-bold text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                      title="Eliminar Información General de Diplomados"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <span className="text-xs text-slate-400 italic">Sin archivo cargado</span>
+              )}
+            </div>
+
+            <form onSubmit={handleDiplomadosPdfSubmit} className="space-y-3">
+              <input
+                type="file"
+                name="pdf_file"
+                accept="application/pdf,.pdf"
+                required
+                className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-300 rounded-lg p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer"
+              />
+              <button
+                type="submit"
+                disabled={isUploadingDiplomadosPdf}
+                className="w-full py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {isUploadingDiplomadosPdf ? "Subiendo..." : "Subir Información General de Diplomados"}
+              </button>
+            </form>
+
+            {diplomadosPdfMessage && (
+              <p className={`text-xs font-medium flex items-center gap-1 ${diplomadosPdfMessage.error ? "text-red-600" : "text-green-600"}`}>
+                {diplomadosPdfMessage.error ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                {diplomadosPdfMessage.text}
+              </p>
+            )}
+          </div>
+
+          {/* Tarjeta 2: Información General - Programas Académicos ETDH */}
+          <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 space-y-4 shadow-sm">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] text-[oklch(0.65_0.04_145)] font-medium mb-0.5">Información General</p>
+                <h3 className="font-bold text-[oklch(0.25_0.10_145)] text-base">
+                  Programas Académicos ETDH
+                </h3>
+              </div>
+              {generalEtdhPdfUrl ? (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={generalEtdhPdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-primary/30"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> Ver Documento
+                  </a>
+                  {confirmDeleteEtdhPdf ? (
+                    <div className="flex items-center gap-1 bg-red-100 border border-red-300 rounded px-2 py-0.5 text-xs">
+                      <span className="text-red-700 font-medium">¿Eliminar?</span>
+                      <button
+                        type="button"
+                        onClick={handleDeleteEtdhPdf}
+                        disabled={isUploadingEtdhPdf}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded"
+                      >
+                        Sí
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteEtdhPdf(false)}
+                        className="bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteEtdhPdf(true)}
+                      className="text-xs font-bold text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                      title="Eliminar Información General de ETDH"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <span className="text-xs text-slate-400 italic">Sin archivo cargado</span>
+              )}
+            </div>
+
+            <form onSubmit={handleEtdhPdfSubmit} className="space-y-3">
+              <input
+                type="file"
+                name="pdf_file"
+                accept="application/pdf,.pdf"
+                required
+                className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-300 rounded-lg p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-secondary file:text-slate-900 hover:file:bg-secondary/90 cursor-pointer"
+              />
+              <button
+                type="submit"
+                disabled={isUploadingEtdhPdf}
+                className="w-full py-2.5 bg-secondary hover:bg-secondary/90 text-slate-900 font-extrabold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {isUploadingEtdhPdf ? "Subiendo..." : "Subir Información General de Programas Académicos ETDH"}
+              </button>
+            </form>
+
+            {etdhPdfMessage && (
+              <p className={`text-xs font-medium flex items-center gap-1 ${etdhPdfMessage.error ? "text-red-600" : "text-green-600"}`}>
+                {etdhPdfMessage.error ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                {etdhPdfMessage.text}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* Module Selector Bar */}
       <section className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] p-6 shadow-sm">
@@ -573,21 +839,47 @@ export function ModuleManager({
                       })}
                     </div>
 
-                    {/* Feedback Optional */}
-                    <div className="pt-2">
-                      <label className="block text-[11px] font-bold text-[oklch(0.55_0.04_145)] mb-1">
-                        Retroalimentación / Fundamento (Opcional)
-                      </label>
-                      <input
-                        type="text"
-                        value={q.feedbackCorrect || ""}
-                        onChange={(e) => handleQuestionChange(qIdx, "feedbackCorrect", e.target.value)}
-                        className="w-full px-3 py-1.5 rounded-lg border border-[oklch(0.88_0.04_145)] text-xs text-[oklch(0.40_0.04_145)] bg-white"
-                        placeholder="Ej: Conforme al Artículo 10 del estatuto..."
-                      />
+                    {/* Feedback - Respuesta Correcta */}
+                    <div className="pt-2 space-y-2">
+                      <div>
+                        <label className="block text-[11px] font-bold text-green-700 mb-1">
+                          Retroalimentación — Respuesta Correcta (Opcional)
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={q.feedbackCorrect || ""}
+                          onChange={(e) => handleQuestionChange(qIdx, "feedbackCorrect", e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-green-200 bg-green-50/30 text-xs text-[oklch(0.35_0.10_145)] focus:outline-none focus:ring-2 focus:ring-green-300 resize-none"
+                          placeholder="Ej: Fundamento normativo: Decreto 111 de 1996, artículo 6..."
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-[11px] font-bold text-red-600 mb-1">
+                          Retroalimentación — Respuesta Incorrecta (Opcional)
+                        </label>
+                        <textarea
+                          rows={3}
+                          value={q.feedbackIncorrect || ""}
+                          onChange={(e) => handleQuestionChange(qIdx, "feedbackIncorrect", e.target.value)}
+                          className="w-full px-3 py-2 rounded-lg border border-red-200 bg-red-50/30 text-xs text-[oklch(0.35_0.10_145)] focus:outline-none focus:ring-2 focus:ring-red-200 resize-none"
+                          placeholder="Ej: Por qué no las demás opciones: A desconoce la regla..."
+                        />
+                      </div>
                     </div>
                   </div>
                 ))}
+                
+                {/* Botón de Guardar Inferior */}
+                <div className="mt-8 pt-6 border-t border-[oklch(0.88_0.04_145)] flex justify-end">
+                  <button
+                    onClick={handleSaveAll}
+                    disabled={isPending}
+                    className="px-6 py-2.5 rounded-lg bg-primary text-white font-bold text-sm hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-md shadow-primary/20 disabled:opacity-50"
+                  >
+                    <Save className="w-4 h-4" />
+                    {isPending ? "Guardando..." : "Guardar Cambios"}
+                  </button>
+                </div>
               </div>
             )}
           </div>

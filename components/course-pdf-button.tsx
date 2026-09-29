@@ -23,9 +23,12 @@ export async function CoursePdfButton({ type, courseId, courseName }: CoursePdfB
   const hasSpecificPdf = Boolean(coursePdfUrl)
   const hasPdf = Boolean(coursePdfUrl || generalPdfUrl)
 
+  const fallbackUrl = type === "etdh" ? "/api/file/General - etdh.pdf" : "/api/file/General - diplomados.pdf"
+  const defaultCourseUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
+
   const viewerUrl = hasSpecificPdf
-    ? `/api/view-pdf?courseId=${encodeURIComponent(courseId)}`
-    : `/api/view-pdf?key=${generalPdfKey}`
+    ? coursePdfUrl!
+    : (generalPdfUrl || fallbackUrl)
 
   const buttonLabel = `Por qué cursar nuestro "${courseName}"`
 
@@ -56,13 +59,6 @@ export async function CoursePdfButton({ type, courseId, courseName }: CoursePdfB
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> Abrir en nueva pestaña
                 </a>
-                <a
-                  href={viewerUrl}
-                  download={`Informacion-${courseName}.pdf`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-yellow-500 hover:bg-yellow-400 text-slate-950 text-xs font-bold transition-colors shadow-sm"
-                >
-                  <Download className="w-3.5 h-3.5" /> Descargar PDF
-                </a>
               </div>
             )}
           </DialogHeader>
@@ -71,7 +67,7 @@ export async function CoursePdfButton({ type, courseId, courseName }: CoursePdfB
             {hasPdf ? (
               <div className="w-full h-[72vh] rounded-md overflow-hidden bg-white shadow-md border border-slate-200">
                 <iframe
-                  src={viewerUrl}
+                  src={`${viewerUrl}#toolbar=0&navpanes=0`}
                   className="w-full h-full border-0"
                   title={`PDF ${courseName}`}
                 />

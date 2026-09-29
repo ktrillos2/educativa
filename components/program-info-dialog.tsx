@@ -9,8 +9,9 @@ interface ProgramInfoDialogProps {
 export async function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
   const isDiplomado = type === "diplomados"
   const key = isDiplomado ? "info_diplomados_pdf" : "info_etdh_pdf"
-  const pdfUrl = await getPdfUrl(key)
-  const viewerUrl = `/api/view-pdf?key=${key}`
+  const storedUrl = await getPdfUrl(key)
+  const viewerUrl = storedUrl || `/api/file/${encodeURIComponent(`General - ${type}.pdf`)}`
+  const hasPdf = Boolean(storedUrl)
 
   const title = isDiplomado
     ? "Información General - Diplomados"
@@ -37,7 +38,7 @@ export async function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
                 {title}
               </DialogTitle>
             </div>
-            {pdfUrl && (
+            {hasPdf && (
               <div className="flex items-center gap-2 pr-6">
                 <a
                   href={viewerUrl}
@@ -47,22 +48,15 @@ export async function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> Abrir en pestaña nueva
                 </a>
-                <a
-                  href={viewerUrl}
-                  download={`Informacion-${type}.pdf`}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-yellow-500 hover:bg-yellow-400 text-slate-950 text-xs font-bold transition-colors shadow-sm"
-                >
-                  <Download className="w-3.5 h-3.5" /> Descargar PDF
-                </a>
               </div>
             )}
           </DialogHeader>
 
           <div className="p-4 bg-slate-100 min-h-[500px] flex flex-col items-center justify-center">
-            {pdfUrl ? (
+            {hasPdf ? (
               <div className="w-full h-[72vh] rounded-md overflow-hidden bg-white shadow-md border border-slate-200">
                 <iframe
-                  src={viewerUrl}
+                  src={`${viewerUrl}#toolbar=0&navpanes=0`}
                   className="w-full h-full border-0"
                   title={title}
                 />

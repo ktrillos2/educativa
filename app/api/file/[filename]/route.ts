@@ -10,57 +10,22 @@ export async function GET(
     context: { params: Promise<{ filename: string }> }
 ) {
     const { filename } = await context.params
-    const session = await getSession()
-
-    const { cookies } = await import("next/headers")
-    const cookieStore = await cookies()
-    const isMockPaid = cookieStore.get("mock_paid")?.value === "true"
-
-    if (!isMockPaid) {
-        if (!session?.userId) {
-            return new NextResponse("Unauthorized", { status: 401 })
-        }
-
-        if (session.role !== "admin") {
-            const { searchParams } = new URL(request.url)
-            const courseId = searchParams.get("courseId")
-            const supabase = await createClient()
-
-            let isEnrolled = false
-            if (courseId) {
-                const { data } = await supabase
-                    .from("enrollments")
-                    .select("user_id")
-                    .eq("user_id", session.userId)
-                    .eq("course_id", courseId)
-                    .maybeSingle()
-                if (data) isEnrolled = true
-            } else {
-                const { data } = await supabase
-                    .from("enrollments")
-                    .select("user_id")
-                    .eq("user_id", session.userId)
-                    .limit(1)
-                if (data && data.length > 0) isEnrolled = true
-            }
-
-            if (!isEnrolled) {
-                return new NextResponse("Enrollment Required", { status: 403 })
-            }
-        }
-    }
-
-    // Parse the filename to extract courseId and moduleIndex
-    // Expected formats:
-    //   "Modulo {N} - {courseId}.pdf"
-    //   "Cuestionario Modulo {N} - {courseId}.pdf"
     const decodedFilename = decodeURIComponent(filename)
+
     const examMatch = decodedFilename.match(/^Cuestionario Modulo (\d+) - (.+)\.pdf$/i)
     const moduleMatch = decodedFilename.match(/^Modulo (\d+) - (.+)\.pdf$/i)
+    const infoMatch = decodedFilename.match(/^Info - (.+)\.pdf$/i)
+    const generalMatch = decodedFilename.match(/^General - (diplomados|etdh)\.pdf$/i)
 
     let storagePath: string | null = null
 
-    if (examMatch) {
+    if (generalMatch) {
+        const gType = generalMatch[1].toLowerCase()
+        storagePath = `info/general-${gType}.pdf`
+    } else if (infoMatch) {
+        const courseId = infoMatch[1]
+        storagePath = `${courseId}/info.pdf`
+    } else if (examMatch) {
         const moduleIndex = examMatch[1]
         const courseId = examMatch[2]
         storagePath = `${courseId}/cuestionario-modulo-${moduleIndex}.pdf`
@@ -74,6 +39,48 @@ export async function GET(
         return new NextResponse("File not found", { status: 404 })
     }
 
+    // Require enrollment ONLY for internal study module PDFs or exam PDFs
+    if (examMatch || moduleMatch) {
+        const session = await getSession()
+        const { cookies } = await import("next/headers")
+        const cookieStore = await cookies()
+        const isMockPaid = cookieStore.get("mock_paid")?.value === "true"
+
+        if (!isMockPaid) {
+            if (!session?.userId) {
+                return new NextResponse("Unauthorized", { status: 401 })
+            }
+
+            if (session.role !== "admin") {
+                const { searchParams } = new URL(request.url)
+                const courseId = searchParams.get("courseId")
+                const supabase = await createClient()
+
+                let isEnrolled = false
+                if (courseId) {
+                    const { data } = await supabase
+                        .from("enrollments")
+                        .select("user_id")
+                        .eq("user_id", session.userId)
+                        .eq("course_id", courseId)
+                        .maybeSingle()
+                    if (data) isEnrolled = true
+                } else {
+                    const { data } = await supabase
+                        .from("enrollments")
+                        .select("user_id")
+                        .eq("user_id", session.userId)
+                        .limit(1)
+                    if (data && data.length > 0) isEnrolled = true
+                }
+
+                if (!isEnrolled) {
+                    return new NextResponse("Enrollment Required", { status: 403 })
+                }
+            }
+        }
+    }
+
     // Generate a short-lived signed URL and redirect to it
     const adminSupabase = createAdminClient()
     const { data, error } = await adminSupabase.storage
@@ -81,7 +88,7 @@ export async function GET(
         .createSignedUrl(storagePath, 3600) // 1 hour
 
     if (error || !data?.signedUrl) {
-        console.error("Error creating signed URL:", error)
+        console.error("Error creating signed URL for storagePath:", storagePath, error)
         return new NextResponse("File not found", { status: 404 })
     }
 

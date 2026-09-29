@@ -32,8 +32,11 @@ export default function CrearCursoPage() {
       if (result?.error) {
         setError(result.error)
         setIsPending(false)
+      } else if (result?.success && result?.id) {
+        router.push(`/admin/cursos/${result.id}/editar`)
+      } else {
+        router.push("/admin/cursos")
       }
-      // Si no hay error, el action hace redirect
     } catch (err: any) {
       if (err?.message === 'NEXT_REDIRECT' || err?.digest?.startsWith('NEXT_REDIRECT')) {
         throw err

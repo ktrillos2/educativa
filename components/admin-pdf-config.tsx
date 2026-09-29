@@ -1,7 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import { FileText, Upload, CheckCircle, AlertCircle, Loader2, ExternalLink, Eye, BookOpen } from "lucide-react"
+import { FileText, Upload, CheckCircle, AlertCircle, Loader2, ExternalLink, Eye, BookOpen, Trash2 } from "lucide-react"
+import { deleteGeneralInfoPdf, deleteCourseInfoPdf } from "@/app/actions/pdf-info"
 
 interface PdfSection {
   type: "diplomados" | "etdh"
@@ -56,10 +57,26 @@ export function AdminPdfConfig({ sections, courses = [], coursePdfs = {} }: Admi
 
 function PdfUploadCard({ section }: { section: PdfSection }) {
   const [isPending, setIsPending] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [confirmDelete, setConfirmDelete] = useState(false)
   const [result, setResult] = useState<{ success?: boolean; error?: string; pdfUrl?: string } | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
 
-  const activePdfUrl = result?.pdfUrl || section.pdfUrl
+  const activePdfUrl = result?.pdfUrl !== undefined ? result.pdfUrl : section.pdfUrl
+
+  async function handleDelete() {
+    setIsDeleting(true)
+    setResult(null)
+
+    const res = await deleteGeneralInfoPdf(section.type)
+    if (res.error) {
+      setResult({ error: res.error })
+    } else {
+      setResult({ success: true, pdfUrl: undefined })
+    }
+    setIsDeleting(false)
+    setConfirmDelete(false)
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -100,9 +117,40 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
           </div>
         </div>
         {activePdfUrl && (
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-green-500/20 text-green-300 px-3 py-1 rounded-full border border-green-400/30">
-            <CheckCircle className="w-3.5 h-3.5" /> PDF Activo
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-green-500/20 text-green-300 px-3 py-1 rounded-full border border-green-400/30">
+              <CheckCircle className="w-3.5 h-3.5" /> PDF Activo
+            </span>
+            {confirmDelete ? (
+              <div className="inline-flex items-center gap-1.5 bg-red-950/80 px-2 py-1 rounded-full border border-red-500/50">
+                <span className="text-[11px] font-bold text-red-200">¿Eliminar?</span>
+                <button
+                  type="button"
+                  onClick={handleDelete}
+                  disabled={isDeleting}
+                  className="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-xs hover:bg-red-700 transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? "..." : "Sí"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setConfirmDelete(false)}
+                  className="px-2 py-0.5 rounded bg-white/20 text-white font-bold text-xs hover:bg-white/30 transition-colors"
+                >
+                  No
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setConfirmDelete(true)}
+                className="inline-flex items-center gap-1 text-xs font-bold bg-red-500/20 hover:bg-red-500/30 text-red-200 px-2.5 py-1 rounded-full border border-red-400/30 transition-colors"
+                title="Eliminar PDF"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Eliminar
+              </button>
+            )}
+          </div>
         )}
       </div>
 
@@ -203,11 +251,33 @@ function CoursePdfUploadCard({
   const [selectedCourseId, setSelectedCourseId] = useState<string>(courses[0]?.id || "")
   const [coursePdfs, setCoursePdfs] = useState<Record<string, string | null>>(initialCoursePdfs)
   const [isPending, setIsPending] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [result, setResult] = useState<{ success?: boolean; error?: string; pdfUrl?: string } | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
 
   const activePdfUrl = selectedCourseId ? coursePdfs[selectedCourseId] : null
   const selectedCourse = courses.find((c) => c.id === selectedCourseId)
+
+  async function handleDeleteCoursePdf() {
+    if (!selectedCourseId || !selectedCourse) return
+
+    setIsDeleting(true)
+    setResult(null)
+
+    const res = await deleteCourseInfoPdf(selectedCourseId)
+    if (res.error) {
+      setResult({ error: res.error })
+    } else {
+      setResult({ success: true, pdfUrl: undefined })
+      setCoursePdfs((prev) => ({
+        ...prev,
+        [selectedCourseId]: null,
+      }))
+    }
+    setIsDeleting(false)
+    setShowDeleteConfirm(false)
+  }
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -255,9 +325,42 @@ function CoursePdfUploadCard({
           </div>
         </div>
         {activePdfUrl && (
-          <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-green-500/20 text-green-300 px-3 py-1 rounded-full border border-green-400/30">
-            <CheckCircle className="w-3.5 h-3.5" /> PDF Activo
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold bg-green-500/20 text-green-300 px-3 py-1 rounded-full border border-green-400/30">
+              <CheckCircle className="w-3.5 h-3.5" /> PDF Activo
+            </span>
+            {showDeleteConfirm ? (
+              <div className="inline-flex items-center gap-1 bg-red-950/80 border border-red-500/50 rounded-full px-2 py-0.5 text-xs">
+                <span className="text-red-200 font-medium px-1">¿Eliminar?</span>
+                <button
+                  type="button"
+                  onClick={handleDeleteCoursePdf}
+                  disabled={isDeleting}
+                  className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded-full transition-colors disabled:opacity-50"
+                >
+                  {isDeleting ? "..." : "Sí"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setShowDeleteConfirm(false)}
+                  disabled={isDeleting}
+                  className="bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-0.5 rounded-full transition-colors"
+                >
+                  No
+                </button>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={() => setShowDeleteConfirm(true)}
+                disabled={isDeleting}
+                className="inline-flex items-center gap-1 text-xs font-bold bg-red-500/20 hover:bg-red-500/30 text-red-200 px-2.5 py-1 rounded-full border border-red-400/30 transition-colors disabled:opacity-50"
+                title="Eliminar PDF de este curso"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Eliminar
+              </button>
+            )}
+          </div>
         )}
       </div>
 

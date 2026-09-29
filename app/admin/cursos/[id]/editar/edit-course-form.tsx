@@ -2,15 +2,20 @@
 
 import { useState, useRef } from "react"
 import { useRouter } from "next/navigation"
-import { ChevronLeft, BookOpen, Save, Loader2 } from "lucide-react"
+import { ChevronLeft, BookOpen, Save, Loader2, FileText, ExternalLink, CheckCircle, Trash2 } from "lucide-react"
 import Link from "next/link"
 import { updateCourse } from "@/app/actions/courses"
+import { deleteCourseInfoPdf } from "@/app/actions/pdf-info"
 import { ImageUploadZone, ImageUploadZoneRef } from "@/components/image-upload-zone"
 
-export function EditCourseForm({ course }: { course: any }) {
+export function EditCourseForm({ course, currentPdfUrl }: { course: any; currentPdfUrl?: string | null }) {
   const router = useRouter()
   const [isPending, setIsPending] = useState(false)
+  const [isDeletingPdf, setIsDeletingPdf] = useState(false)
+  const [confirmDeletePdf, setConfirmDeletePdf] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [pdfUrlState, setPdfUrlState] = useState<string | null>(currentPdfUrl || null)
   const [courseType, setCourseType] = useState(course.type || "diplomado")
   const [title, setTitle] = useState(course.title || "")
   const [description, setDescription] = useState(course.description || "")
@@ -28,10 +33,33 @@ export function EditCourseForm({ course }: { course: any }) {
     }
   }
 
+  async function handleDeletePdf() {
+    setIsDeletingPdf(true)
+    setError(null)
+    setSuccessMessage(null)
+
+    try {
+      const res = await deleteCourseInfoPdf(course.id)
+      if (res.error) {
+        setError(res.error)
+      } else {
+        setPdfUrlState(null)
+        setSuccessMessage("PDF eliminado exitosamente.")
+      }
+    } catch (err: any) {
+      console.error("Error al eliminar PDF:", err)
+      setError("No se pudo eliminar el PDF.")
+    } finally {
+      setIsDeletingPdf(false)
+      setConfirmDeletePdf(false)
+    }
+  }
+
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setIsPending(true)
     setError(null)
+    setSuccessMessage(null)
 
     try {
       const formData = new FormData(e.currentTarget)
@@ -41,6 +69,8 @@ export function EditCourseForm({ course }: { course: any }) {
       if (selectedFile) {
         formData.set("image_file", selectedFile)
       }
+
+      let uploadedPdf = false
 
       // 1. If a PDF file was selected, upload it via /api/upload-pdf first
       const pdfFileInput = formData.get("pdf_file") as File | null
@@ -62,6 +92,7 @@ export function EditCourseForm({ course }: { course: any }) {
           return
         }
 
+        uploadedPdf = true
         // Delete pdf_file from formData so server action does not upload it twice
         formData.delete("pdf_file")
       }
@@ -71,6 +102,16 @@ export function EditCourseForm({ course }: { course: any }) {
       if (result?.error) {
         setError(result.error)
         setIsPending(false)
+      } else {
+        const targetId = result?.finalId || course.id
+        setPdfUrlState(`/api/file/${encodeURIComponent(`Info - ${targetId}.pdf`)}`)
+        setSuccessMessage(
+          uploadedPdf
+            ? "¡Curso y nuevo documento PDF guardados y publicados exitosamente!"
+            : "¡Datos del curso guardados exitosamente!"
+        )
+        setIsPending(false)
+        window.scrollTo({ top: 0, behavior: "smooth" })
       }
     } catch (err: any) {
       if (err?.message === 'NEXT_REDIRECT' || err?.digest?.startsWith('NEXT_REDIRECT')) {
@@ -101,8 +142,25 @@ export function EditCourseForm({ course }: { course: any }) {
 
         <form onSubmit={handleSubmit} className="p-6 md:p-8 space-y-8" autoComplete="off">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm font-medium">
               {error}
+            </div>
+          )}
+
+          {successMessage && (
+            <div className="bg-green-50 border border-green-300 text-green-800 p-4 rounded-xl flex items-center justify-between shadow-sm animate-fade-in">
+              <div className="flex items-center gap-2 font-bold text-sm text-green-900">
+                <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0" />
+                <span>PDF guardado exitosamente</span>
+              </div>
+              <a
+                href={`/api/file/${encodeURIComponent(`Info - ${course.id}.pdf`)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white border border-green-300 text-green-800 font-bold text-xs hover:bg-green-100 transition-colors shadow-sm"
+              >
+                <FileText className="w-3.5 h-3.5 text-green-600" /> Ver PDF <ExternalLink className="w-3 h-3" />
+              </a>
             </div>
           )}
 
@@ -216,9 +274,52 @@ export function EditCourseForm({ course }: { course: any }) {
             )}
             
             <div className="md:col-span-2 space-y-2">
-              <label htmlFor="pdf_file" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
-                Documento de Información (PDF) (Opcional - Reemplaza el actual si existe)
-              </label>
+              <div className="flex items-center justify-between">
+                <label htmlFor="pdf_file" className="block text-sm font-bold text-[oklch(0.25_0.10_145)]">
+                  Documento de Información (PDF) (Opcional)
+                </label>
+                {pdfUrlState && (
+                  <div className="flex items-center gap-2">
+                    <a
+                      href={pdfUrlState}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:underline bg-primary/10 px-2.5 py-1 rounded-md border border-primary/20"
+                    >
+                      <FileText className="w-3.5 h-3.5" /> Ver PDF actual <ExternalLink className="w-3 h-3" />
+                    </a>
+                    {confirmDeletePdf ? (
+                      <div className="inline-flex items-center gap-1.5 bg-red-50 p-1 rounded-md border border-red-200 animate-fade-in">
+                        <span className="text-[11px] font-bold text-red-700 pl-1">¿Eliminar PDF?</span>
+                        <button
+                          type="button"
+                          onClick={handleDeletePdf}
+                          disabled={isDeletingPdf}
+                          className="px-2 py-0.5 rounded bg-red-600 text-white font-bold text-xs hover:bg-red-700 transition-colors disabled:opacity-50"
+                        >
+                          {isDeletingPdf ? "..." : "Sí"}
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setConfirmDeletePdf(false)}
+                          className="px-2 py-0.5 rounded bg-gray-200 text-gray-700 font-bold text-xs hover:bg-gray-300 transition-colors"
+                        >
+                          No
+                        </button>
+                      </div>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeletePdf(true)}
+                        className="inline-flex items-center gap-1.5 text-xs font-bold text-red-600 hover:text-red-700 bg-red-50 hover:bg-red-100 px-2.5 py-1 rounded-md border border-red-200 transition-colors"
+                        title="Eliminar PDF actual"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" /> Eliminar PDF
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
               <input
                 type="file"
                 id="pdf_file"
@@ -227,7 +328,9 @@ export function EditCourseForm({ course }: { course: any }) {
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
               />
               <p className="text-xs text-[oklch(0.55_0.04_145)]">
-                Sube un nuevo PDF si deseas actualizar la información de "¿Por qué cursar?".
+                {pdfUrlState
+                  ? "Sube un nuevo archivo PDF si deseas reemplazar el documento actualmente guardado."
+                  : "Sube un archivo PDF de información para este curso. Se mostrará en el botón \"¿Por qué cursar?\"."}
               </p>
             </div>
 

@@ -64,6 +64,22 @@ export async function getCourseModulesData(courseId: string) {
     }
   }
 
+  // 4. Fetch General Info PDF URLs (Diplomados & ETDH)
+  const { data: infoSettings } = await supabase
+    .from("platform_settings")
+    .select("key, value")
+    .in("key", ["info_diplomados_pdf", "info_etdh_pdf"])
+
+  let generalDiplomadosPdfUrl: string | null = null
+  let generalEtdhPdfUrl: string | null = null
+
+  if (infoSettings) {
+    for (const setting of infoSettings) {
+      if (setting.key === "info_diplomados_pdf" && setting.value) generalDiplomadosPdfUrl = String(setting.value).trim()
+      if (setting.key === "info_etdh_pdf" && setting.value) generalEtdhPdfUrl = String(setting.value).trim()
+    }
+  }
+
   return {
     success: true,
     course,
@@ -71,6 +87,8 @@ export async function getCourseModulesData(courseId: string) {
     pdfFilesStatus,
     examPdfStatus,
     examsData,
+    generalDiplomadosPdfUrl,
+    generalEtdhPdfUrl,
   }
 }
 

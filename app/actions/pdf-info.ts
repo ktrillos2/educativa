@@ -191,3 +191,79 @@ export async function getPdfUrl(key: string): Promise<string | null> {
 export async function getInfoContent(key: string): Promise<string | null> {
   return getPdfUrl(key)
 }
+
+function slugify(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/(^-|-$)+/g, "")
+}
+
+/**
+ * Deletes the course info PDF from platform_settings and storage.
+ */
+export async function deleteCourseInfoPdf(courseId: string) {
+  try {
+    const supabase = createAdminClient()
+    const slugId = slugify(courseId)
+    
+    const keysToDelete = [
+      `course_pdf_${courseId}`,
+      `course_info_${courseId}`,
+      `course_pdf_${slugId}`,
+      `course_info_${slugId}`,
+    ]
+
+    await supabase
+      .from("platform_settings")
+      .delete()
+      .in("key", keysToDelete)
+
+    try {
+      await supabase.storage.from(BUCKET_NAME).remove([`${courseId}/info.pdf`])
+    } catch (e) {}
+
+    revalidatePath("/diplomados")
+    revalidatePath("/formacion-academica")
+    revalidatePath(`/diplomados/${courseId}`)
+    revalidatePath(`/formacion-academica/${courseId}`)
+    revalidatePath("/admin/configuracion")
+    revalidatePath(`/admin/cursos/${courseId}/editar`)
+
+    return { success: true, message: "PDF eliminado exitosamente." }
+  } catch (err: any) {
+    console.error("Error al eliminar PDF del curso:", err)
+    return { error: err?.message || "Error al eliminar el documento PDF." }
+  }
+}
+
+/**
+ * Deletes a general info PDF (Diplomados or ETDH).
+ */
+export async function deleteGeneralInfoPdf(type: "diplomados" | "etdh") {
+  try {
+    const supabase = createAdminClient()
+    const key = type === "etdh" ? "info_etdh_pdf" : "info_diplomados_pdf"
+
+    await supabase
+      .from("platform_settings")
+      .delete()
+      .eq("key", key)
+
+    try {
+      const storagePath = type === "etdh" ? "info/general-etdh.pdf" : "info/general-diplomados.pdf"
+      await supabase.storage.from(BUCKET_NAME).remove([storagePath])
+    } catch (e) {}
+
+    revalidatePath("/diplomados")
+    revalidatePath("/formacion-academica")
+    revalidatePath("/admin/configuracion")
+
+    return { success: true, message: "PDF general eliminado exitosamente." }
+  } catch (err: any) {
+    console.error("Error al eliminar PDF general:", err)
+    return { error: err?.message || "Error al eliminar el documento PDF general." }
+  }
+}
