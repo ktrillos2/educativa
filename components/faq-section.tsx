@@ -113,7 +113,7 @@ export function FAQSection() {
                   className="w-full flex items-center justify-between p-3 sm:p-4 text-left"
                 >
                   <span 
-                    className={`font-semibold pr-2 text-[12px] sm:text-[13px] lg:text-[13.5px] xl:text-sm tracking-tight whitespace-nowrap overflow-hidden text-ellipsis ${
+                    className={`font-semibold pr-2 text-sm md:text-base tracking-tight leading-snug ${
                       openIndex === index ? "text-primary" : "text-foreground"
                     }`}
                     title={faq.question}

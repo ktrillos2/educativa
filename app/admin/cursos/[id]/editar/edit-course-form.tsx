@@ -339,11 +339,11 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
             </div>
           </div>
 
-          <div className="pt-6 border-t border-[oklch(0.88_0.04_145)] flex justify-end gap-3">
+          <div className="pt-6 border-t border-[oklch(0.88_0.04_145)] flex flex-col-reverse sm:flex-row justify-end gap-3">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-6 py-2.5 rounded-lg border border-[oklch(0.88_0.04_145)] text-[oklch(0.55_0.04_145)] font-medium hover:bg-gray-50 transition-colors"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-lg border border-[oklch(0.88_0.04_145)] text-[oklch(0.55_0.04_145)] font-medium hover:bg-gray-50 transition-colors"
             >
               Cancelar
             </button>
@@ -351,7 +351,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
             <button
               type="submit"
               disabled={isPending}
-              className="px-6 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 disabled:opacity-70 shadow-md"
+              className="w-full sm:w-auto px-6 py-2.5 rounded-lg bg-primary text-white font-bold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-70 shadow-md"
             >
               {isPending ? (
                 <>
