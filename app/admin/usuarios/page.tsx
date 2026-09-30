@@ -66,14 +66,18 @@ export default async function AdminUsuariosPage() {
                     <td className="px-6 py-4">
                       <p className="font-bold text-[oklch(0.25_0.10_145)]">{u.name}</p>
                       <p className="text-xs text-[oklch(0.55_0.04_145)] mt-0.5">CC: {u.document || 'N/A'}</p>
-                      {u.id_document_url && (
-                        <div className="mt-2">
+                      <div className="mt-3 flex flex-wrap gap-2">
+                        {u.id_document_url && (
                           <a href={u.id_document_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-gray-100 hover:bg-gray-200 text-gray-700 text-[10px] font-bold uppercase rounded-md transition-colors border border-gray-200">
                             <FileText className="w-3.5 h-3.5" />
                             Ver Cédula
                           </a>
-                        </div>
-                      )}
+                        )}
+                        <a href={`/admin/usuarios/ficha/${u.id}`} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 px-2.5 py-1 text-[10px] font-bold uppercase rounded-md transition-colors border" style={{background: 'oklch(0.95 0.06 85)', color: 'oklch(0.45 0.12 85)', borderColor: 'oklch(0.82 0.10 85)'}}>
+                          <BookOpen className="w-3.5 h-3.5" />
+                          Ficha
+                        </a>
+                      </div>
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-1.5 text-[oklch(0.45_0.08_145)] mb-1">

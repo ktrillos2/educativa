@@ -15,7 +15,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
       <div className="container mx-auto px-4 flex flex-col md:flex-row gap-6">
 
         {/* ── Sidebar ── */}
-        <aside className="w-full md:w-64 flex-shrink-0">
+        <aside className="w-full md:w-64 flex-shrink-0 print:hidden">
           <div className="sticky top-28 md:top-32 rounded-xl overflow-hidden shadow-lg border border-[oklch(0.88_0.04_145)]">
 
             {/* Sidebar header */}

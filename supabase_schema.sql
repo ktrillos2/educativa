@@ -5,6 +5,7 @@ CREATE TABLE IF NOT EXISTS public.users (
   name TEXT NOT NULL,
   document TEXT UNIQUE NOT NULL,
   phone TEXT,
+  address TEXT,
   email TEXT UNIQUE NOT NULL,
   role TEXT DEFAULT 'user',
   id_document_url TEXT,

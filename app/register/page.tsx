@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { User, Mail, Lock, Phone, Shield } from "@/components/ui/icons"
+import { MapPin } from "lucide-react"
 import { registerAction } from "@/app/actions/auth"
 import { toast } from "sonner"
 
@@ -15,6 +16,7 @@ export default function RegisterPage() {
   const [name, setName] = useState("")
   const [document, setDocument] = useState("")
   const [phone, setPhone] = useState("")
+  const [address, setAddress] = useState("")
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
@@ -24,7 +26,7 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
 
-    if (!name || !document || !phone || !email || !password || !confirmPassword) {
+    if (!name || !document || !phone || !address || !email || !password || !confirmPassword) {
       toast.error("Por favor, completa todos los campos")
       return
     }
@@ -45,6 +47,7 @@ export default function RegisterPage() {
         name,
         document,
         phone,
+        address,
         email,
         password,
       })
@@ -116,6 +119,22 @@ export default function RegisterPage() {
                   type="tel"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
+                  disabled={isLoading}
+                  required
+                  className="pl-9"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Dirección de Residencia</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-2.5 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="address"
+                  placeholder="Calle 123 # 45-67, Ciudad"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
                   disabled={isLoading}
                   required
                   className="pl-9"
