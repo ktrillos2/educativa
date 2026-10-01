@@ -228,6 +228,9 @@ export function ModuleManager({
       setUploadMessage({ text: result.error, error: true })
     } else {
       setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
+      if (modIdx > modulesCount) {
+        setModulesCount(modIdx)
+      }
       setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
     }
     setUploadingModule(null)

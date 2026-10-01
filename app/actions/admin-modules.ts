@@ -103,8 +103,13 @@ export async function uploadModulePdfAction(formData: FormData) {
     return { error: "Faltan datos o el archivo PDF está vacío." }
   }
 
-  if (file.type !== "application/pdf") {
-    return { error: "Solo se aceptan archivos PDF." }
+  const isPdf =
+    file.type === "application/pdf" ||
+    file.type.includes("pdf") ||
+    file.name.toLowerCase().endsWith(".pdf")
+
+  if (!isPdf) {
+    return { error: `El archivo "${file.name}" debe ser un documento PDF (.pdf).` }
   }
 
   const maxSizeBytes = 50 * 1024 * 1024 // 50 MB
@@ -132,24 +137,34 @@ export async function uploadModulePdfAction(formData: FormData) {
     }
 
     // Mark this module as having a PDF in the module_pdfs JSONB column
-    const { data: courseData } = await supabase
+    const { data: courseData, error: fetchError } = await supabase
       .from("courses")
       .select("module_pdfs, modules")
       .eq("id", courseId)
-      .single()
+      .maybeSingle()
+
+    if (fetchError || !courseData) {
+      console.error("Course fetch error during PDF upload:", fetchError)
+      return { error: "No se encontró el curso en la base de datos." }
+    }
 
     const currentPdfs = (courseData?.module_pdfs as Record<string, boolean>) || {}
     currentPdfs[`mod-${moduleIndex}`] = true
 
     const newModulesCount = Math.max(courseData?.modules || 0, moduleIndex)
 
-    await supabase
+    const { error: updateError } = await supabase
       .from("courses")
       .update({
         module_pdfs: currentPdfs,
         modules: newModulesCount,
       } as any)
       .eq("id", courseId)
+
+    if (updateError) {
+      console.error("Error updating course module_pdfs in DB:", updateError)
+      return { error: `Error al actualizar la base de datos: ${updateError.message}` }
+    }
 
     revalidatePath(`/admin/cursos`)
     revalidatePath(`/admin/cursos/${courseId}/modulos`)
@@ -450,19 +465,27 @@ export async function deleteModulePdfAction(courseId: string, moduleIndex: numbe
 
     // Update the tracking column in the DB
     const columnKey = type === "exam" ? "exam_pdfs" : "module_pdfs"
-    const { data: courseData } = await supabase
+    const { data: courseData, error: fetchError } = await supabase
       .from("courses")
       .select(columnKey)
       .eq("id", courseId)
-      .single()
+      .maybeSingle()
+
+    if (fetchError || !courseData) {
+      return { error: "Curso no encontrado en la base de datos." }
+    }
 
     const currentMap = ((courseData as any)?.[columnKey] as Record<string, boolean>) || {}
     currentMap[`mod-${moduleIndex}`] = false
 
-    await supabase
+    const { error: updateError } = await supabase
       .from("courses")
       .update({ [columnKey]: currentMap } as any)
       .eq("id", courseId)
+
+    if (updateError) {
+      return { error: `Error al actualizar la base de datos: ${updateError.message}` }
+    }
 
     revalidatePath(`/admin/cursos`)
     revalidatePath(`/admin/cursos/${courseId}/modulos`)
