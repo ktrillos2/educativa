@@ -259,11 +259,11 @@ export async function deleteCourseInfoPdf(courseId: string) {
       await supabase.storage.from(BUCKET_NAME).remove([`${courseId}/info.pdf`])
     } catch (e) {}
 
-    revalidatePath("/diplomados")
-    revalidatePath("/formacion-academica")
-    revalidatePath(`/diplomados/${courseId}`)
-    revalidatePath(`/formacion-academica/${courseId}`)
-    revalidatePath("/admin/configuracion")
+    revalidatePath("/diplomados", "page")
+    revalidatePath("/formacion-academica", "page")
+    revalidatePath("/diplomados/[id]", "page")
+    revalidatePath("/formacion-academica/[id]", "page")
+    revalidatePath("/admin/configuracion", "page")
     revalidatePath(`/admin/cursos/${courseId}/editar`)
 
     return { success: true, message: "PDF eliminado exitosamente." }

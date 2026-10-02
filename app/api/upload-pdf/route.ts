@@ -72,12 +72,14 @@ export async function POST(request: NextRequest) {
 
     // Revalidaciones no críticas
     try {
-      revalidatePath("/diplomados")
-      revalidatePath("/formacion-academica")
-      revalidatePath("/admin/configuracion")
+      revalidatePath("/diplomados", "page")
+      revalidatePath("/formacion-academica", "page")
+      revalidatePath("/admin/configuracion", "page")
+      revalidatePath("/diplomados/[id]", "page")
+      revalidatePath("/formacion-academica/[id]", "page")
       if (courseId) {
-        revalidatePath(`/diplomados/${courseId}`)
-        revalidatePath(`/formacion-academica/${courseId}`)
+        revalidatePath(`/admin/cursos/${courseId}/editar`, "page")
+        revalidatePath(`/admin/cursos/${courseId}/modulos`, "page")
       }
     } catch (e) {
       console.warn("Revalidación fallida:", e)

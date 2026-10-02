@@ -23,6 +23,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
   const [price, setPrice] = useState(course.price || "")
   const [duration, setDuration] = useState(course.duration || "")
   const imageZoneRef = useRef<ImageUploadZoneRef>(null)
+  const pdfInputRef = useRef<HTMLInputElement>(null)
   
   // Extract min_students from 'students' if it's etdh
   let minStudentsDefault = 15
@@ -44,6 +45,9 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
         setError(res.error)
       } else {
         setPdfUrlState(null)
+        if (pdfInputRef.current) {
+          pdfInputRef.current.value = ""
+        }
         setSuccessMessage("PDF eliminado exitosamente.")
       }
     } catch (err: any) {
@@ -130,7 +134,9 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
         setIsPending(false)
       } else {
         const targetId = result?.finalId || course.id
-        setPdfUrlState(`/api/file/${encodeURIComponent(`Info - ${targetId}.pdf`)}`)
+        if (uploadedPdf) {
+          setPdfUrlState(`/api/file/${encodeURIComponent(`Info - ${targetId}.pdf`)}`)
+        }
         setSuccessMessage(
           uploadedPdf
             ? "¡Curso y nuevo documento PDF guardados y publicados exitosamente!"
@@ -350,6 +356,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
                 type="file"
                 id="pdf_file"
                 name="pdf_file"
+                ref={pdfInputRef}
                 accept="application/pdf,.pdf"
                 className="w-full px-4 py-2 rounded-lg border border-[oklch(0.88_0.04_145)] focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm bg-white file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
               />

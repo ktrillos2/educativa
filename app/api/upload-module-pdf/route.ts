@@ -59,11 +59,11 @@ export async function POST(request: NextRequest) {
     }
 
     try {
-      revalidatePath(`/admin/cursos`)
-      revalidatePath(`/admin/cursos/${courseId}/modulos`)
-      revalidatePath(`/diplomados/${courseId}`)
-      revalidatePath(`/formacion-academica/${courseId}`)
-      revalidatePath(`/estudiante/cursos/${courseId}`)
+      revalidatePath("/admin/cursos", "page")
+      revalidatePath(`/admin/cursos/${courseId}/modulos`, "page")
+      revalidatePath(`/diplomados/[id]`, "page")
+      revalidatePath(`/formacion-academica/[id]`, "page")
+      revalidatePath(`/estudiante/cursos/[id]`, "page")
     } catch (revalidateErr) {
       console.warn("[upload-module-pdf] revalidatePath falló (no crítico):", revalidateErr)
     }
