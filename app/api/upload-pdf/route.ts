@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { revalidatePath } from "next/cache"
-
-const BUCKET_NAME = "course-modules"
+import { getSession } from "@/lib/auth"
 
 function slugify(text: string): string {
   return text
@@ -13,90 +12,42 @@ function slugify(text: string): string {
     .replace(/(^-|-$)+/g, "")
 }
 
+/**
+ * POST /api/upload-pdf
+ * Confirma la subida del PDF (hecha directamente al storage desde el cliente)
+ * y guarda la URL en platform_settings.
+ */
 export async function POST(request: NextRequest) {
   try {
-    const formData = await request.formData()
-    const type = formData.get("type") as string // "diplomados" | "etdh" | "course"
-    const rawCourseId = formData.get("course_id") as string | null
-    const pdfFile = formData.get("pdf_file") as File | null
-
-    if (!pdfFile || pdfFile.size === 0) {
-      return NextResponse.json(
-        { error: "No se seleccionó ningún archivo PDF." },
-        { status: 400 }
-      )
+    const session = await getSession()
+    if (!session?.userId) {
+      return NextResponse.json({ error: "No autorizado." }, { status: 401 })
     }
 
-    const isPdf =
-      pdfFile.type === "application/pdf" ||
-      pdfFile.type.includes("pdf") ||
-      pdfFile.name.toLowerCase().endsWith(".pdf")
+    const body = await request.json()
+    const { type, courseId } = body // "diplomados" | "etdh" | "course"
 
-    if (!isPdf) {
-      return NextResponse.json(
-        { error: `El archivo "${pdfFile.name}" debe ser un documento PDF (.pdf).` },
-        { status: 400 }
-      )
-    }
-
-    const maxSizeBytes = 40 * 1024 * 1024 // 40 MB
-    if (pdfFile.size > maxSizeBytes) {
-      return NextResponse.json(
-        { error: `El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 40 MB.` },
-        { status: 400 }
-      )
-    }
-
-    let courseId = rawCourseId || ""
     if (type === "course" && !courseId) {
       return NextResponse.json(
-        { error: "Debes seleccionar un curso o diplomado válido." },
-        { status: 400 }
-      )
-    }
-
-    const arrayBuffer = await pdfFile.arrayBuffer()
-    const buffer = Buffer.from(arrayBuffer)
-    if (!buffer || buffer.length < 500) {
-      return NextResponse.json(
-        { error: "El archivo PDF está vacío o corrupto." },
+        { error: "Debes proporcionar un courseId para cursos." },
         { status: 400 }
       )
     }
 
     const supabase = createAdminClient()
 
-    let destinationPath = ""
     let viewerUrl = ""
     let primaryKey = ""
 
     if (type === "course") {
-      destinationPath = `${courseId}/info.pdf`
       viewerUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
       primaryKey = `course_pdf_${courseId}`
     } else if (type === "etdh") {
-      destinationPath = "info/general-etdh.pdf"
       viewerUrl = "/api/file/General - etdh.pdf"
       primaryKey = "info_etdh_pdf"
     } else {
-      destinationPath = "info/general-diplomados.pdf"
       viewerUrl = "/api/file/General - diplomados.pdf"
       primaryKey = "info_diplomados_pdf"
-    }
-
-    const { error: uploadError } = await supabase.storage
-      .from(BUCKET_NAME)
-      .upload(destinationPath, buffer, {
-        contentType: "application/pdf",
-        upsert: true,
-      })
-
-    if (uploadError) {
-      console.error("Error al subir PDF a Supabase Storage (course-modules):", uploadError)
-      return NextResponse.json(
-        { error: `Error al guardar PDF en el servidor: ${uploadError.message}` },
-        { status: 500 }
-      )
     }
 
     const keysToSave = [primaryKey]
@@ -109,6 +60,7 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    // Actualizar base de datos
     for (const key of keysToSave) {
       await supabase
         .from("platform_settings")
@@ -118,12 +70,17 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    revalidatePath("/diplomados")
-    revalidatePath("/formacion-academica")
-    revalidatePath("/admin/configuracion")
-    if (courseId) {
-      revalidatePath(`/diplomados/${courseId}`)
-      revalidatePath(`/formacion-academica/${courseId}`)
+    // Revalidaciones no críticas
+    try {
+      revalidatePath("/diplomados")
+      revalidatePath("/formacion-academica")
+      revalidatePath("/admin/configuracion")
+      if (courseId) {
+        revalidatePath(`/diplomados/${courseId}`)
+        revalidatePath(`/formacion-academica/${courseId}`)
+      }
+    } catch (e) {
+      console.warn("Revalidación fallida:", e)
     }
 
     return NextResponse.json({
@@ -140,3 +97,4 @@ export async function POST(request: NextRequest) {
     )
   }
 }
+

@@ -83,24 +83,56 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
     setIsPending(true)
     setResult(null)
 
-    const formData = new FormData(e.currentTarget)
-    formData.set("type", section.type)
-
     try {
+      const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement
+      const file = fileInput?.files?.[0]
+      if (!file) {
+        setResult({ error: "No se seleccionó ningún archivo." })
+        setIsPending(false)
+        return
+      }
+
+      // 1. Obtener URL firmada
+      const urlResponse = await fetch("/api/general-pdf-upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: section.type }),
+      })
+
+      const urlData = await urlResponse.json()
+      if (!urlResponse.ok || urlData.error) {
+        throw new Error(urlData.error || "No se pudo obtener la URL de subida.")
+      }
+
+      const { signedUrl } = urlData
+
+      // 2. Subir directo a Supabase
+      const uploadResponse = await fetch(signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type || "application/pdf" },
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error("Error al subir el archivo al almacenamiento.")
+      }
+
+      // 3. Confirmar subida
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: section.type }),
       })
 
       const data = await response.json()
       if (!response.ok || data.error) {
-        setResult({ error: data.error || "No se pudo subir el PDF." })
+        setResult({ error: data.error || "No se pudo actualizar la configuración." })
       } else {
         setResult({ success: true, pdfUrl: data.pdfUrl })
       }
     } catch (err: any) {
       console.error("Error al subir PDF:", err)
-      setResult({ error: "Error de conexión al servidor al subir el PDF." })
+      setResult({ error: err?.message || "Error de conexión al servidor al subir el PDF." })
     } finally {
       setIsPending(false)
     }
@@ -288,19 +320,49 @@ function CoursePdfUploadCard({
     setIsPending(true)
     setResult(null)
 
-    const formData = new FormData(e.currentTarget)
-    formData.set("type", "course")
-    formData.set("course_id", selectedCourseId)
-
     try {
+      const file = fileInputRef.current?.files?.[0]
+      if (!file) {
+        setResult({ error: "No se seleccionó ningún archivo." })
+        setIsPending(false)
+        return
+      }
+
+      // 1. Obtener URL firmada
+      const urlResponse = await fetch("/api/general-pdf-upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "course", courseId: selectedCourseId }),
+      })
+
+      const urlData = await urlResponse.json()
+      if (!urlResponse.ok || urlData.error) {
+        throw new Error(urlData.error || "No se pudo obtener la URL de subida.")
+      }
+
+      const { signedUrl } = urlData
+
+      // 2. Subir directo a Supabase
+      const uploadResponse = await fetch(signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type || "application/pdf" },
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error("Error al subir el archivo al almacenamiento.")
+      }
+
+      // 3. Confirmar subida en BD
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "course", courseId: selectedCourseId }),
       })
 
       const data = await response.json()
       if (!response.ok || data.error) {
-        setResult({ error: data.error || "No se pudo subir el PDF del curso." })
+        setResult({ error: data.error || "No se pudo actualizar la configuración del curso." })
       } else {
         setResult({ success: true, pdfUrl: data.pdfUrl })
         setCoursePdfs((prev) => ({
@@ -310,7 +372,7 @@ function CoursePdfUploadCard({
       }
     } catch (err: any) {
       console.error("Error al subir PDF del curso:", err)
-      setResult({ error: "Error de conexión al servidor." })
+      setResult({ error: err?.message || "Error de conexión al servidor." })
     } finally {
       setIsPending(false)
     }

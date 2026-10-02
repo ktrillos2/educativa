@@ -72,22 +72,48 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
 
       let uploadedPdf = false
 
-      // 1. If a PDF file was selected, upload it via /api/upload-pdf first
+      // 1. If a PDF file was selected, upload it using direct upload
       const pdfFileInput = formData.get("pdf_file") as File | null
       if (pdfFileInput && pdfFileInput.size > 0) {
-        const pdfFormData = new FormData()
-        pdfFormData.set("type", "course")
-        pdfFormData.set("course_id", course.id)
-        pdfFormData.set("pdf_file", pdfFileInput)
+        // a) Obtener URL firmada
+        const urlResponse = await fetch("/api/general-pdf-upload-url", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "course", courseId: course.id }),
+        })
+        
+        const urlData = await urlResponse.json()
+        if (!urlResponse.ok || urlData.error) {
+          setError(`[Error al Guardar PDF] ${urlData.error || "No se pudo obtener url de subida."}`)
+          setIsPending(false)
+          return
+        }
 
+        const { signedUrl } = urlData
+
+        // b) Subir directo a Supabase
+        const uploadResponse = await fetch(signedUrl, {
+          method: "PUT",
+          body: pdfFileInput,
+          headers: { "Content-Type": pdfFileInput.type || "application/pdf" },
+        })
+
+        if (!uploadResponse.ok) {
+          setError(`[Error al Guardar PDF] Error al subir el documento al almacenamiento.`)
+          setIsPending(false)
+          return
+        }
+
+        // c) Confirmar en la BD
         const pdfResponse = await fetch("/api/upload-pdf", {
           method: "POST",
-          body: pdfFormData,
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "course", courseId: course.id }),
         })
 
         const pdfResult = await pdfResponse.json()
         if (!pdfResponse.ok || pdfResult.error) {
-          setError(`[Error al Guardar PDF] ${pdfResult.error || "No se pudo procesar el documento PDF."}`)
+          setError(`[Error al Guardar PDF] ${pdfResult.error || "No se pudo actualizar la configuración."}`)
           setIsPending(false)
           return
         }

@@ -83,6 +83,10 @@ export function ModuleManager({
   const [isPending, startTransition] = useTransition()
   const [saveMessage, setSaveMessage] = useState<{ text: string; error?: boolean } | null>(null)
 
+  // Estados para modales/mensajes de confirmación
+  const [confirmDeleteModule, setConfirmDeleteModule] = useState<number | null>(null)
+  const [confirmDeletePdf, setConfirmDeletePdf] = useState<{type: "content"|"exam", moduleNum: number} | null>(null)
+
   const activeModuleKey = `mod-${selectedModule}`
   const activeQuestions = examsData[activeModuleKey] || []
 
@@ -273,23 +277,29 @@ export function ModuleManager({
 
 
   // Delete PDF file
-  const handleDeletePdf = async (type: "content" | "exam", moduleNum: number) => {
-    if (confirm(`¿Estás seguro de que deseas eliminar este PDF del Módulo ${moduleNum}?`)) {
-      setSaveMessage(null)
-      const result = await deleteModulePdfAction(course.id, moduleNum, type)
-      
-      if (result.error) {
-        setSaveMessage({ text: result.error, error: true })
+  const handleDeletePdf = (type: "content" | "exam", moduleNum: number) => {
+    setConfirmDeletePdf({ type, moduleNum })
+  }
+
+  const executeDeletePdf = async () => {
+    if (!confirmDeletePdf) return
+    const { type, moduleNum } = confirmDeletePdf
+    
+    setSaveMessage(null)
+    const result = await deleteModulePdfAction(course.id, moduleNum, type)
+    
+    if (result.error) {
+      setSaveMessage({ text: result.error, error: true })
+    } else {
+      setSaveMessage({ text: result.message || "PDF eliminado exitosamente", error: false })
+      const targetKey = `mod-${moduleNum}`
+      if (type === "content") {
+        setPdfStatus(prev => ({ ...prev, [targetKey]: false }))
       } else {
-        setSaveMessage({ text: result.message || "PDF eliminado exitosamente", error: false })
-        const targetKey = `mod-${moduleNum}`
-        if (type === "content") {
-          setPdfStatus(prev => ({ ...prev, [targetKey]: false }))
-        } else {
-          setExamPdfStatus(prev => ({ ...prev, [targetKey]: false }))
-        }
+        setExamPdfStatus(prev => ({ ...prev, [targetKey]: false }))
       }
     }
+    setConfirmDeletePdf(null)
   }
 
   // Save changes
@@ -334,28 +344,33 @@ export function ModuleManager({
   // Remove the last module
   const handleRemoveModule = () => {
     if (modulesCount <= 1) return // Do not remove if only 1 module is left
+    setConfirmDeleteModule(modulesCount)
+  }
 
-    if (confirm(`¿Estás seguro de que deseas eliminar el Módulo ${modulesCount}? Se perderán sus preguntas no guardadas.`)) {
-      const newCount = modulesCount - 1
-      const keyToRemove = `mod-${modulesCount}`
+  const executeRemoveModule = () => {
+    if (!confirmDeleteModule) return
 
-      setModulesCount(newCount)
-      if (selectedModule > newCount) {
-        setSelectedModule(newCount)
-      }
+    const newCount = confirmDeleteModule - 1
+    const keyToRemove = `mod-${confirmDeleteModule}`
 
-      setExamsData((prev) => {
-        const newData = { ...prev }
-        delete newData[keyToRemove]
-        
-        // Auto-guardado para asegurar que la base de datos se actualice inmediatamente
-        startTransition(async () => {
-          await saveCourseExamsAction(course.id, newCount, newData)
-        })
-        
-        return newData
-      })
+    setModulesCount(newCount)
+    if (selectedModule > newCount) {
+      setSelectedModule(newCount)
     }
+
+    setExamsData((prev) => {
+      const newData = { ...prev }
+      delete newData[keyToRemove]
+      
+      // Auto-guardado para asegurar que la base de datos se actualice inmediatamente
+      startTransition(async () => {
+        await saveCourseExamsAction(course.id, newCount, newData)
+      })
+      
+      return newData
+    })
+    
+    setConfirmDeleteModule(null)
   }
 
   return (
@@ -944,6 +959,71 @@ export function ModuleManager({
           Desarrollado por K&T <span className="text-black">❤</span> {new Date().getFullYear()}
         </a>
       </footer>
+
+      {/* Modales de Confirmación */}
+      {confirmDeleteModule !== null && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                <AlertCircle className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">¿Eliminar Módulo {confirmDeleteModule}?</h3>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  Esta acción eliminará el módulo y perderás todas sus preguntas no guardadas. <br/><strong>No se puede deshacer.</strong>
+                </p>
+              </div>
+              <div className="flex items-center gap-3 w-full pt-4">
+                <button
+                  onClick={() => setConfirmDeleteModule(null)}
+                  className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={executeRemoveModule}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmDeletePdf !== null && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white rounded-xl shadow-2xl max-w-sm w-full p-6 border border-slate-200 animate-in fade-in zoom-in-95 duration-200">
+            <div className="flex flex-col items-center text-center space-y-4">
+              <div className="w-12 h-12 bg-red-100 text-red-600 rounded-full flex items-center justify-center">
+                <Trash2 className="w-6 h-6" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900">¿Eliminar PDF?</h3>
+                <p className="text-sm text-slate-500 mt-2 leading-relaxed">
+                  Estás a punto de eliminar el PDF de <strong>{confirmDeletePdf.type === "content" ? "estudio" : "evaluación"}</strong> del Módulo {confirmDeletePdf.moduleNum}.
+                </p>
+              </div>
+              <div className="flex items-center gap-3 w-full pt-4">
+                <button
+                  onClick={() => setConfirmDeletePdf(null)}
+                  className="flex-1 px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg transition-colors"
+                >
+                  Cancelar
+                </button>
+                <button
+                  onClick={executeDeletePdf}
+                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white font-bold rounded-lg transition-colors"
+                >
+                  Sí, Eliminar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
