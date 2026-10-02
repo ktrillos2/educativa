@@ -133,7 +133,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
               <h2 className="text-2xl font-bold mb-4">Aún no cumples los requisitos</h2>
               <p className="text-muted-foreground mb-6">
                 Has completado {completedModules} unidades.
-                Para obtener el certificado oficial necesitas completar al menos 120 horas o el 80% del programa.
+                Para obtener el certificado oficial necesitas completar al menos el 80% del programa.
                 Asegúrate de aprobar las evaluaciones requeridas.
               </p>
               <Link href={`/diplomados/${course.id}`} className="inline-block bg-primary text-white px-6 py-2 font-medium hover:bg-primary/90">

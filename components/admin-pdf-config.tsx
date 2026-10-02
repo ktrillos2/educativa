@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useRef } from "react"
 import { FileText, Upload, CheckCircle, AlertCircle, Loader2, ExternalLink, Eye, BookOpen, Trash2 } from "lucide-react"
 import { deleteGeneralInfoPdf, deleteCourseInfoPdf } from "@/app/actions/pdf-info"
 
@@ -255,6 +255,8 @@ function CoursePdfUploadCard({
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [result, setResult] = useState<{ success?: boolean; error?: string; pdfUrl?: string } | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
+  // Ref para limpiar el input de archivo al cambiar de curso y evitar subir el PDF equivocado
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   const activePdfUrl = selectedCourseId ? coursePdfs[selectedCourseId] : null
   const selectedCourse = courses.find((c) => c.id === selectedCourseId)
@@ -376,6 +378,8 @@ function CoursePdfUploadCard({
                 setSelectedCourseId(e.target.value)
                 setResult(null)
                 setFileName(null)
+                // Limpiar el archivo seleccionado para evitar que se suba al curso equivocado
+                if (fileInputRef.current) fileInputRef.current.value = ""
               }}
               className="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary text-sm bg-white font-medium text-slate-900"
             >
@@ -392,6 +396,7 @@ function CoursePdfUploadCard({
               2. Adjunta el Archivo PDF para "{selectedCourse?.title}":
             </label>
             <input
+              ref={fileInputRef}
               type="file"
               name="pdf_file"
               accept="application/pdf,.pdf"

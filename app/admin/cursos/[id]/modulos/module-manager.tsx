@@ -275,6 +275,8 @@ export function ModuleManager({
     const nextCount = modulesCount + 1
     setModulesCount(nextCount)
     setSelectedModule(nextCount)
+    // Limpiar el mensaje de subida para que no se herede del módulo anterior
+    setUploadMessage(null)
 
     const modKey = `mod-${nextCount}`
     if (!examsData[modKey]) {
@@ -588,7 +590,12 @@ export function ModuleManager({
             return (
               <div
                 key={mKey}
-                onClick={() => setSelectedModule(mNum)}
+                onClick={() => {
+                  setSelectedModule(mNum)
+                  // Limpiar el mensaje de subida al cambiar de módulo para evitar
+                  // que el mensaje del módulo anterior se muestre en el nuevo módulo
+                  setUploadMessage(null)
+                }}
                 className={`p-4 rounded-xl border text-left transition-all relative overflow-hidden flex flex-col justify-between cursor-pointer ${
                   isSelected
                     ? "bg-primary text-white border-primary shadow-md"

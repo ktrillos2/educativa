@@ -121,17 +121,51 @@ export async function uploadCourseInfoPdf(formData: FormData) {
     return { error: "No se seleccionó ningún archivo PDF." }
   }
 
+  const isPdf =
+    pdfFile.type === "application/pdf" ||
+    pdfFile.type.includes("pdf") ||
+    pdfFile.name.toLowerCase().endsWith(".pdf")
+
+  if (!isPdf) {
+    return { error: `El archivo "${pdfFile.name}" debe ser un documento PDF (.pdf).` }
+  }
+
+  const maxSizeBytes = 40 * 1024 * 1024
+  if (pdfFile.size > maxSizeBytes) {
+    return { error: `El PDF pesa ${(pdfFile.size / 1024 / 1024).toFixed(1)} MB. El límite es 40 MB.` }
+  }
+
   try {
-    const filename = `info-pdfs/course-${courseId}-${Date.now()}.pdf`
-    const publicUrl = await uploadPdfToStorage(pdfFile, filename)
+    const arrayBuffer = await pdfFile.arrayBuffer()
+    const buffer = Buffer.from(arrayBuffer)
+
+    if (!buffer || buffer.length < 500) {
+      return { error: "El archivo PDF está vacío o corrupto." }
+    }
+
+    const supabase = createAdminClient()
+    // Path aislado por curso: cada curso tiene su propio archivo info.pdf
+    const destinationPath = `${courseId}/info.pdf`
+    // URL estable a través del proxy API, nunca expira y es única por curso
+    const viewerUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
+
+    const { error: uploadError } = await supabase.storage
+      .from(BUCKET_NAME)
+      .upload(destinationPath, buffer, {
+        contentType: "application/pdf",
+        upsert: true,
+      })
+
+    if (uploadError) {
+      console.error("Error al subir PDF a Supabase Storage:", uploadError)
+      return { error: `Error al subir el archivo PDF: ${uploadError.message}` }
+    }
 
     const key = `course_pdf_${courseId}`
-    const supabase = createAdminClient()
-
     const { error: upsertError } = await supabase
       .from("platform_settings")
       .upsert(
-        { key, value: publicUrl, updated_at: new Date().toISOString() },
+        { key, value: viewerUrl, updated_at: new Date().toISOString() },
         { onConflict: "key" }
       )
 
@@ -146,7 +180,7 @@ export async function uploadCourseInfoPdf(formData: FormData) {
     revalidatePath(`/formacion-academica/${courseId}`)
     revalidatePath("/admin/configuracion")
 
-    return { success: true, pdfUrl: publicUrl, courseId }
+    return { success: true, pdfUrl: viewerUrl, courseId }
   } catch (err: any) {
     console.error("Error al subir PDF del curso:", err)
     return { error: err?.message || "Error al subir el archivo PDF." }
