@@ -228,10 +228,19 @@ export function ModuleManager({
         body: formData,
       })
 
-      const result = await response.json()
+      // Parsear respuesta de forma segura (puede ser HTML en caso de error 504/500 de Vercel)
+      let result: any = {}
+      const contentType = response.headers.get("content-type") || ""
+      if (contentType.includes("application/json")) {
+        result = await response.json()
+      } else {
+        const rawText = await response.text()
+        console.error("[handlePdfUpload] Respuesta no-JSON:", response.status, rawText.slice(0, 300))
+        result = { error: `Error del servidor (HTTP ${response.status}). Revisa los logs de Vercel.` }
+      }
 
       if (!response.ok || result.error) {
-        setUploadMessage({ text: result.error || "Error al subir el PDF.", error: true })
+        setUploadMessage({ text: result.error || `Error HTTP ${response.status} al subir el PDF.`, error: true })
       } else {
         setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
         if (modIdx > modulesCount) {
@@ -240,8 +249,8 @@ export function ModuleManager({
         setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
       }
     } catch (err: any) {
-      console.error("[handlePdfUpload] Error de red:", err)
-      setUploadMessage({ text: "Error de conexión al servidor. Intenta de nuevo.", error: true })
+      console.error("[handlePdfUpload] Error de red inesperado:", err)
+      setUploadMessage({ text: `Error inesperado: ${err?.message || "sin detalles"}`, error: true })
     } finally {
       setUploadingModule(null)
     }
