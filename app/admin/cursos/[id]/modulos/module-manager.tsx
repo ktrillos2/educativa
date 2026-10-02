@@ -208,7 +208,7 @@ export function ModuleManager({
     })
   }
 
-  // Handle PDF upload for module
+  // Handle PDF upload for module — usa API Route para evitar timeouts en Vercel
   const handlePdfUpload = async (modIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -222,18 +222,29 @@ export function ModuleManager({
     formData.append("moduleIndex", String(modIdx))
     formData.append("file", file)
 
-    const result = await uploadModulePdfAction(formData)
+    try {
+      const response = await fetch("/api/upload-module-pdf", {
+        method: "POST",
+        body: formData,
+      })
 
-    if (result.error) {
-      setUploadMessage({ text: result.error, error: true })
-    } else {
-      setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
-      if (modIdx > modulesCount) {
-        setModulesCount(modIdx)
+      const result = await response.json()
+
+      if (!response.ok || result.error) {
+        setUploadMessage({ text: result.error || "Error al subir el PDF.", error: true })
+      } else {
+        setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
+        if (modIdx > modulesCount) {
+          setModulesCount(modIdx)
+        }
+        setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
       }
-      setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
+    } catch (err: any) {
+      console.error("[handlePdfUpload] Error de red:", err)
+      setUploadMessage({ text: "Error de conexión al servidor. Intenta de nuevo.", error: true })
+    } finally {
+      setUploadingModule(null)
     }
-    setUploadingModule(null)
   }
 
 
