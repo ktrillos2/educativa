@@ -208,7 +208,7 @@ export function ModuleManager({
     })
   }
 
-  // Handle PDF upload for module — usa API Route para evitar timeouts en Vercel
+  // Handle PDF upload for module — Sube directo a Supabase con signed URL
   const handlePdfUpload = async (modIdx: number, e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
     if (!files || files.length === 0) return
@@ -217,40 +217,55 @@ export function ModuleManager({
     setUploadingModule(modIdx)
     setUploadMessage(null)
 
-    const formData = new FormData()
-    formData.append("courseId", course.id)
-    formData.append("moduleIndex", String(modIdx))
-    formData.append("file", file)
-
     try {
-      const response = await fetch("/api/upload-module-pdf", {
+      // 1. Obtener URL firmada
+      const urlResponse = await fetch("/api/module-pdf-upload-url", {
         method: "POST",
-        body: formData,
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: course.id, moduleIndex: modIdx }),
       })
 
-      // Parsear respuesta de forma segura (puede ser HTML en caso de error 504/500 de Vercel)
-      let result: any = {}
-      const contentType = response.headers.get("content-type") || ""
-      if (contentType.includes("application/json")) {
-        result = await response.json()
-      } else {
-        const rawText = await response.text()
-        console.error("[handlePdfUpload] Respuesta no-JSON:", response.status, rawText.slice(0, 300))
-        result = { error: `Error del servidor (HTTP ${response.status}). Revisa los logs de Vercel.` }
+      const urlData = await urlResponse.json()
+      if (!urlResponse.ok || urlData.error) {
+        throw new Error(urlData.error || `Error obteniendo URL (HTTP ${urlResponse.status})`)
       }
 
-      if (!response.ok || result.error) {
-        setUploadMessage({ text: result.error || `Error HTTP ${response.status} al subir el PDF.`, error: true })
-      } else {
-        setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
-        if (modIdx > modulesCount) {
-          setModulesCount(modIdx)
-        }
-        setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
+      const { signedUrl } = urlData
+
+      // 2. Subir archivo directamente a Supabase
+      const uploadResponse = await fetch(signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: {
+          "Content-Type": file.type || "application/pdf",
+        },
+      })
+
+      if (!uploadResponse.ok) {
+        throw new Error(`Error subiendo a Supabase (HTTP ${uploadResponse.status})`)
       }
+
+      // 3. Confirmar subida y actualizar BD
+      const confirmResponse = await fetch("/api/upload-module-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ courseId: course.id, moduleIndex: modIdx }),
+      })
+
+      const result = await confirmResponse.json()
+      if (!confirmResponse.ok || result.error) {
+        throw new Error(result.error || `Error confirmando (HTTP ${confirmResponse.status})`)
+      }
+
+      setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
+      if (modIdx > modulesCount) {
+        setModulesCount(modIdx)
+      }
+      setUploadMessage({ text: result.message || "PDF subido con éxito.", error: false })
+
     } catch (err: any) {
-      console.error("[handlePdfUpload] Error de red inesperado:", err)
-      setUploadMessage({ text: `Error inesperado: ${err?.message || "sin detalles"}`, error: true })
+      console.error("[handlePdfUpload] Error:", err)
+      setUploadMessage({ text: err?.message || "Error inesperado al subir el PDF.", error: true })
     } finally {
       setUploadingModule(null)
     }
