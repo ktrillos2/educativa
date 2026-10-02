@@ -62,7 +62,7 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
   const [result, setResult] = useState<{ success?: boolean; error?: string; pdfUrl?: string } | null>(null)
   const [fileName, setFileName] = useState<string | null>(null)
 
-  const activePdfUrl = result?.pdfUrl !== undefined ? result.pdfUrl : section.pdfUrl
+  const activePdfUrl = result ? result.pdfUrl : section.pdfUrl
 
   async function handleDelete() {
     setIsDeleting(true)
@@ -220,9 +220,12 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
           )}
 
           {result?.success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between">
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm flex items-center justify-between mt-4">
               <p className="flex items-center gap-2 font-bold">
-                <CheckCircle className="w-4 h-4" /> ¡PDF guardado y publicado correctamente!
+                <CheckCircle className="w-4 h-4" /> 
+                {result.pdfUrl 
+                  ? "¡PDF guardado y publicado correctamente!" 
+                  : "¡PDF eliminado correctamente!"}
               </p>
             </div>
           )}
@@ -481,9 +484,12 @@ function CoursePdfUploadCard({
           )}
 
           {result?.success && (
-            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm">
+            <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-lg text-sm mt-4">
               <p className="flex items-center gap-2 font-bold">
-                <CheckCircle className="w-4 h-4" /> ¡PDF guardado correctamente para {selectedCourse?.title}!
+                <CheckCircle className="w-4 h-4" /> 
+                {result.pdfUrl 
+                  ? `¡PDF guardado correctamente para ${selectedCourse?.title}!` 
+                  : `¡PDF eliminado correctamente de ${selectedCourse?.title}!`}
               </p>
             </div>
           )}

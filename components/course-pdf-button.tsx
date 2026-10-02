@@ -17,18 +17,8 @@ export async function CoursePdfButton({ type, courseId, courseName }: CoursePdfB
     (await getPdfUrl(`course_pdf_${slug}`)) ||
     (await getPdfUrl(`course_info_${slug}`))
 
-  const generalPdfKey = type === "etdh" ? "info_etdh_pdf" : "info_diplomados_pdf"
-  const generalPdfUrl = await getPdfUrl(generalPdfKey)
-
-  const hasSpecificPdf = Boolean(coursePdfUrl)
-  const hasPdf = Boolean(coursePdfUrl || generalPdfUrl)
-
-  const fallbackUrl = type === "etdh" ? "/api/file/General - etdh.pdf" : "/api/file/General - diplomados.pdf"
-  const defaultCourseUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
-
-  const viewerUrl = hasSpecificPdf
-    ? coursePdfUrl!
-    : (generalPdfUrl || fallbackUrl)
+  const hasPdf = Boolean(coursePdfUrl)
+  const viewerUrl = coursePdfUrl || ""
 
   const buttonLabel = `Por qué cursar nuestro "${courseName}"`
 

@@ -96,17 +96,51 @@ export function ModuleManager({
     setIsUploadingDiplomadosPdf(true)
     setDiplomadosPdfMessage(null)
 
-    const formData = new FormData(e.currentTarget)
-    formData.set("type", "diplomados")
+    try {
+      const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement
+      const file = fileInput?.files?.[0]
+      if (!file) {
+        setDiplomadosPdfMessage({ text: "No se seleccionó ningún archivo.", error: true })
+        setIsUploadingDiplomadosPdf(false)
+        return
+      }
 
-    const res = await uploadGeneralInfoPdf(formData)
-    if (res.error) {
-      setDiplomadosPdfMessage({ text: res.error, error: true })
-    } else {
-      setDiplomadosPdfMessage({ text: "PDF General guardado exitosamente", error: false })
-      setGeneralDiplomadosPdfUrl(res.pdfUrl || "/api/file/General - diplomados.pdf")
+      const urlResponse = await fetch("/api/general-pdf-upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "diplomados" }),
+      })
+
+      const urlData = await urlResponse.json()
+      if (!urlResponse.ok || urlData.error) throw new Error(urlData.error || "No se pudo obtener la URL de subida.")
+
+      const uploadResponse = await fetch(urlData.signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type || "application/pdf" },
+      })
+
+      if (!uploadResponse.ok) throw new Error("Error al subir el archivo al almacenamiento.")
+
+      const response = await fetch("/api/upload-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "diplomados" }),
+      })
+
+      const data = await response.json()
+      if (!response.ok || data.error) {
+        setDiplomadosPdfMessage({ text: data.error || "No se pudo actualizar la configuración.", error: true })
+      } else {
+        setDiplomadosPdfMessage({ text: "PDF General guardado exitosamente", error: false })
+        setGeneralDiplomadosPdfUrl(data.pdfUrl || "/api/file/General - diplomados.pdf")
+      }
+    } catch (err: any) {
+      console.error("Error al subir PDF general diplomados:", err)
+      setDiplomadosPdfMessage({ text: err?.message || "Error de conexión al servidor al subir el PDF.", error: true })
+    } finally {
+      setIsUploadingDiplomadosPdf(false)
     }
-    setIsUploadingDiplomadosPdf(false)
   }
 
   async function handleDeleteDiplomadosPdf() {
@@ -130,17 +164,51 @@ export function ModuleManager({
     setIsUploadingEtdhPdf(true)
     setEtdhPdfMessage(null)
 
-    const formData = new FormData(e.currentTarget)
-    formData.set("type", "etdh")
+    try {
+      const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement
+      const file = fileInput?.files?.[0]
+      if (!file) {
+        setEtdhPdfMessage({ text: "No se seleccionó ningún archivo.", error: true })
+        setIsUploadingEtdhPdf(false)
+        return
+      }
 
-    const res = await uploadGeneralInfoPdf(formData)
-    if (res.error) {
-      setEtdhPdfMessage({ text: res.error, error: true })
-    } else {
-      setEtdhPdfMessage({ text: "PDF General guardado exitosamente", error: false })
-      setGeneralEtdhPdfUrl(res.pdfUrl || "/api/file/General - etdh.pdf")
+      const urlResponse = await fetch("/api/general-pdf-upload-url", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "etdh" }),
+      })
+
+      const urlData = await urlResponse.json()
+      if (!urlResponse.ok || urlData.error) throw new Error(urlData.error || "No se pudo obtener la URL de subida.")
+
+      const uploadResponse = await fetch(urlData.signedUrl, {
+        method: "PUT",
+        body: file,
+        headers: { "Content-Type": file.type || "application/pdf" },
+      })
+
+      if (!uploadResponse.ok) throw new Error("Error al subir el archivo al almacenamiento.")
+
+      const response = await fetch("/api/upload-pdf", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "etdh" }),
+      })
+
+      const data = await response.json()
+      if (!response.ok || data.error) {
+        setEtdhPdfMessage({ text: data.error || "No se pudo actualizar la configuración.", error: true })
+      } else {
+        setEtdhPdfMessage({ text: "PDF General guardado exitosamente", error: false })
+        setGeneralEtdhPdfUrl(data.pdfUrl || "/api/file/General - etdh.pdf")
+      }
+    } catch (err: any) {
+      console.error("Error al subir PDF general ETDH:", err)
+      setEtdhPdfMessage({ text: err?.message || "Error de conexión al servidor al subir el PDF.", error: true })
+    } finally {
+      setIsUploadingEtdhPdf(false)
     }
-    setIsUploadingEtdhPdf(false)
   }
 
   async function handleDeleteEtdhPdf() {
