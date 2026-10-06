@@ -59,7 +59,7 @@ export function ModuleManager({
   initialGeneralEtdhPdfUrl,
 }: ModuleManagerProps) {
   const [modulesCount, setModulesCount] = useState<number>(initialModulesCount)
-  const [pdfStatus, setPdfStatus] = useState<Record<string, boolean>>(initialPdfFilesStatus)
+  const [pdfStatus, setPdfStatus] = useState<Record<string, any>>(initialPdfFilesStatus)
   const [examPdfStatus, setExamPdfStatus] = useState<Record<string, boolean>>(initialExamPdfStatus)
   const [examsData, setExamsData] = useState<Record<string, Question[]>>(initialExamsData)
   const [selectedModule, setSelectedModule] = useState<number>(1)
@@ -105,10 +105,11 @@ export function ModuleManager({
         return
       }
 
+      const ts = Date.now()
       const urlResponse = await fetch("/api/general-pdf-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "diplomados" }),
+        body: JSON.stringify({ type: "diplomados", ts }),
       })
 
       const urlData = await urlResponse.json()
@@ -125,7 +126,7 @@ export function ModuleManager({
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "diplomados" }),
+        body: JSON.stringify({ type: "diplomados", ts }),
       })
 
       const data = await response.json()
@@ -173,10 +174,11 @@ export function ModuleManager({
         return
       }
 
+      const ts = Date.now()
       const urlResponse = await fetch("/api/general-pdf-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "etdh" }),
+        body: JSON.stringify({ type: "etdh", ts }),
       })
 
       const urlData = await urlResponse.json()
@@ -193,7 +195,7 @@ export function ModuleManager({
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "etdh" }),
+        body: JSON.stringify({ type: "etdh", ts }),
       })
 
       const data = await response.json()
@@ -290,11 +292,12 @@ export function ModuleManager({
     setUploadMessage(null)
 
     try {
+      const ts = Date.now()
       // 1. Obtener URL firmada
       const urlResponse = await fetch("/api/module-pdf-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId: course.id, moduleIndex: modIdx }),
+        body: JSON.stringify({ courseId: course.id, moduleIndex: modIdx, ts }),
       })
 
       const urlData = await urlResponse.json()
@@ -321,7 +324,7 @@ export function ModuleManager({
       const confirmResponse = await fetch("/api/upload-module-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ courseId: course.id, moduleIndex: modIdx }),
+        body: JSON.stringify({ courseId: course.id, moduleIndex: modIdx, ts }),
       })
 
       const result = await confirmResponse.json()
@@ -329,7 +332,7 @@ export function ModuleManager({
         throw new Error(result.error || `Error confirmando (HTTP ${confirmResponse.status})`)
       }
 
-      setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: true }))
+      setPdfStatus((prev) => ({ ...prev, [`mod-${modIdx}`]: ts }))
       if (modIdx > modulesCount) {
         setModulesCount(modIdx)
       }
@@ -426,16 +429,18 @@ export function ModuleManager({
       setSelectedModule(newCount)
     }
 
-    setExamsData((prev) => {
-      const newData = { ...prev }
-      delete newData[keyToRemove]
-      
-      // Auto-guardado para asegurar que la base de datos se actualice inmediatamente
-      startTransition(async () => {
-        await saveCourseExamsAction(course.id, newCount, newData)
-      })
-      
-      return newData
+    const newExamsData = { ...examsData }
+    delete newExamsData[keyToRemove]
+    setExamsData(newExamsData)
+    
+    // Auto-guardado para asegurar que la base de datos se actualice inmediatamente
+    startTransition(async () => {
+      const result = await saveCourseExamsAction(course.id, newCount, newExamsData)
+      if (result.error) {
+        setSaveMessage({ text: result.error, error: true })
+      } else {
+        setSaveMessage({ text: "Módulo eliminado exitosamente.", error: false })
+      }
     })
     
     setConfirmDeleteModule(null)
@@ -732,7 +737,7 @@ export function ModuleManager({
                             PDF ✓
                           </span>
                           <a
-                            href={`/api/file/Modulo ${mNum} - ${course.id}.pdf?courseId=${course.id}`}
+                            href={`/api/file/Modulo ${mNum} - ${course.id}${hasPdf && hasPdf !== true ? ` - ${hasPdf}` : ""}.pdf?courseId=${course.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}

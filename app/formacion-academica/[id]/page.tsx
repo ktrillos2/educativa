@@ -140,7 +140,8 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
 
     // Generate an array of modules based on course.modules length for visualization
     const courseModules = Array.from({ length: totalModules }).map((_, i) => {
-        const docName = `Modulo ${i + 1} - ${course.id}.pdf`
+        const ts = modulePdfs[`mod-${i + 1}`]
+        const docName = ts && ts !== true ? `Modulo ${i + 1} - ${course.id} - ${ts}.pdf` : `Modulo ${i + 1} - ${course.id}.pdf`
         const examName = `Cuestionario Modulo ${i + 1} - ${course.id}.docx`
         const fileExists = Boolean(modulePdfs[`mod-${i + 1}`])
 

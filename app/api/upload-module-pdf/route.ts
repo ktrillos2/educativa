@@ -19,9 +19,9 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { courseId, moduleIndex } = body
+    const { courseId, moduleIndex, ts } = body
 
-    console.log(`[upload-module-pdf] Confirmando subida — courseId=${courseId}, moduleIndex=${moduleIndex}`)
+    console.log(`[upload-module-pdf] Confirmando subida — courseId=${courseId}, moduleIndex=${moduleIndex}, ts=${ts}`)
 
     if (!courseId || !moduleIndex) {
       return NextResponse.json({ error: "Faltan courseId o moduleIndex." }, { status: 400 })
@@ -41,8 +41,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No se encontró el curso en la base de datos." }, { status: 404 })
     }
 
-    const currentPdfs = (courseData.module_pdfs as Record<string, boolean>) || {}
-    currentPdfs[`mod-${moduleIndex}`] = true
+    const currentPdfs = (courseData.module_pdfs as Record<string, any>) || {}
+    currentPdfs[`mod-${moduleIndex}`] = ts || true
     const newModulesCount = Math.max(courseData.modules || 0, moduleIndex)
 
     const { error: updateError } = await supabase
@@ -61,9 +61,9 @@ export async function POST(request: NextRequest) {
     try {
       revalidatePath("/admin/cursos", "page")
       revalidatePath(`/admin/cursos/${courseId}/modulos`, "page")
-      revalidatePath(`/diplomados/[id]`, "page")
-      revalidatePath(`/formacion-academica/[id]`, "page")
-      revalidatePath(`/estudiante/cursos/[id]`, "page")
+      revalidatePath(`/diplomados/${courseId}`)
+      revalidatePath(`/formacion-academica/${courseId}`)
+      revalidatePath(`/estudiante/cursos/${courseId}`)
     } catch (revalidateErr) {
       console.warn("[upload-module-pdf] revalidatePath falló (no crítico):", revalidateErr)
     }

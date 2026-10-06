@@ -17,13 +17,14 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { courseId, moduleIndex } = body
+    const { courseId, moduleIndex, ts } = body
 
     if (!courseId || !moduleIndex) {
       return NextResponse.json({ error: "Faltan courseId o moduleIndex." }, { status: 400 })
     }
 
-    const storagePath = `${courseId}/modulo-${moduleIndex}.pdf`
+    const timestampStr = ts ? `-${ts}` : ""
+    const storagePath = `${courseId}/modulo-${moduleIndex}${timestampStr}.pdf`
     const supabase = createAdminClient()
 
     // Generar URL firmada de subida válida por 5 minutos

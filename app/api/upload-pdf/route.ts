@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json()
-    const { type, courseId } = body // "diplomados" | "etdh" | "course"
+    const { type, courseId, ts } = body // "diplomados" | "etdh" | "course"
 
     if (type === "course" && !courseId) {
       return NextResponse.json(
@@ -40,13 +40,13 @@ export async function POST(request: NextRequest) {
     let primaryKey = ""
 
     if (type === "course") {
-      viewerUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
+      viewerUrl = ts ? `/api/file/${encodeURIComponent(`Info - ${courseId} - ${ts}.pdf`)}` : `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
       primaryKey = `course_pdf_${courseId}`
     } else if (type === "etdh") {
-      viewerUrl = "/api/file/General - etdh.pdf"
+      viewerUrl = ts ? `/api/file/General - etdh - ${ts}.pdf` : "/api/file/General - etdh.pdf"
       primaryKey = "info_etdh_pdf"
     } else {
-      viewerUrl = "/api/file/General - diplomados.pdf"
+      viewerUrl = ts ? `/api/file/General - diplomados - ${ts}.pdf` : "/api/file/General - diplomados.pdf"
       primaryKey = "info_diplomados_pdf"
     }
 

@@ -13,18 +13,20 @@ export async function GET(
     const decodedFilename = decodeURIComponent(filename)
 
     const examMatch = decodedFilename.match(/^Cuestionario Modulo (\d+) - (.+)\.pdf$/i)
-    const moduleMatch = decodedFilename.match(/^Modulo (\d+) - (.+)\.pdf$/i)
-    const infoMatch = decodedFilename.match(/^Info - (.+)\.pdf$/i)
-    const generalMatch = decodedFilename.match(/^General - (diplomados|etdh)\.pdf$/i)
+    const moduleMatch = decodedFilename.match(/^Modulo (\d+) - (.+?)(?: - (\d+))?\.pdf$/i)
+    const infoMatch = decodedFilename.match(/^Info - (.+?)(?: - (\d+))?\.pdf$/i)
+    const generalMatch = decodedFilename.match(/^General - (diplomados|etdh)(?: - (\d+))?\.pdf$/i)
 
     let storagePath: string | null = null
 
     if (generalMatch) {
         const gType = generalMatch[1].toLowerCase()
-        storagePath = `info/general-${gType}.pdf`
+        const ts = generalMatch[2]
+        storagePath = ts ? `info/general-${gType}-${ts}.pdf` : `info/general-${gType}.pdf`
     } else if (infoMatch) {
         const courseId = infoMatch[1]
-        storagePath = `${courseId}/info.pdf`
+        const ts = infoMatch[2]
+        storagePath = ts ? `${courseId}/info-${ts}.pdf` : `${courseId}/info.pdf`
     } else if (examMatch) {
         const moduleIndex = examMatch[1]
         const courseId = examMatch[2]
@@ -32,7 +34,8 @@ export async function GET(
     } else if (moduleMatch) {
         const moduleIndex = moduleMatch[1]
         const courseId = moduleMatch[2]
-        storagePath = `${courseId}/modulo-${moduleIndex}.pdf`
+        const ts = moduleMatch[3]
+        storagePath = ts ? `${courseId}/modulo-${moduleIndex}-${ts}.pdf` : `${courseId}/modulo-${moduleIndex}.pdf`
     }
 
     if (!storagePath) {

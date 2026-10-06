@@ -92,11 +92,12 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
         return
       }
 
+      const ts = Date.now()
       // 1. Obtener URL firmada
       const urlResponse = await fetch("/api/general-pdf-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: section.type }),
+        body: JSON.stringify({ type: section.type, ts }),
       })
 
       const urlData = await urlResponse.json()
@@ -121,7 +122,7 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: section.type }),
+        body: JSON.stringify({ type: section.type, ts }),
       })
 
       const data = await response.json()
@@ -264,6 +265,7 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
             </div>
             <div className="w-full h-80 rounded-lg overflow-hidden border bg-slate-100">
               <iframe
+                key={activePdfUrl}
                 src={`${activePdfUrl}#toolbar=0`}
                 className="w-full h-full"
                 title={`PDF ${section.label}`}
@@ -331,11 +333,12 @@ function CoursePdfUploadCard({
         return
       }
 
+      const ts = Date.now()
       // 1. Obtener URL firmada
       const urlResponse = await fetch("/api/general-pdf-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "course", courseId: selectedCourseId }),
+        body: JSON.stringify({ type: "course", courseId: selectedCourseId, ts }),
       })
 
       const urlData = await urlResponse.json()
@@ -360,7 +363,7 @@ function CoursePdfUploadCard({
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "course", courseId: selectedCourseId }),
+        body: JSON.stringify({ type: "course", courseId: selectedCourseId, ts }),
       })
 
       const data = await response.json()
@@ -528,6 +531,7 @@ function CoursePdfUploadCard({
             </div>
             <div className="w-full h-80 rounded-lg overflow-hidden border bg-slate-100">
               <iframe
+                key={activePdfUrl}
                 src={`${activePdfUrl}#toolbar=0`}
                 className="w-full h-full"
                 title={`PDF ${selectedCourse?.title}`}

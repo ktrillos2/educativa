@@ -129,7 +129,8 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
   // 5. Build modules list
   const totalModules = course.modules || 1
   const courseModules = Array.from({ length: totalModules }).map((_, i) => {
-    const docName = `Modulo ${i + 1} - ${course.id}.pdf`
+    const ts = modulePdfs[`mod-${i + 1}`]
+    const docName = ts && ts !== true ? `Modulo ${i + 1} - ${course.id} - ${ts}.pdf` : `Modulo ${i + 1} - ${course.id}.pdf`
     const fileExists = Boolean(modulePdfs[`mod-${i + 1}`])
     const examExists = !!(examsData && examsData[`mod-${i + 1}`] && examsData[`mod-${i + 1}`].length > 0)
     return { id: `mod-${i + 1}`, index: i, title: `Módulo ${i + 1}`, docName, fileExists, examExists }

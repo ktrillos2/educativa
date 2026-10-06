@@ -80,10 +80,11 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
       const pdfFileInput = formData.get("pdf_file") as File | null
       if (pdfFileInput && pdfFileInput.size > 0) {
         // a) Obtener URL firmada
+        const ts = Date.now()
         const urlResponse = await fetch("/api/general-pdf-upload-url", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "course", courseId: course.id }),
+          body: JSON.stringify({ type: "course", courseId: course.id, ts }),
         })
         
         const urlData = await urlResponse.json()
@@ -112,7 +113,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
         const pdfResponse = await fetch("/api/upload-pdf", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ type: "course", courseId: course.id }),
+          body: JSON.stringify({ type: "course", courseId: course.id, ts }),
         })
 
         const pdfResult = await pdfResponse.json()

@@ -28,7 +28,7 @@ export default async function CursosPage() {
   // Cursos desde la base de datos
   const { data: courses } = await supabase
     .from("courses")
-    .select("id, title, category, modules")
+    .select("id, title, category, modules, module_pdfs")
 
   if (isMockPaid && session?.userId && courses) {
       // Add a mock enrollment for every course for testing
@@ -76,7 +76,9 @@ export default async function CursosPage() {
     const progressPercent = Math.min(100, Math.round((completedModules / totalModules) * 100))
 
     const nextModuleIndex = Math.min(completedModules, totalModules - 1)
-    const nextDocName = `Modulo ${nextModuleIndex + 1} - ${e.course_id}.pdf`
+    const modulePdfs = (course as any)?.module_pdfs || {}
+    const ts = modulePdfs[`mod-${nextModuleIndex + 1}`]
+    const nextDocName = ts && ts !== true ? `Modulo ${nextModuleIndex + 1} - ${e.course_id} - ${ts}.pdf` : `Modulo ${nextModuleIndex + 1} - ${e.course_id}.pdf`
 
     const courseTitle = course?.title || `Diplomado en Gestión del Presupuesto Público`
 

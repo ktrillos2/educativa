@@ -24,13 +24,14 @@ export async function POST(request: NextRequest) {
     }
 
     let destinationPath = ""
+    const timestamp = body.ts || Date.now()
     if (type === "course") {
       if (!courseId) return NextResponse.json({ error: "Falta courseId." }, { status: 400 })
-      destinationPath = `${courseId}/info.pdf`
+      destinationPath = `${courseId}/info-${timestamp}.pdf`
     } else if (type === "etdh") {
-      destinationPath = "info/general-etdh.pdf"
+      destinationPath = `info/general-etdh-${timestamp}.pdf`
     } else {
-      destinationPath = "info/general-diplomados.pdf"
+      destinationPath = `info/general-diplomados-${timestamp}.pdf`
     }
 
     const supabase = createAdminClient()

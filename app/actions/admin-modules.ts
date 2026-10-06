@@ -449,21 +449,8 @@ export async function deleteModulePdfAction(courseId: string, moduleIndex: numbe
   
   const supabase = createAdminClient()
 
-  const storagePath = type === "exam"
-    ? `${courseId}/cuestionario-modulo-${moduleIndex}.pdf`
-    : modulePdfPath(courseId, moduleIndex)
-
   try {
-    const { error: deleteError } = await supabase.storage
-      .from(MODULES_BUCKET)
-      .remove([storagePath])
-
-    if (deleteError) {
-      console.error("Supabase Storage delete error:", deleteError)
-      return { error: `Error al eliminar el archivo: ${deleteError.message}` }
-    }
-
-    // Update the tracking column in the DB
+    // Update the tracking column in the DB first to get the current timestamp
     const columnKey = type === "exam" ? "exam_pdfs" : "module_pdfs"
     const { data: courseData, error: fetchError } = await supabase
       .from("courses")
@@ -475,7 +462,23 @@ export async function deleteModulePdfAction(courseId: string, moduleIndex: numbe
       return { error: "Curso no encontrado en la base de datos." }
     }
 
-    const currentMap = ((courseData as any)?.[columnKey] as Record<string, boolean>) || {}
+    const currentMap = ((courseData as any)?.[columnKey] as Record<string, any>) || {}
+    const currentTs = currentMap[`mod-${moduleIndex}`]
+    
+    // Now build the accurate storage path based on the timestamp
+    const tsStr = currentTs && currentTs !== true ? `-${currentTs}` : ""
+    const storagePath = type === "exam"
+      ? `${courseId}/cuestionario-modulo-${moduleIndex}.pdf`
+      : `${courseId}/modulo-${moduleIndex}${tsStr}.pdf`
+
+    const { error: deleteError } = await supabase.storage
+      .from(MODULES_BUCKET)
+      .remove([storagePath, `${courseId}/modulo-${moduleIndex}.pdf`]) // Also try to delete old cached version just in case
+
+    if (deleteError) {
+      console.error("Supabase Storage delete error:", deleteError)
+    }
+
     currentMap[`mod-${moduleIndex}`] = false
 
     const { error: updateError } = await supabase
@@ -490,6 +493,8 @@ export async function deleteModulePdfAction(courseId: string, moduleIndex: numbe
     revalidatePath(`/admin/cursos`)
     revalidatePath(`/admin/cursos/${courseId}/modulos`)
     revalidatePath(`/diplomados/${courseId}`)
+    revalidatePath(`/formacion-academica/${courseId}`)
+    revalidatePath(`/estudiante/cursos`)
     revalidatePath(`/estudiante/cursos/${courseId}`)
     
     return { success: true, message: "PDF eliminado correctamente." }

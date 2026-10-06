@@ -208,7 +208,6 @@ export async function updateCourse(formData: FormData) {
   const category = formData.get("category") as string
   const price = formData.get("price") as string
   const duration = formData.get("duration") as string
-  const modules = Number(formData.get("modules") || 0)
   const min_students = Number(formData.get("min_students") || 0)
   
   const newId = formData.get("new_id") as string
@@ -243,7 +242,6 @@ export async function updateCourse(formData: FormData) {
     category,
     price,
     duration,
-    modules,
     students,
   }
 
