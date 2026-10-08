@@ -201,7 +201,7 @@ export default async function DiplomadoDetailPage(props: { params: Promise<{ id:
                                                 <div className="p-4 bg-red-50 border border-red-200 text-red-800 text-left shadow-sm">
                                                     <p className="text-sm font-bold mb-2 text-red-600">Tiempo límite expirado (30 días)</p>
                                                     <p className="text-xs mb-4">No completaste el diplomado en el mes estipulado. Contáctate con el profesor para revisar tu caso.</p>
-                                                    <a href="https://wa.me/1234567890?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-4 font-bold hover:bg-green-600 transition-colors shadow-sm rounded-none">
+                                                    <a href="https://wa.me/573115232106?text=Hola,%20mi%20tiempo%20para%20terminar%20el%20diplomado%20expiró" target="_blank" rel="noreferrer" className="w-full inline-flex items-center justify-center gap-2 bg-green-500 text-white py-2 px-4 font-bold hover:bg-green-600 transition-colors shadow-sm rounded-none">
                                                         Contactar por WhatsApp
                                                     </a>
                                                 </div>

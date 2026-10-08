@@ -1,74 +1,12 @@
 "use client"
 import React, { forwardRef } from "react"
+import * as LucideIcons from "lucide-react"
 import { Icon as IconifyIcon } from "@iconify/react"
 
 export type LucideIcon = React.ElementType
 
-const iconMap: Record<string, string> = {
-  "ArrowLeft": "solar:arrow-left-bold-duotone",
-  "ArrowRight": "solar:arrow-right-bold-duotone",
-  "ArrowUpRight": "solar:arrow-right-up-bold-duotone",
-  "Award": "solar:medal-ribbon-star-bold-duotone",
-  "Banknote": "solar:wallet-money-bold-duotone",
-  "BookMarked": "solar:bookmark-square-bold-duotone",
-  "BookOpen": "solar:book-bookmark-bold-duotone",
-  "Briefcase": "solar:case-bold-duotone",
-  "CalendarDays": "solar:calendar-date-bold-duotone",
-  "CheckCircle": "solar:check-circle-bold-duotone",
-  "CheckCircle2": "solar:check-circle-bold-duotone",
-  "CreditCard": "lucide:credit-card",
-  "ChevronDown": "solar:alt-arrow-down-bold-duotone",
-  "ChevronLeft": "solar:alt-arrow-left-bold-duotone",
-  "ChevronRight": "solar:alt-arrow-right-bold-duotone",
-  "Clock": "solar:clock-circle-bold-duotone",
-  "Download": "solar:download-square-bold-duotone",
-  "GraduationCap": "solar:diploma-bold-duotone",
-  "Headphones": "solar:headphones-round-bold-duotone",
-  "Heart": "solar:heart-bold-duotone",
-  "HelpCircle": "solar:question-circle-bold-duotone",
-  "Home": "solar:home-angle-bold-duotone",
-  "Lightbulb": "solar:lightbulb-minimalistic-bold-duotone",
-  "Lock": "solar:lock-keyhole-bold-duotone",
-  "Mail": "solar:letter-bold-duotone",
-  "MapPin": "solar:map-point-bold-duotone",
-  "Menu": "solar:hamburger-menu-bold-duotone",
-  "MessageCircle": "solar:chat-round-dots-bold-duotone",
-  "MessageSquare": "solar:chat-square-bold-duotone",
-  "MessageSquareQuote": "solar:chat-square-quote-bold-duotone",
-  "Phone": "solar:phone-calling-bold-duotone",
-  "PhoneCall": "solar:phone-calling-bold-duotone",
-  "Play": "solar:play-circle-bold-duotone",
-  "Send": "solar:plain-bold-duotone",
-  "Shield": "solar:shield-check-bold-duotone",
-  "Star": "solar:star-bold-duotone",
-  "TrendingUp": "solar:graph-up-bold-duotone",
-  "Trophy": "solar:cup-star-bold-duotone",
-  "User": "solar:user-bold-duotone",
-  "Users": "solar:users-group-rounded-bold-duotone",
-  "X": "solar:close-circle-bold-duotone",
-  "Zap": "solar:bolt-bold-duotone",
-  "Building2": "solar:buildings-bold-duotone",
-  "Landmark": "solar:bank-bold-duotone",
-  "Cpu": "solar:cpu-bold-duotone",
-  "HeartPulse": "solar:heart-pulse-bold-duotone",
-  "BadgeCheck": "solar:verified-check-bold-duotone",
-  "Flame": "solar:fire-bold-duotone",
-  "Sparkles": "solar:stars-bold-duotone",
-  "Search": "solar:magnifer-bold-duotone",
-  "SlidersHorizontal": "solar:tuning-bold-duotone",
-  "Clock3": "solar:clock-circle-bold-duotone",
-  "Users2": "solar:users-group-two-rounded-bold-duotone",
-  "MoveUpRight": "solar:arrow-right-up-bold-duotone",
-  "Medal": "solar:medal-ribbon-bold-duotone",
-  "CalendarClock": "solar:calendar-date-bold-duotone",
-  "ShieldCheck": "solar:shield-check-bold-duotone",
-  "Gem": "solar:diamonds-bold-duotone",
-  "AlertCircle": "solar:danger-circle-bold-duotone",
-  "Target": "solar:target-bold-duotone",
-  "Presentation": "solar:presentation-bold-duotone",
-  "FileSpreadsheet": "solar:document-text-bold-duotone",
-  "Scale": "solar:scale-bold-duotone",
-  "Calculator": "solar:calculator-bold-duotone",
+// Fallback icon map for custom icons if not directly named in Lucide
+const iconifyMap: Record<string, string> = {
   "Facebook": "mdi:facebook",
   "Instagram": "mdi:instagram",
   "Linkedin": "mdi:linkedin",
@@ -76,9 +14,27 @@ const iconMap: Record<string, string> = {
 }
 
 const createIcon = (name: string) => {
-  const iconId = iconMap[name] || "ph:circle-light"
-  return forwardRef<SVGSVGElement, any>((props, ref) => {
-    return <IconifyIcon icon={iconId} ref={ref} {...props} />
+  const LucideComp = (LucideIcons as any)[name]
+  
+  return forwardRef<SVGSVGElement, any>(({ className, ...props }, ref) => {
+    if (LucideComp) {
+      return (
+        <LucideComp 
+          ref={ref} 
+          className={`shrink-0 inline-block align-middle ${className || ''}`} 
+          {...props} 
+        />
+      )
+    }
+    const iconId = iconifyMap[name] || "ph:circle-light"
+    return (
+      <IconifyIcon 
+        icon={iconId} 
+        ref={ref as any} 
+        className={`shrink-0 inline-block align-middle ${className || ''}`} 
+        {...props} 
+      />
+    )
   })
 }
 

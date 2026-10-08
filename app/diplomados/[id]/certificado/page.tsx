@@ -271,7 +271,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                     </div>
 
                     {/* Pie / Footer */}
-                    <div className="absolute bottom-[60px] left-12 right-12 flex justify-between items-end z-10">
+                    <div className="absolute bottom-[20px] left-12 right-12 flex justify-between items-end z-10">
                       {/* QR */}
                       <div className="text-center flex flex-col items-center w-40" style={{ transform: 'translateY(-2mm)' }}>
                         <p className="text-[14px] font-bold text-black mb-1 whitespace-nowrap" style={{ fontFamily: 'Times New Roman, serif' }}>QR DE VERIFICACIÓN</p>
@@ -290,7 +290,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                       
                       {/* Signature */}
                       <div className="text-center flex flex-col items-center w-[400px] pb-4">
-                        <div className="flex justify-center relative pointer-events-none z-10" style={{ width: '305px', height: '182px', marginBottom: '-60px', marginLeft: '30px', transform: 'translateY(calc(30px - 2mm)) scale(0.75)' }}>
+                        <div className="flex justify-center relative pointer-events-none z-10" style={{ width: '305px', height: '182px', marginBottom: '-50px', marginLeft: '30px', transform: 'translateY(45px) scale(0.65)' }}>
                           <div className="w-full h-full relative overflow-hidden">
                             <img 
                               src="/certificado-diplomado/firma-auden-viloria.svg" 

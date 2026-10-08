@@ -2,6 +2,7 @@ import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { redirect } from "next/navigation"
 import { CreateGroupForm } from "./create-group-form"
+import { PlanillaModal } from "./planilla-modal"
 import { Calendar, Users as UsersIcon, Link as LinkIcon, Clock } from "lucide-react"
 
 export const dynamic = "force-dynamic"
@@ -15,11 +16,10 @@ export default async function AdminGruposPage() {
 
   const supabase = createAdminClient()
 
-  // Get all courses for the dropdown (only ETDH/Formacion Academica)
+  // Get all courses to show the title correctly
   const { data: courses } = await supabase
     .from("courses")
-    .select("id, title")
-    .eq("type", "etdh")
+    .select("id, title, type")
     .order("created_at", { ascending: true })
 
   // Get all groups with their course title
@@ -31,7 +31,7 @@ export default async function AdminGruposPage() {
     `)
     .order("created_at", { ascending: false })
 
-  const coursesMap = new Map((courses || []).map(c => [c.id, c.title]))
+  const coursesMap = new Map((courses || []).map(c => [c.id, { title: c.title, type: c.type }]))
 
   // Get enrollment counts per group
   const { data: enrollments } = await supabase
@@ -66,7 +66,9 @@ export default async function AdminGruposPage() {
           <div className="grid gap-4 md:grid-cols-2">
             {groups.map(group => {
               const enrolled = groupCounts[group.id] || 0
-              const courseTitle = coursesMap.get(group.course_id) || "Curso Desconocido"
+              const courseData = coursesMap.get(group.course_id)
+              const courseTitle = courseData?.title || "Curso Desconocido"
+              const isEtdh = courseData?.type === "etdh"
               
               const startDate = new Date(group.registration_start).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
               const endDate = new Date(group.registration_end).toLocaleDateString('es-CO', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -107,6 +109,12 @@ export default async function AdminGruposPage() {
                       </div>
                     )}
                   </div>
+
+                  {isEtdh && (
+                    <div className="mt-4 pt-4 border-t border-[oklch(0.95_0.02_145)]">
+                      <PlanillaModal groupId={group.id} groupName={group.name} />
+                    </div>
+                  )}
                 </div>
               )
             })}

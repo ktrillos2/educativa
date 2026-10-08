@@ -178,7 +178,7 @@ export default async function AulaPage(props: { params: Promise<{ courseId: stri
   }
 
   const groupWhatsappLink = !isDiplomado && enrollment.course_groups && !Array.isArray(enrollment.course_groups) ? (enrollment.course_groups as any).whatsapp_link : null;
-  const finalWhatsappLink = groupWhatsappLink || `https://wa.me/1234567890?text=${whatsappDefaultText}`;
+  const finalWhatsappLink = groupWhatsappLink || `https://wa.me/573115232106?text=${whatsappDefaultText}`;
 
   return (
     <div className="space-y-8 animate-fade-up pt-6 md:pt-8">

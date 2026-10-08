@@ -59,10 +59,11 @@ export function EnrollButton({
 
     return (
         <Button 
+            variant="secondary"
             size="lg" 
             onClick={handleEnroll} 
             disabled={loading}
-            className="w-full sm:w-auto font-bold text-lg bg-secondary hover:bg-secondary/90 text-white shadow-[3px_3px_0_0_#006838]"
+            className="w-full sm:w-auto font-bold text-base sm:text-lg text-white"
         >
             {loading ? "Redirigiendo al pago..." : "Inscribirme y Pagar Ahora"}
         </Button>

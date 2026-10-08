@@ -45,8 +45,7 @@ interface ModuleManagerProps {
   initialPdfFilesStatus: Record<string, boolean>
   initialExamPdfStatus: Record<string, boolean>
   initialExamsData: Record<string, Question[]>
-  initialGeneralDiplomadosPdfUrl?: string | null
-  initialGeneralEtdhPdfUrl?: string | null
+  initialCoursePdfUrl?: string | null
 }
 
 export function ModuleManager({
@@ -55,8 +54,7 @@ export function ModuleManager({
   initialPdfFilesStatus,
   initialExamPdfStatus,
   initialExamsData,
-  initialGeneralDiplomadosPdfUrl,
-  initialGeneralEtdhPdfUrl,
+  initialCoursePdfUrl,
 }: ModuleManagerProps) {
   const [modulesCount, setModulesCount] = useState<number>(initialModulesCount)
   const [pdfStatus, setPdfStatus] = useState<Record<string, any>>(initialPdfFilesStatus)
@@ -64,18 +62,11 @@ export function ModuleManager({
   const [examsData, setExamsData] = useState<Record<string, Question[]>>(initialExamsData)
   const [selectedModule, setSelectedModule] = useState<number>(1)
 
-  // General Info PDFs state
-  const [generalDiplomadosPdfUrl, setGeneralDiplomadosPdfUrl] = useState<string | null>(initialGeneralDiplomadosPdfUrl || null)
-  const [generalEtdhPdfUrl, setGeneralEtdhPdfUrl] = useState<string | null>(initialGeneralEtdhPdfUrl || null)
-
-  const [isUploadingDiplomadosPdf, setIsUploadingDiplomadosPdf] = useState(false)
-  const [isUploadingEtdhPdf, setIsUploadingEtdhPdf] = useState(false)
-
-  const [diplomadosPdfMessage, setDiplomadosPdfMessage] = useState<{ text: string; error?: boolean } | null>(null)
-  const [etdhPdfMessage, setEtdhPdfMessage] = useState<{ text: string; error?: boolean } | null>(null)
-
-  const [confirmDeleteDiplomadosPdf, setConfirmDeleteDiplomadosPdf] = useState(false)
-  const [confirmDeleteEtdhPdf, setConfirmDeleteEtdhPdf] = useState(false)
+  // Course Info PDF state
+  const [coursePdfUrl, setCoursePdfUrl] = useState<string | null>(initialCoursePdfUrl || null)
+  const [isUploadingCoursePdf, setIsUploadingCoursePdf] = useState(false)
+  const [coursePdfMessage, setCoursePdfMessage] = useState<{ text: string; error?: boolean } | null>(null)
+  const [confirmDeleteCoursePdf, setConfirmDeleteCoursePdf] = useState(false)
 
   const [uploadingModule, setUploadingModule] = useState<number | null>(null)
   const [uploadMessage, setUploadMessage] = useState<{ text: string; error?: boolean } | null>(null)
@@ -90,18 +81,18 @@ export function ModuleManager({
   const activeModuleKey = `mod-${selectedModule}`
   const activeQuestions = examsData[activeModuleKey] || []
 
-  // Handlers for General Diplomados PDF
-  async function handleDiplomadosPdfSubmit(e: React.FormEvent<HTMLFormElement>) {
+  // Handlers for Course Specific PDF
+  async function handleCoursePdfSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
-    setIsUploadingDiplomadosPdf(true)
-    setDiplomadosPdfMessage(null)
+    setIsUploadingCoursePdf(true)
+    setCoursePdfMessage(null)
 
     try {
       const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement
       const file = fileInput?.files?.[0]
       if (!file) {
-        setDiplomadosPdfMessage({ text: "No se seleccionó ningún archivo.", error: true })
-        setIsUploadingDiplomadosPdf(false)
+        setCoursePdfMessage({ text: "No se seleccionó ningún archivo.", error: true })
+        setIsUploadingCoursePdf(false)
         return
       }
 
@@ -109,7 +100,7 @@ export function ModuleManager({
       const urlResponse = await fetch("/api/general-pdf-upload-url", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "diplomados", ts }),
+        body: JSON.stringify({ type: "course", courseId: course.id, ts }),
       })
 
       const urlData = await urlResponse.json()
@@ -126,106 +117,37 @@ export function ModuleManager({
       const response = await fetch("/api/upload-pdf", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "diplomados", ts }),
+        body: JSON.stringify({ type: "course", courseId: course.id, ts }),
       })
 
       const data = await response.json()
       if (!response.ok || data.error) {
-        setDiplomadosPdfMessage({ text: data.error || "No se pudo actualizar la configuración.", error: true })
+        setCoursePdfMessage({ text: data.error || "No se pudo actualizar la configuración.", error: true })
       } else {
-        setDiplomadosPdfMessage({ text: "PDF General guardado exitosamente", error: false })
-        setGeneralDiplomadosPdfUrl(data.pdfUrl || "/api/file/General - diplomados.pdf")
+        setCoursePdfMessage({ text: "PDF del curso guardado exitosamente", error: false })
+        setCoursePdfUrl(data.pdfUrl || `/api/file/Info - ${course.id}.pdf`)
       }
     } catch (err: any) {
-      console.error("Error al subir PDF general diplomados:", err)
-      setDiplomadosPdfMessage({ text: err?.message || "Error de conexión al servidor al subir el PDF.", error: true })
+      console.error("Error al subir PDF del curso:", err)
+      setCoursePdfMessage({ text: err?.message || "Error de conexión al servidor al subir el PDF.", error: true })
     } finally {
-      setIsUploadingDiplomadosPdf(false)
+      setIsUploadingCoursePdf(false)
     }
   }
 
-  async function handleDeleteDiplomadosPdf() {
-    setIsUploadingDiplomadosPdf(true)
-    setDiplomadosPdfMessage(null)
+  async function handleDeleteCoursePdf() {
+    setIsUploadingCoursePdf(true)
+    setCoursePdfMessage(null)
 
-    const res = await deleteGeneralInfoPdf("diplomados")
+    const res = await deleteCourseInfoPdf(course.id)
     if (res.error) {
-      setDiplomadosPdfMessage({ text: res.error, error: true })
+      setCoursePdfMessage({ text: res.error, error: true })
     } else {
-      setDiplomadosPdfMessage({ text: "PDF General eliminado exitosamente", error: false })
-      setGeneralDiplomadosPdfUrl(null)
+      setCoursePdfMessage({ text: "PDF del curso eliminado exitosamente", error: false })
+      setCoursePdfUrl(null)
     }
-    setIsUploadingDiplomadosPdf(false)
-    setConfirmDeleteDiplomadosPdf(false)
-  }
-
-  // Handlers for General ETDH Formación Académica PDF
-  async function handleEtdhPdfSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault()
-    setIsUploadingEtdhPdf(true)
-    setEtdhPdfMessage(null)
-
-    try {
-      const fileInput = e.currentTarget.querySelector('input[type="file"]') as HTMLInputElement
-      const file = fileInput?.files?.[0]
-      if (!file) {
-        setEtdhPdfMessage({ text: "No se seleccionó ningún archivo.", error: true })
-        setIsUploadingEtdhPdf(false)
-        return
-      }
-
-      const ts = Date.now()
-      const urlResponse = await fetch("/api/general-pdf-upload-url", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "etdh", ts }),
-      })
-
-      const urlData = await urlResponse.json()
-      if (!urlResponse.ok || urlData.error) throw new Error(urlData.error || "No se pudo obtener la URL de subida.")
-
-      const uploadResponse = await fetch(urlData.signedUrl, {
-        method: "PUT",
-        body: file,
-        headers: { "Content-Type": file.type || "application/pdf" },
-      })
-
-      if (!uploadResponse.ok) throw new Error("Error al subir el archivo al almacenamiento.")
-
-      const response = await fetch("/api/upload-pdf", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ type: "etdh", ts }),
-      })
-
-      const data = await response.json()
-      if (!response.ok || data.error) {
-        setEtdhPdfMessage({ text: data.error || "No se pudo actualizar la configuración.", error: true })
-      } else {
-        setEtdhPdfMessage({ text: "PDF General guardado exitosamente", error: false })
-        setGeneralEtdhPdfUrl(data.pdfUrl || "/api/file/General - etdh.pdf")
-      }
-    } catch (err: any) {
-      console.error("Error al subir PDF general ETDH:", err)
-      setEtdhPdfMessage({ text: err?.message || "Error de conexión al servidor al subir el PDF.", error: true })
-    } finally {
-      setIsUploadingEtdhPdf(false)
-    }
-  }
-
-  async function handleDeleteEtdhPdf() {
-    setIsUploadingEtdhPdf(true)
-    setEtdhPdfMessage(null)
-
-    const res = await deleteGeneralInfoPdf("etdh")
-    if (res.error) {
-      setEtdhPdfMessage({ text: res.error, error: true })
-    } else {
-      setEtdhPdfMessage({ text: "PDF General eliminado exitosamente", error: false })
-      setGeneralEtdhPdfUrl(null)
-    }
-    setIsUploadingEtdhPdf(false)
-    setConfirmDeleteEtdhPdf(false)
+    setIsUploadingCoursePdf(false)
+    setConfirmDeleteCoursePdf(false)
   }
 
   // Add a new empty question
@@ -498,52 +420,51 @@ export function ModuleManager({
         </div>
       )}
 
-      {/* Documentos de Información General */}
+      {/* Documento de Información Específica del Curso */}
       <section className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm overflow-hidden">
         <div className="bg-[oklch(0.25_0.10_145)] px-6 py-4 text-white flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <FileText className="w-5 h-5 text-secondary" />
+            <BookOpen className="w-5 h-5 text-secondary" />
             <div>
-              <h2 className="font-bold text-base text-white">Información General</h2>
-              <p className="text-white/80 text-xs">Carga y actualiza los documentos de información general que se muestran a los estudiantes</p>
+              <h2 className="font-bold text-base text-white">PDF Específico del Curso</h2>
+              <p className="text-white/80 text-xs">Carga el documento "Por qué cursar nuestro programa" que se muestra a los estudiantes para este curso.</p>
             </div>
           </div>
         </div>
 
-        <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Tarjeta 1: Información General - Diplomados */}
-          <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 space-y-4 shadow-sm">
+        <div className="p-6">
+          <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 space-y-4 shadow-sm max-w-2xl">
             <div className="flex justify-between items-start">
               <div>
-                <p className="text-[10px] text-[oklch(0.65_0.04_145)] font-medium mb-0.5">Información General</p>
+                <p className="text-[10px] text-[oklch(0.65_0.04_145)] font-medium mb-0.5">Información Específica</p>
                 <h3 className="font-bold text-[oklch(0.25_0.10_145)] text-base">
-                  Diplomados
+                  Documento del Curso
                 </h3>
               </div>
-              {generalDiplomadosPdfUrl ? (
+              {coursePdfUrl ? (
                 <div className="flex items-center gap-2">
                   <a
-                    href={generalDiplomadosPdfUrl}
+                    href={coursePdfUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-primary/30"
                   >
                     <Eye className="w-3.5 h-3.5" /> Ver Documento
                   </a>
-                  {confirmDeleteDiplomadosPdf ? (
+                  {confirmDeleteCoursePdf ? (
                     <div className="flex items-center gap-1 bg-red-100 border border-red-300 rounded px-2 py-0.5 text-xs">
                       <span className="text-red-700 font-medium">¿Eliminar?</span>
                       <button
                         type="button"
-                        onClick={handleDeleteDiplomadosPdf}
-                        disabled={isUploadingDiplomadosPdf}
+                        onClick={handleDeleteCoursePdf}
+                        disabled={isUploadingCoursePdf}
                         className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded"
                       >
                         Sí
                       </button>
                       <button
                         type="button"
-                        onClick={() => setConfirmDeleteDiplomadosPdf(false)}
+                        onClick={() => setConfirmDeleteCoursePdf(false)}
                         className="bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded"
                       >
                         No
@@ -552,9 +473,9 @@ export function ModuleManager({
                   ) : (
                     <button
                       type="button"
-                      onClick={() => setConfirmDeleteDiplomadosPdf(true)}
+                      onClick={() => setConfirmDeleteCoursePdf(true)}
                       className="text-xs font-bold text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
-                      title="Eliminar Información General de Diplomados"
+                      title="Eliminar PDF del Curso"
                     >
                       <Trash2 className="w-4 h-4" />
                     </button>
@@ -565,7 +486,7 @@ export function ModuleManager({
               )}
             </div>
 
-            <form onSubmit={handleDiplomadosPdfSubmit} className="space-y-3">
+            <form onSubmit={handleCoursePdfSubmit} className="space-y-3">
               <input
                 type="file"
                 name="pdf_file"
@@ -575,98 +496,18 @@ export function ModuleManager({
               />
               <button
                 type="submit"
-                disabled={isUploadingDiplomadosPdf}
+                disabled={isUploadingCoursePdf}
                 className="w-full py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
               >
                 <Upload className="w-3.5 h-3.5" />
-                {isUploadingDiplomadosPdf ? "Subiendo..." : "Subir Información General de Diplomados"}
+                {isUploadingCoursePdf ? "Subiendo..." : "Subir PDF del Curso"}
               </button>
             </form>
 
-            {diplomadosPdfMessage && (
-              <p className={`text-xs font-medium flex items-center gap-1 ${diplomadosPdfMessage.error ? "text-red-600" : "text-green-600"}`}>
-                {diplomadosPdfMessage.error ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                {diplomadosPdfMessage.text}
-              </p>
-            )}
-          </div>
-
-          {/* Tarjeta 2: Información General - Programas Académicos ETDH */}
-          <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 space-y-4 shadow-sm">
-            <div className="flex justify-between items-start">
-              <div>
-                <p className="text-[10px] text-[oklch(0.65_0.04_145)] font-medium mb-0.5">Información General</p>
-                <h3 className="font-bold text-[oklch(0.25_0.10_145)] text-base">
-                  Programas Académicos ETDH
-                </h3>
-              </div>
-              {generalEtdhPdfUrl ? (
-                <div className="flex items-center gap-2">
-                  <a
-                    href={generalEtdhPdfUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-primary/30"
-                  >
-                    <Eye className="w-3.5 h-3.5" /> Ver Documento
-                  </a>
-                  {confirmDeleteEtdhPdf ? (
-                    <div className="flex items-center gap-1 bg-red-100 border border-red-300 rounded px-2 py-0.5 text-xs">
-                      <span className="text-red-700 font-medium">¿Eliminar?</span>
-                      <button
-                        type="button"
-                        onClick={handleDeleteEtdhPdf}
-                        disabled={isUploadingEtdhPdf}
-                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded"
-                      >
-                        Sí
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setConfirmDeleteEtdhPdf(false)}
-                        className="bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded"
-                      >
-                        No
-                      </button>
-                    </div>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => setConfirmDeleteEtdhPdf(true)}
-                      className="text-xs font-bold text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
-                      title="Eliminar Información General de ETDH"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </button>
-                  )}
-                </div>
-              ) : (
-                <span className="text-xs text-slate-400 italic">Sin archivo cargado</span>
-              )}
-            </div>
-
-            <form onSubmit={handleEtdhPdfSubmit} className="space-y-3">
-              <input
-                type="file"
-                name="pdf_file"
-                accept="application/pdf,.pdf"
-                required
-                className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-300 rounded-lg p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-secondary file:text-slate-900 hover:file:bg-secondary/90 cursor-pointer"
-              />
-              <button
-                type="submit"
-                disabled={isUploadingEtdhPdf}
-                className="w-full py-2.5 bg-secondary hover:bg-secondary/90 text-slate-900 font-extrabold text-xs rounded-lg transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
-              >
-                <Upload className="w-3.5 h-3.5" />
-                {isUploadingEtdhPdf ? "Subiendo..." : "Subir Información General de Programas Académicos ETDH"}
-              </button>
-            </form>
-
-            {etdhPdfMessage && (
-              <p className={`text-xs font-medium flex items-center gap-1 ${etdhPdfMessage.error ? "text-red-600" : "text-green-600"}`}>
-                {etdhPdfMessage.error ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
-                {etdhPdfMessage.text}
+            {coursePdfMessage && (
+              <p className={`text-xs font-medium flex items-center gap-1 ${coursePdfMessage.error ? "text-red-600" : "text-green-600"}`}>
+                {coursePdfMessage.error ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                {coursePdfMessage.text}
               </p>
             )}
           </div>

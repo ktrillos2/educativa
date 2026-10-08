@@ -28,8 +28,7 @@ export default async function AdminCursoModulosPage(props: { params: Promise<{ i
         initialPdfFilesStatus={data.pdfFilesStatus}
         initialExamPdfStatus={data.examPdfStatus}
         initialExamsData={data.examsData}
-        initialGeneralDiplomadosPdfUrl={data.generalDiplomadosPdfUrl}
-        initialGeneralEtdhPdfUrl={data.generalEtdhPdfUrl}
+        initialCoursePdfUrl={data.coursePdfUrl}
       />
     </div>
   )

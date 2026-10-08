@@ -110,7 +110,7 @@ export function EnrollmentDialog({ courseId, courseName, price }: { courseId: st
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button size="lg" onClick={() => router.prefetch('/estudiante')} className="w-full sm:w-auto font-bold text-xs sm:text-base bg-secondary hover:bg-secondary/90 text-white whitespace-normal py-3 h-auto leading-tight shadow-[3px_3px_0_0_#006838]">
+                <Button variant="secondary" size="lg" onClick={() => router.prefetch('/estudiante')} className="w-full sm:w-auto font-bold text-xs sm:text-base text-white whitespace-normal py-3 h-auto leading-tight">
                     Inscribirse al Diplomado
                 </Button>
             </DialogTrigger>

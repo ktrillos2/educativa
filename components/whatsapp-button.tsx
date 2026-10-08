@@ -4,7 +4,7 @@ import { Icon } from '@iconify/react'
 
 export function WhatsAppButton() {
   // Aquí puedes configurar el número de teléfono (con código de país) y el mensaje por defecto.
-  const phoneNumber = "573000000000" // Ejemplo: 57 para Colombia + Número
+  const phoneNumber = "573115232106" // Ejemplo: 57 para Colombia + Número
   const message = "Hola, me gustaría obtener más información sobre los programas de la Academia."
   
   const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`

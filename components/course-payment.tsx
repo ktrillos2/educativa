@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { CreditCard, ShieldCheck } from '@/components/ui/icons'
+import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 
 interface CoursePaymentProps {
@@ -70,14 +71,15 @@ export function CoursePayment({ courseId, programName, price, compact = true }: 
           <p className="text-2xl font-black text-primary">{formattedPrice}</p>
         </div>
 
-        <button 
+        <Button 
+          variant="secondary"
           onClick={handlePaymentClick}
           disabled={loading}
-          className="w-full bg-secondary text-white py-3 px-4 font-bold text-sm sm:text-base hover:bg-secondary/90 transition-all flex items-center justify-center gap-2 shadow-[3px_3px_0_0_#006838] active:translate-y-0.5 active:shadow-[1px_1px_0_0_#006838]"
+          className="w-full py-3 px-4 font-bold text-sm sm:text-base text-white flex items-center justify-center gap-2"
         >
           <CreditCard className="w-5 h-5 shrink-0" />
           <span>{loading ? 'Generando Orden...' : 'Pagar y Comenzar'}</span>
-        </button>
+        </Button>
 
         <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground pt-1">
           <ShieldCheck className="h-4 w-4 text-green-600 flex-shrink-0" />
@@ -99,14 +101,15 @@ export function CoursePayment({ courseId, programName, price, compact = true }: 
         <p className="text-3xl font-black text-foreground">{formattedPrice}</p>
       </div>
 
-      <button 
+      <Button 
+        variant="secondary"
         onClick={handlePaymentClick}
         disabled={loading}
-        className="w-full bg-secondary text-white py-3.5 px-4 font-bold text-sm sm:text-base hover:bg-secondary/90 transition-all flex items-center justify-center gap-3 shadow-[4px_4px_0_0_#006838]"
+        className="w-full py-3.5 px-4 font-bold text-sm sm:text-base text-white flex items-center justify-center gap-3 h-auto"
       >
         <CreditCard className="w-5 h-5 shrink-0" />
         <span>{loading ? 'Generando Orden...' : 'Pagar y Comenzar'}</span>
-      </button>
+      </Button>
 
       <div className="flex items-center justify-center gap-2 mt-4 text-xs text-muted-foreground">
         <ShieldCheck className="h-4 w-4 text-green-600" />

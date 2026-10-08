@@ -113,7 +113,7 @@ export function CTASection() {
 
               <div className="space-y-3 sm:space-y-4">
                 <Button asChild className="w-full bg-primary hover:bg-primary/90 text-white rounded-none h-11 sm:h-12 uppercase font-bold text-xs sm:text-sm tracking-wider shadow-[3px_3px_0_0_#C5A059] sm:shadow-[4px_4px_0_0_#C5A059]">
-                  <a href="https://wa.me/573000000000?text=Hola,%20quisiera%20solicitar%20asesor%C3%ADa%20sobre%20los%20programas." target="_blank" rel="noopener noreferrer">
+                  <a href="https://wa.me/573115232106?text=Hola,%20quisiera%20solicitar%20asesor%C3%ADa%20sobre%20los%20programas." target="_blank" rel="noopener noreferrer">
                     <span>Solicitar Asesoría</span>
                     <ArrowRight className="ml-2 h-4 w-4 shrink-0" />
                   </a>

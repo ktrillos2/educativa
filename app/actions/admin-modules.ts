@@ -64,20 +64,19 @@ export async function getCourseModulesData(courseId: string) {
     }
   }
 
-  // 4. Fetch General Info PDF URLs (Diplomados & ETDH)
+  // 4. Fetch Course Info PDF URL
+  const slug = courseId.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/(^-|-$)+/g, "")
+  const keysToTry = [`course_pdf_${courseId}`, `course_info_${courseId}`, `course_pdf_${slug}`, `course_info_${slug}`]
+  
   const { data: infoSettings } = await supabase
     .from("platform_settings")
     .select("key, value")
-    .in("key", ["info_diplomados_pdf", "info_etdh_pdf"])
+    .in("key", keysToTry)
 
-  let generalDiplomadosPdfUrl: string | null = null
-  let generalEtdhPdfUrl: string | null = null
-
-  if (infoSettings) {
-    for (const setting of infoSettings) {
-      if (setting.key === "info_diplomados_pdf" && setting.value) generalDiplomadosPdfUrl = String(setting.value).trim()
-      if (setting.key === "info_etdh_pdf" && setting.value) generalEtdhPdfUrl = String(setting.value).trim()
-    }
+  let coursePdfUrl: string | null = null
+  if (infoSettings && infoSettings.length > 0) {
+    const exact = infoSettings.find(s => s.key === `course_pdf_${courseId}` || s.key === `course_info_${courseId}`)
+    coursePdfUrl = String((exact || infoSettings[0]).value).trim()
   }
 
   return {
@@ -87,8 +86,7 @@ export async function getCourseModulesData(courseId: string) {
     pdfFilesStatus,
     examPdfStatus,
     examsData,
-    generalDiplomadosPdfUrl,
-    generalEtdhPdfUrl,
+    coursePdfUrl,
   }
 }
 
