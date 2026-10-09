@@ -35,9 +35,14 @@ export default async function AdminCursosPage() {
           <h1 className="text-2xl font-bold text-[oklch(0.25_0.10_145)]">Gestión de Cursos</h1>
           <p className="text-[oklch(0.55_0.04_145)] text-sm">Administra el catálogo de diplomados y programas disponibles.</p>
         </div>
-        <a href="/admin/cursos/crear" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center gap-2">
-          + Crear Curso
-        </a>
+        <div className="flex items-center gap-2">
+          <a href="/admin/configuracion" className="bg-slate-800 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-slate-900 transition-colors flex items-center gap-2 shadow-sm">
+            📄 PDFs Generales
+          </a>
+          <a href="/admin/cursos/crear" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 shadow-sm">
+            + Crear Curso
+          </a>
+        </div>
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
