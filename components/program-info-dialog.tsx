@@ -8,10 +8,13 @@ interface ProgramInfoDialogProps {
 
 export async function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
   const isDiplomado = type === "diplomados"
-  const key = isDiplomado ? "info_diplomados_pdf" : "info_etdh_pdf"
-  const storedUrl = await getPdfUrl(key)
-  const viewerUrl = storedUrl || `/api/file/${encodeURIComponent(`General - ${type}.pdf`)}`
+  const storedUrl =
+    (await getPdfUrl(isDiplomado ? "info_diplomados_pdf" : "info_etdh_pdf")) ||
+    (await getPdfUrl(isDiplomado ? "info_diplomados" : "info_etdh")) ||
+    (await getPdfUrl(isDiplomado ? "general_diplomados_pdf" : "general_etdh_pdf"))
+
   const hasPdf = Boolean(storedUrl)
+  const viewerUrl = storedUrl || ""
 
   const title = isDiplomado
     ? "Información General - Diplomados"

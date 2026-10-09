@@ -76,16 +76,25 @@ export async function uploadGeneralInfoPdf(formData: FormData) {
   }
 
   try {
-    const filename = `info-pdfs/general-${type}-${Date.now()}.pdf`
-    const publicUrl = await uploadPdfToStorage(pdfFile, filename)
+    const ts = Date.now()
+    const filename = `info/general-${type}-${ts}.pdf`
+    await uploadPdfToStorage(pdfFile, filename)
 
     const key = type === "etdh" ? "info_etdh_pdf" : "info_diplomados_pdf"
+    const viewerUrl = `/api/file/${encodeURIComponent(`General - ${type} - ${ts}.pdf`)}`
     const supabase = createAdminClient()
+
+    // Clean up older keys for this type
+    const keysToClean = type === "etdh" 
+      ? ["info_etdh_pdf", "info_etdh", "general_etdh_pdf", "info_etdh_url"] 
+      : ["info_diplomados_pdf", "info_diplomados", "general_diplomados_pdf", "info_diplomados_url"]
+
+    await supabase.from("platform_settings").delete().in("key", keysToClean)
 
     const { error: upsertError } = await supabase
       .from("platform_settings")
       .upsert(
-        { key, value: publicUrl, updated_at: new Date().toISOString() },
+        { key, value: viewerUrl, updated_at: new Date().toISOString() },
         { onConflict: "key" }
       )
 
@@ -94,11 +103,14 @@ export async function uploadGeneralInfoPdf(formData: FormData) {
       return { error: "Error de base de datos al registrar el PDF." }
     }
 
-    revalidatePath("/diplomados")
-    revalidatePath("/formacion-academica")
-    revalidatePath("/admin/configuracion")
+    revalidatePath("/diplomados", "page")
+    revalidatePath("/diplomados", "layout")
+    revalidatePath("/formacion-academica", "page")
+    revalidatePath("/formacion-academica", "layout")
+    revalidatePath("/admin/configuracion", "page")
+    revalidatePath("/admin/configuracion", "layout")
 
-    return { success: true, pdfUrl: publicUrl }
+    return { success: true, pdfUrl: viewerUrl }
   } catch (err: any) {
     console.error("Error al procesar PDF general:", err)
     return { error: err?.message || "Error al subir el archivo PDF." }
@@ -291,17 +303,19 @@ export async function deleteGeneralInfoPdf(type: "diplomados" | "etdh") {
       .delete()
       .in("key", keysToDelete)
 
-    // 2. Listar y eliminar todos los archivos físicos almacenados en info/
+    // 2. Listar y eliminar todos los archivos físicos almacenados en info/ e info-pdfs/
     try {
-      const { data: files } = await supabase.storage.from(BUCKET_NAME).list("info")
-      if (files && files.length > 0) {
-        const prefix = type === "etdh" ? "general-etdh" : "general-diplomados"
-        const filesToRemove = files
-          .filter(f => f.name.startsWith(prefix) || f.name.includes(type))
-          .map(f => `info/${f.name}`)
+      for (const folder of ["info", "info-pdfs"]) {
+        const { data: files } = await supabase.storage.from(BUCKET_NAME).list(folder)
+        if (files && files.length > 0) {
+          const prefix = type === "etdh" ? "general-etdh" : "general-diplomados"
+          const filesToRemove = files
+            .filter(f => f.name.startsWith(prefix) || f.name.includes(type))
+            .map(f => `${folder}/${f.name}`)
 
-        if (filesToRemove.length > 0) {
-          await supabase.storage.from(BUCKET_NAME).remove(filesToRemove)
+          if (filesToRemove.length > 0) {
+            await supabase.storage.from(BUCKET_NAME).remove(filesToRemove)
+          }
         }
       }
     } catch (e) {
