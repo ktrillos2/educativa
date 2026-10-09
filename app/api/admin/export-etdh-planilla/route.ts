@@ -43,29 +43,18 @@ export async function GET(request: Request) {
     return new NextResponse("Este grupo no pertenece a un programa académico ETDH", { status: 400 })
   }
 
-  // 2. Obtener inscripciones del grupo (con fallback al curso completo si el group_id no se asignó explícitamente)
-  let { data: enrollments, error: enrollError } = await supabase
+  // 2. Obtener todas las inscripciones del curso para el cohorte ordenadas cronológicamente
+  const { data: courseEnrollments, error: enrollError } = await supabase
     .from("enrollments")
     .select("user_id, created_at, group_id, payment_verified")
-    .eq("group_id", groupId)
+    .eq("course_id", group.course_id)
+    .order("created_at", { ascending: true })
 
   if (enrollError) {
     return new NextResponse("Error obteniendo inscripciones", { status: 500 })
   }
 
-  if (!enrollments || enrollments.length === 0) {
-    // Si no hay inscripciones directamente asociadas a group_id, obtener todas las del curso
-    const { data: courseEnrollments } = await supabase
-      .from("enrollments")
-      .select("user_id, created_at, group_id, payment_verified")
-      .eq("course_id", group.course_id)
-
-    if (courseEnrollments) {
-      enrollments = courseEnrollments
-    }
-  }
-
-  enrollments = enrollments || []
+  let enrollments = courseEnrollments || []
 
   const userIds = enrollments.map(e => e.user_id)
   
@@ -82,12 +71,22 @@ export async function GET(request: Request) {
   // 4. Obtener study_acts (Diplomas y Actas)
   let studyActs: any[] = []
   if (userIds.length > 0) {
-    const { data: acts } = await supabase
+    const { data: acts, error: actsErr } = await supabase
       .from("study_acts")
       .select("user_id, type, created_at")
       .eq("course_id", group.course_id)
       .in("user_id", userIds)
-    if (acts) studyActs = acts
+
+    if (actsErr) {
+      const { data: fallbackActs } = await supabase
+        .from("study_acts")
+        .select("user_id, type")
+        .eq("course_id", group.course_id)
+        .in("user_id", userIds)
+      if (fallbackActs) studyActs = fallbackActs
+    } else if (acts) {
+      studyActs = acts
+    }
   }
 
   const formatDate = (dateString?: string) => {
@@ -98,6 +97,26 @@ export async function GET(request: Request) {
       year: "numeric"
     })
   }
+
+  // 1. Obtener consecutivo de Folio para el cohorte/grupo (según orden cronológico de cohortes ETDH)
+  const { data: etdhCourses } = await supabase.from("courses").select("id").eq("type", "etdh")
+  const etdhCourseIds = (etdhCourses || []).map(c => c.id)
+
+  const { data: etdhGroups } = await supabase
+    .from("course_groups")
+    .select("id, course_id, registration_start, created_at")
+    .in("course_id", etdhCourseIds.length > 0 ? etdhCourseIds : [group.course_id])
+    .order("registration_start", { ascending: true })
+
+  let groupIndex = -1
+  if (groupId) {
+    groupIndex = (etdhGroups || []).findIndex(g => g.id === groupId)
+  }
+  if (groupIndex === -1) {
+    groupIndex = (etdhGroups || []).findIndex(g => g.course_id === group.course_id)
+  }
+  const folioNum = groupIndex >= 0 ? groupIndex + 1 : 1
+  const folioString = String(folioNum).padStart(2, "0")
 
   // Fecha de inicio del programa (Fecha del cohorte/grupo, no de inscripción)
   const programStartDate = formatDate(group.registration_start)
@@ -111,7 +130,13 @@ export async function GET(request: Request) {
     const acta = actsForUser.find(a => a.type === "ACTA")
 
     // Fecha de certificación es la misma fecha del diploma (cuándo se certificó)
-    const certificationDate = diploma ? formatDate(diploma.created_at) : "No certificado"
+    const todayFormatted = new Date().toLocaleDateString("es-CO", { day: "2-digit", month: "2-digit", year: "numeric" })
+    const certificationDate = diploma ? (diploma.created_at ? formatDate(diploma.created_at) : todayFormatted) : "No certificado"
+    const currentYear = new Date().getFullYear()
+    const seqActa = String(index + 1).padStart(5, "0")
+    const registroActa = diploma ? `${currentYear}-${seqActa}` : "N/A"
+
+    const actaDetails = diploma ? `Acta N° ${registroActa} (Folio N° ${folioString})` : "Pendiente"
 
     return {
       index: index + 1,
@@ -122,10 +147,13 @@ export async function GET(request: Request) {
       phone: user.phone || "No registrado",
       address: user.address || "No registrada",
       startDate: programStartDate, // Fecha de inicio del programa
+      folio: `Folio N° ${folioString}`,
+      registroActa: registroActa,
       status: (enrollment as any).is_expired ? "Expirado" : (enrollment.payment_verified ? "Activo (Pagado)" : "Pendiente"),
       certificationDate: certificationDate, // Fecha de certificación
       actaDownloaded: acta ? "Sí" : "No",
       actaDate: formatDate(acta?.created_at),
+      actaDetails: actaDetails,
     }
   })
 
@@ -135,6 +163,7 @@ export async function GET(request: Request) {
       success: true,
       course: course.title,
       group: group.name,
+      folio: `Folio N° ${folioString}`,
       registrationStart: programStartDate,
       registrationEnd: formatDate(group.registration_end),
       totalStudents: studentRecords.length,
@@ -159,8 +188,9 @@ export async function GET(request: Request) {
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${s.address}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${s.startDate}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${s.status}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; font-weight: bold;">${s.registroActa}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center;">${s.certificationDate}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center;">${s.actaDownloaded} ${s.actaDate !== "No" ? `(${s.actaDate})` : ""}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; font-weight: bold;">${s.actaDetails}</td>
       </tr>
     `).join('')
 
@@ -186,9 +216,9 @@ export async function GET(request: Request) {
       <body>
         <div class="header-box">
           <h1>PLANILLA DE ESTUDIANTES - PROGRAMA ETDH</h1>
-          <h2>${course.title} — Cohorte: ${group.name}</h2>
+          <h2>${course.title} — Cohorte: ${group.name} (${folioString ? `Folio N° ${folioString}` : ''})</h2>
           <p style="font-size: 11px; margin: 4px 0 0 0; color: #475569;">
-            <strong>Fecha de Generación:</strong> ${new Date().toLocaleDateString('es-CO')} | <strong>Fecha de Inicio del Programa:</strong> ${programStartDate} | <strong>Total Estudiantes:</strong> ${studentRecords.length}
+            <strong>Generado el:</strong> ${new Date().toLocaleDateString('es-CO')} | <strong>Fecha de Inicio:</strong> ${programStartDate} | <strong>Folio N°:</strong> ${folioString} | <strong>Total Estudiantes:</strong> ${studentRecords.length}
           </p>
         </div>
 
@@ -203,18 +233,17 @@ export async function GET(request: Request) {
               <th>Dirección</th>
               <th>Fecha de Inicio</th>
               <th>Estado</th>
+              <th>N° Registro / Certificado</th>
               <th>Fecha de Certificación</th>
-              <th>Acta Descargada</th>
+              <th>Acta de Grado / Folio</th>
             </tr>
           </thead>
           <tbody>
-            ${tableRowsHtml.length > 0 ? tableRowsHtml : '<tr><td colspan="10" style="text-align: center; padding: 15px; color: #64748b;">No hay estudiantes matriculados en este cohorte.</td></tr>'}
+            ${tableRowsHtml.length > 0 ? tableRowsHtml : '<tr><td colspan="11" style="text-align: center; padding: 15px; color: #64748b;">No hay estudiantes matriculados en este cohorte.</td></tr>'}
           </tbody>
         </table>
 
-        <div class="footer">
-          Desarrollado por K&T ♥ — ${currentYear} | https://www.kytcode.lat
-        </div>
+        </table>
       </body>
       </html>
     `
@@ -239,8 +268,9 @@ export async function GET(request: Request) {
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${s.address}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${s.startDate}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px;">${s.status}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; font-weight: 600;">${s.registroActa}</td>
         <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center;">${s.certificationDate}</td>
-        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center;">${s.actaDownloaded} ${s.actaDate !== "No" ? `<br><small style="color: #64748b;">(${s.actaDate})</small>` : ""}</td>
+        <td style="border: 1px solid #cbd5e1; padding: 6px; text-align: center; font-weight: 600; color: #166534;">${s.actaDetails}</td>
       </tr>
     `).join('')
 
@@ -275,9 +305,9 @@ export async function GET(request: Request) {
         </div>
         <div class="header-box">
           <h1>PLANILLA DE ESTUDIANTES - FORMACIÓN ACADÉMICA ETDH</h1>
-          <h2>${course.title} — Cohorte: ${group.name}</h2>
+          <h2>${course.title} — Cohorte: ${group.name} (Folio N° ${folioString})</h2>
           <p style="font-size: 12px; margin: 6px 0 0 0; color: #475569;">
-            <strong>Fecha de Generación:</strong> ${new Date().toLocaleDateString('es-CO')} | <strong>Fecha de Inicio:</strong> ${programStartDate} | <strong>Total Estudiantes Inscritos:</strong> ${studentRecords.length}
+            <strong>Fecha de Generación:</strong> ${new Date().toLocaleDateString('es-CO')} | <strong>Fecha de Inicio:</strong> ${programStartDate} | <strong>Folio N°:</strong> ${folioString} | <strong>Total Estudiantes:</strong> ${studentRecords.length}
           </p>
         </div>
 
@@ -292,20 +322,15 @@ export async function GET(request: Request) {
               <th>Dirección</th>
               <th>Fecha de Inicio</th>
               <th>Estado</th>
+              <th>N° Registro / Certificado</th>
               <th>Fecha de Certificación</th>
-              <th>Acta Descargada</th>
+              <th>Acta de Grado / Folio</th>
             </tr>
           </thead>
           <tbody>
-            ${tableRowsHtml.length > 0 ? tableRowsHtml : '<tr><td colspan="10" style="text-align: center; padding: 20px; color: #64748b;">No hay estudiantes matriculados en este cohorte.</td></tr>'}
+            ${tableRowsHtml.length > 0 ? tableRowsHtml : '<tr><td colspan="11" style="text-align: center; padding: 20px; color: #64748b;">No hay estudiantes matriculados en este cohorte.</td></tr>'}
           </tbody>
         </table>
-
-        <div class="footer">
-          <a href="https://www.kytcode.lat" target="_blank" style="text-decoration: none; color: inherit;">
-            Desarrollado por K&T <span style="color: #000;">♥</span> — ${currentYear}
-          </a>
-        </div>
 
         <script>
           if (window.location.search.includes('format=pdf')) {
@@ -333,9 +358,9 @@ export async function GET(request: Request) {
     "Dirección",
     "Fecha de Inicio",
     "Estado",
+    "N° Registro / Certificado",
     "Fecha de Certificación",
-    "Acta Descargada",
-    "Fecha de Acta"
+    "Acta de Grado y Folio"
   ]
 
   const rows = studentRecords.map(s => [
@@ -347,9 +372,9 @@ export async function GET(request: Request) {
     `"${s.address.replace(/"/g, '""')}"`,
     `"${s.startDate}"`,
     `"${s.status}"`,
+    `"${s.registroActa}"`,
     `"${s.certificationDate}"`,
-    `"${s.actaDownloaded}"`,
-    `"${s.actaDate}"`
+    `"${s.actaDetails.replace(/"/g, '""')}"`
   ].join(","))
 
   const csvContent = "\uFEFF" + [headers.join(","), ...rows].join("\n")

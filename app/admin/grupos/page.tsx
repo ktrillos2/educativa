@@ -33,15 +33,20 @@ export default async function AdminGruposPage() {
 
   const coursesMap = new Map((courses || []).map(c => [c.id, { title: c.title, type: c.type }]))
 
-  // Get enrollment counts per group
+  // Get enrollment counts per group and course
   const { data: enrollments } = await supabase
     .from("enrollments")
-    .select("group_id")
+    .select("group_id, course_id")
   
-  const groupCounts: Record<string, number> = {}
+  const groupDirectCounts: Record<string, number> = {}
+  const courseCounts: Record<string, number> = {}
+
   enrollments?.forEach(e => {
     if (e.group_id) {
-      groupCounts[e.group_id] = (groupCounts[e.group_id] || 0) + 1
+      groupDirectCounts[e.group_id] = (groupDirectCounts[e.group_id] || 0) + 1
+    }
+    if (e.course_id) {
+      courseCounts[e.course_id] = (courseCounts[e.course_id] || 0) + 1
     }
   })
 
@@ -65,7 +70,9 @@ export default async function AdminGruposPage() {
         ) : (
           <div className="grid gap-4 md:grid-cols-2">
             {groups.map(group => {
-              const enrolled = groupCounts[group.id] || 0
+              const directEnrolled = groupDirectCounts[group.id] || 0
+              const courseEnrolled = courseCounts[group.course_id] || 0
+              const enrolled = Math.max(directEnrolled, courseEnrolled)
               const courseData = coursesMap.get(group.course_id)
               const courseTitle = courseData?.title || "Curso Desconocido"
               const isEtdh = courseData?.type === "etdh"

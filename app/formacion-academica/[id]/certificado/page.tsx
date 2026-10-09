@@ -110,6 +110,40 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
     .eq("course_id", course.id)
     .eq("completed", true)
 
+  // 1. Obtener número de Folio cronológico por cohorte en programas ETDH
+  const { data: etdhCourses } = await supabase.from("courses").select("id").eq("type", "etdh")
+  const etdhCourseIds = (etdhCourses || []).map(c => c.id)
+
+  const { data: etdhGroups } = await supabase
+    .from("course_groups")
+    .select("id, course_id, registration_start, created_at")
+    .in("course_id", etdhCourseIds.length > 0 ? etdhCourseIds : [course.id])
+    .order("registration_start", { ascending: true })
+
+  let groupIndex = -1
+  if (groupData?.id) {
+    groupIndex = (etdhGroups || []).findIndex(g => g.id === groupData.id)
+  }
+  if (groupIndex === -1) {
+    groupIndex = (etdhGroups || []).findIndex(g => g.course_id === course.id)
+  }
+  const folioNum = groupIndex >= 0 ? groupIndex + 1 : 1
+  const folioString = String(folioNum).padStart(2, "0")
+
+  // 2. Obtener consecutivo del número de Acta (00001, 00002...)
+  const { data: courseEnrollments } = await supabase
+    .from("enrollments")
+    .select("user_id, created_at")
+    .eq("course_id", course.id)
+    .order("created_at", { ascending: true })
+
+  const userIndex = (courseEnrollments || []).findIndex(e => e.user_id === targetUserId)
+  const seqActa = userIndex >= 0 ? userIndex + 1 : 1
+  const actaString = String(seqActa).padStart(5, "0")
+  const certYear = groupData?.first_certificate_download_at 
+    ? new Date(groupData.first_certificate_download_at).getFullYear() 
+    : new Date().getFullYear()
+
   // Para obtener el certificado, el usuario debe completar al menos 4 módulos o el 80%
   const completedModules = progressCheck?.length || 0
   const totalModules = course.modules || 1
@@ -295,7 +329,7 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
                           Con una intensidad académica de ciento sesenta (160) horas. Se expide a los {formatDateDDMMYYYY(groupData?.first_certificate_download_at || new Date())}
                         </p>
                         <p>
-                          Registrado en el Libro de Actas N° 2026<span className="inline-block border-b border-black px-3 min-w-[60px] text-center pb-0.5 font-bold">00001</span> Folio N° <span className="inline-block border-b border-black px-3 min-w-[50px] text-center pb-0.5 font-bold">001</span>
+                          Registrado en el Libro de Actas N° {certYear}<span className="inline-block border-b border-black px-3 min-w-[60px] text-center pb-0.5 font-bold">{actaString}</span> Folio N° <span className="inline-block border-b border-black px-3 min-w-[50px] text-center pb-0.5 font-bold">{folioString}</span>
                         </p>
                       </div>
                     </div>

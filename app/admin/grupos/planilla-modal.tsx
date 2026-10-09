@@ -83,7 +83,14 @@ export function PlanillaModal({ groupId, groupName }: PlanillaModalProps) {
               {/* Barra de Estadísticas y Exportación */}
               <div className="bg-slate-50 rounded-xl border border-slate-200 p-4 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
-                  <h3 className="font-bold text-slate-800 text-base">{data.course}</h3>
+                  <h3 className="font-bold text-slate-800 text-base flex items-center gap-2">
+                    {data.course}
+                    {data.folio && (
+                      <span className="font-bold px-2.5 py-0.5 bg-emerald-700 text-white text-xs rounded-full shadow-xs">
+                        {data.folio}
+                      </span>
+                    )}
+                  </h3>
                   <p className="text-xs text-slate-600 mt-0.5">
                     Total estudiantes matriculados: <span className="font-bold text-emerald-700 text-sm">{data.totalStudents}</span>
                   </p>
@@ -121,8 +128,9 @@ export function PlanillaModal({ groupId, groupName }: PlanillaModalProps) {
                       <th className="p-3 border-b border-slate-800">Dirección</th>
                       <th className="p-3 border-b border-slate-800">Fecha de Inicio</th>
                       <th className="p-3 border-b border-slate-800">Estado</th>
+                      <th className="p-3 text-center border-b border-slate-800">N° Registro / Certificado</th>
                       <th className="p-3 text-center border-b border-slate-800">Fecha de Certificación</th>
-                      <th className="p-3 text-center border-b border-slate-800">Acta</th>
+                      <th className="p-3 text-center border-b border-slate-800">Acta de Grado / Folio</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-200 bg-white">
@@ -141,6 +149,7 @@ export function PlanillaModal({ groupId, groupName }: PlanillaModalProps) {
                               {s.status}
                             </span>
                           </td>
+                          <td className="p-3 text-center font-mono font-semibold text-slate-800">{s.registroActa}</td>
                           <td className="p-3 text-center font-medium">
                             {s.certificationDate !== "No certificado" ? (
                               <span className="text-emerald-700 font-bold">{s.certificationDate}</span>
@@ -149,10 +158,12 @@ export function PlanillaModal({ groupId, groupName }: PlanillaModalProps) {
                             )}
                           </td>
                           <td className="p-3 text-center">
-                            {s.actaDownloaded === "Sí" ? (
-                              <span className="text-emerald-700 font-bold">Sí ({s.actaDate})</span>
+                            {s.actaDetails && s.actaDetails !== "Pendiente" ? (
+                              <span className="text-emerald-700 font-bold bg-emerald-50 px-2 py-1 rounded border border-emerald-200 inline-block">
+                                {s.actaDetails}
+                              </span>
                             ) : (
-                              <span className="text-slate-400">No</span>
+                              <span className="text-slate-400">Pendiente</span>
                             )}
                           </td>
                         </tr>

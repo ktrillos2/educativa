@@ -89,18 +89,54 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
     (progressResult || []).map(row => [row.module_id, { score: Number(row.score), completed: Boolean(row.completed) }])
   )
 
-  const modulesData = Array.from({ length: course.modules }).map((_, i) => {
-    const moduleId = `mod-${i + 1}`
-    const progress = progressMap.get(moduleId)
+  const modulesData = Array.from({ length: course.modules || 1 }).map((_, i) => {
+    const modKey1 = `mod-${i + 1}`
+    const modKey2 = `modulo-${i + 1}`
+    const modKey3 = `${i + 1}`
+    const progress = progressMap.get(modKey1) || progressMap.get(modKey2) || progressMap.get(modKey3) || Array.from(progressMap.values())[i]
     return {
-      id: moduleId,
+      id: `mod-${i + 1}`,
       title: `Módulo ${i + 1}: Desarrollo de Competencias Unidad ${i + 1}`,
-      score: progress?.score || 0,
+      score: progress?.score !== undefined ? Number(progress.score) : 0,
       completed: progress?.completed || false
     }
   })
 
   const averageScore = modulesData.reduce((acc, mod) => acc + mod.score, 0) / modulesData.length
+
+  // 1. Obtener número de Folio cronológico por cohorte en programas ETDH
+  const { data: etdhCourses } = await supabase.from("courses").select("id").eq("type", "etdh")
+  const etdhCourseIds = (etdhCourses || []).map(c => c.id)
+
+  const { data: etdhGroups } = await supabase
+    .from("course_groups")
+    .select("id, course_id, registration_start, created_at")
+    .in("course_id", etdhCourseIds.length > 0 ? etdhCourseIds : [course.id])
+    .order("registration_start", { ascending: true })
+
+  let groupIndex = -1
+  if (groupData?.id) {
+    groupIndex = (etdhGroups || []).findIndex(g => g.id === groupData.id)
+  }
+  if (groupIndex === -1) {
+    groupIndex = (etdhGroups || []).findIndex(g => g.course_id === course.id)
+  }
+  const folioNum = groupIndex >= 0 ? groupIndex + 1 : 1
+  const folioString = String(folioNum).padStart(2, "0")
+
+  // 2. Obtener consecutivo del número de Acta (00001, 00002...)
+  const { data: courseEnrollments } = await supabase
+    .from("enrollments")
+    .select("user_id, created_at")
+    .eq("course_id", course.id)
+    .order("created_at", { ascending: true })
+
+  const userIndex = (courseEnrollments || []).findIndex(e => e.user_id === targetUserId)
+  const seqActa = userIndex >= 0 ? userIndex + 1 : 1
+  const actaString = String(seqActa).padStart(5, "0")
+  const certYear = groupData?.first_certificate_download_at 
+    ? new Date(groupData.first_certificate_download_at).getFullYear() 
+    : new Date().getFullYear()
 
   return (
     <main className="flex-grow bg-muted/20 pb-20">
@@ -130,7 +166,7 @@ export default async function ActaPage(props: { params: Promise<{ id: string }>,
 
             <div className="text-center mb-12 print:mb-6 border-b-2 border-primary/10 pb-8 print:pb-4">
               <h1 className="text-3xl font-serif font-bold text-primary uppercase tracking-widest mb-2 print:text-2xl">Acta de Finalización Académica</h1>
-              <p className="text-muted-foreground font-medium uppercase tracking-wider text-sm">Registro No. FLM-{course.id}-{session.userId.slice(0, 5)}</p>
+              <p className="text-muted-foreground font-semibold uppercase tracking-wider text-sm">REGISTRO NO. {certYear}-{actaString} &nbsp;&nbsp;|&nbsp;&nbsp; FOLIO NO. {folioString}</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 print:grid-cols-2 gap-8 mb-12 print:gap-4 print:mb-6">
