@@ -422,6 +422,100 @@ export function ModuleManager({
 
 
 
+      {/* Documento de Información Específica del Curso */}
+      <section className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] shadow-sm overflow-hidden">
+        <div className="bg-[oklch(0.25_0.10_145)] px-6 py-4 text-white flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <BookOpen className="w-5 h-5 text-secondary" />
+            <div>
+              <h2 className="font-bold text-base text-white">PDF Específico del Curso</h2>
+              <p className="text-white/80 text-xs">Carga el documento "Por qué cursar nuestro programa" que se muestra a los estudiantes para este curso.</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-6">
+          <div className="bg-white border border-[oklch(0.88_0.04_145)] rounded-xl p-5 space-y-4 shadow-sm max-w-2xl">
+            <div className="flex justify-between items-start">
+              <div>
+                <p className="text-[10px] text-[oklch(0.65_0.04_145)] font-medium mb-0.5">Información Específica</p>
+                <h3 className="font-bold text-[oklch(0.25_0.10_145)] text-base">
+                  Documento del Curso
+                </h3>
+              </div>
+              {coursePdfUrl ? (
+                <div className="flex items-center gap-2">
+                  <a
+                    href={coursePdfUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs font-bold text-primary hover:underline flex items-center gap-1 bg-white px-2.5 py-1 rounded border border-primary/30"
+                  >
+                    <Eye className="w-3.5 h-3.5" /> Ver Documento
+                  </a>
+                  {confirmDeleteCoursePdf ? (
+                    <div className="flex items-center gap-1 bg-red-100 border border-red-300 rounded px-2 py-0.5 text-xs">
+                      <span className="text-red-700 font-medium">¿Eliminar?</span>
+                      <button
+                        type="button"
+                        onClick={handleDeleteCoursePdf}
+                        disabled={isUploadingCoursePdf}
+                        className="bg-red-600 hover:bg-red-700 text-white font-bold px-2 py-0.5 rounded"
+                      >
+                        Sí
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfirmDeleteCoursePdf(false)}
+                        className="bg-slate-200 text-slate-700 font-medium px-2 py-0.5 rounded"
+                      >
+                        No
+                      </button>
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => setConfirmDeleteCoursePdf(true)}
+                      className="text-xs font-bold text-red-600 hover:bg-red-50 p-1 rounded transition-colors"
+                      title="Eliminar PDF del Curso"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
+                </div>
+              ) : (
+                <span className="text-xs text-slate-400 italic">Sin archivo cargado</span>
+              )}
+            </div>
+
+            <form onSubmit={handleCoursePdfSubmit} className="space-y-3">
+              <input
+                type="file"
+                name="pdf_file"
+                accept="application/pdf,.pdf"
+                required
+                className="w-full text-xs text-slate-600 bg-slate-50 border border-slate-300 rounded-lg p-2 file:mr-3 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-primary file:text-white hover:file:bg-primary/90 cursor-pointer"
+              />
+              <button
+                type="submit"
+                disabled={isUploadingCoursePdf}
+                className="w-full py-2.5 bg-primary text-white font-bold text-xs rounded-lg hover:bg-primary/90 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 shadow-sm"
+              >
+                <Upload className="w-3.5 h-3.5" />
+                {isUploadingCoursePdf ? "Subiendo..." : "Subir PDF del Curso"}
+              </button>
+            </form>
+
+            {coursePdfMessage && (
+              <p className={`text-xs font-medium flex items-center gap-1 ${coursePdfMessage.error ? "text-red-600" : "text-green-600"}`}>
+                {coursePdfMessage.error ? <AlertCircle className="w-3.5 h-3.5" /> : <CheckCircle className="w-3.5 h-3.5" />}
+                {coursePdfMessage.text}
+              </p>
+            )}
+          </div>
+        </div>
+      </section>
+
       {/* Module Selector Bar */}
       <section className="bg-white rounded-xl border border-[oklch(0.88_0.04_145)] p-6 shadow-sm">
         <div className="flex justify-between items-center mb-4">
