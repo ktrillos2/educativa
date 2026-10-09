@@ -32,7 +32,6 @@ const ADMIN_NAV: NavItem[] = [
   { label: "Foros / Comunidad", href: "/admin/foros", icon: MessageSquare },
   { label: "Reportes",  href: "/admin/reportes",   icon: BarChart2 },
   { label: "Videos",    href: "/admin/videos",     icon: Video },
-  { label: "Documentos PDF", href: "/admin/configuracion", icon: FileText },
 ]
 
 const ESTUDIANTE_NAV: NavItem[] = [

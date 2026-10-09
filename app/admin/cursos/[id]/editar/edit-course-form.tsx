@@ -135,8 +135,8 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
         setIsPending(false)
       } else {
         const targetId = result?.finalId || course.id
-        if (uploadedPdf) {
-          setPdfUrlState(`/api/file/${encodeURIComponent(`Info - ${targetId}.pdf`)}`)
+        if (uploadedPdf && pdfResult?.pdfUrl) {
+          setPdfUrlState(pdfResult.pdfUrl)
         }
         setSuccessMessage(
           uploadedPdf
