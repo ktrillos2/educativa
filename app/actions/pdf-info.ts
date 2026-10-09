@@ -144,10 +144,9 @@ export async function uploadCourseInfoPdf(formData: FormData) {
     }
 
     const supabase = createAdminClient()
-    // Path aislado por curso: cada curso tiene su propio archivo info.pdf
-    const destinationPath = `${courseId}/info.pdf`
-    // URL estable a través del proxy API, nunca expira y es única por curso
-    const viewerUrl = `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
+    const ts = Date.now()
+    // URL a través del proxy API con timestamp para invalidar caché del navegador al subir nuevo PDF
+    const viewerUrl = `/api/file/${encodeURIComponent(`Info - ${courseId} - ${ts}.pdf`)}`
 
     const { error: uploadError } = await supabase.storage
       .from(BUCKET_NAME)

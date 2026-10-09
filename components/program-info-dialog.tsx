@@ -56,7 +56,7 @@ export async function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
             {hasPdf ? (
               <div className="w-full h-[72vh] rounded-md overflow-hidden bg-white shadow-md border border-slate-200">
                 <iframe
-                  src={`${viewerUrl}#toolbar=0&navpanes=0`}
+                  src={`${viewerUrl}${viewerUrl.includes("?") ? "&" : "?"}t=${Date.now()}#toolbar=0&navpanes=0`}
                   className="w-full h-full border-0"
                   title={title}
                 />

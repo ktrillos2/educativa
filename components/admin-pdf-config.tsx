@@ -265,8 +265,8 @@ function PdfUploadCard({ section }: { section: PdfSection }) {
             </div>
             <div className="w-full h-80 rounded-lg overflow-hidden border bg-slate-100">
               <iframe
-                key={activePdfUrl}
-                src={`${activePdfUrl}#toolbar=0`}
+                key={`${activePdfUrl}-${Date.now()}`}
+                src={`${activePdfUrl}${activePdfUrl.includes("?") ? "&" : "?"}t=${Date.now()}#toolbar=0`}
                 className="w-full h-full"
                 title={`PDF ${section.label}`}
               />
@@ -531,8 +531,8 @@ function CoursePdfUploadCard({
             </div>
             <div className="w-full h-80 rounded-lg overflow-hidden border bg-slate-100">
               <iframe
-                key={activePdfUrl}
-                src={`${activePdfUrl}#toolbar=0`}
+                key={`${activePdfUrl}-${Date.now()}`}
+                src={`${activePdfUrl}${activePdfUrl.includes("?") ? "&" : "?"}t=${Date.now()}#toolbar=0`}
                 className="w-full h-full"
                 title={`PDF ${selectedCourse?.title}`}
               />

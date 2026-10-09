@@ -95,6 +95,10 @@ export async function GET(
         return new NextResponse("File not found", { status: 404 })
     }
 
-    // Redirect to the signed URL — the browser will stream the PDF directly from Supabase Storage
-    return NextResponse.redirect(data.signedUrl)
+    // Redirect to the signed URL with strict no-cache headers so browser never caches old PDF versions
+    const res = NextResponse.redirect(data.signedUrl, { status: 307 })
+    res.headers.set("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
+    res.headers.set("Pragma", "no-cache")
+    res.headers.set("Expires", "0")
+    return res
 }
