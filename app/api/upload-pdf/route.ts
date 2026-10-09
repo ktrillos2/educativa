@@ -43,10 +43,10 @@ export async function POST(request: NextRequest) {
       viewerUrl = ts ? `/api/file/${encodeURIComponent(`Info - ${courseId} - ${ts}.pdf`)}` : `/api/file/${encodeURIComponent(`Info - ${courseId}.pdf`)}`
       primaryKey = `course_pdf_${courseId}`
     } else if (type === "etdh") {
-      viewerUrl = ts ? `/api/file/General - etdh - ${ts}.pdf` : "/api/file/General - etdh.pdf"
+      viewerUrl = ts ? `/api/file/${encodeURIComponent(`General - etdh - ${ts}.pdf`)}` : `/api/file/${encodeURIComponent("General - etdh.pdf")}`
       primaryKey = "info_etdh_pdf"
     } else {
-      viewerUrl = ts ? `/api/file/General - diplomados - ${ts}.pdf` : "/api/file/General - diplomados.pdf"
+      viewerUrl = ts ? `/api/file/${encodeURIComponent(`General - diplomados - ${ts}.pdf`)}` : `/api/file/${encodeURIComponent("General - diplomados.pdf")}`
       primaryKey = "info_diplomados_pdf"
     }
 
@@ -70,16 +70,23 @@ export async function POST(request: NextRequest) {
         )
     }
 
-    // Revalidaciones no críticas
+    // Revalidaciones completas (page + layout)
     try {
       revalidatePath("/diplomados", "page")
+      revalidatePath("/diplomados", "layout")
       revalidatePath("/formacion-academica", "page")
+      revalidatePath("/formacion-academica", "layout")
       revalidatePath("/admin/configuracion", "page")
+      revalidatePath("/admin/configuracion", "layout")
       revalidatePath("/diplomados/[id]", "page")
+      revalidatePath("/diplomados/[id]", "layout")
       revalidatePath("/formacion-academica/[id]", "page")
+      revalidatePath("/formacion-academica/[id]", "layout")
       if (courseId) {
         revalidatePath(`/admin/cursos/${courseId}/editar`, "page")
+        revalidatePath(`/admin/cursos/${courseId}/editar`, "layout")
         revalidatePath(`/admin/cursos/${courseId}/modulos`, "page")
+        revalidatePath(`/admin/cursos/${courseId}/modulos`, "layout")
       }
     } catch (e) {
       console.warn("Revalidación fallida:", e)

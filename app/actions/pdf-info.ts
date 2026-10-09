@@ -259,11 +259,17 @@ export async function deleteCourseInfoPdf(courseId: string) {
     } catch (e) {}
 
     revalidatePath("/diplomados", "page")
+    revalidatePath("/diplomados", "layout")
     revalidatePath("/formacion-academica", "page")
+    revalidatePath("/formacion-academica", "layout")
     revalidatePath("/diplomados/[id]", "page")
+    revalidatePath("/diplomados/[id]", "layout")
     revalidatePath("/formacion-academica/[id]", "page")
+    revalidatePath("/formacion-academica/[id]", "layout")
     revalidatePath("/admin/configuracion", "page")
-    revalidatePath(`/admin/cursos/${courseId}/editar`)
+    revalidatePath("/admin/configuracion", "layout")
+    revalidatePath(`/admin/cursos/${courseId}/editar`, "page")
+    revalidatePath(`/admin/cursos/${courseId}/editar`, "layout")
 
     return { success: true, message: "PDF eliminado exitosamente." }
   } catch (err: any) {
@@ -272,27 +278,42 @@ export async function deleteCourseInfoPdf(courseId: string) {
   }
 }
 
-/**
- * Deletes a general info PDF (Diplomados or ETDH).
- */
 export async function deleteGeneralInfoPdf(type: "diplomados" | "etdh") {
   try {
     const supabase = createAdminClient()
-    const key = type === "etdh" ? "info_etdh_pdf" : "info_diplomados_pdf"
+    const keysToDelete = type === "etdh" 
+      ? ["info_etdh_pdf", "info_etdh", "general_etdh_pdf", "info_etdh_url"] 
+      : ["info_diplomados_pdf", "info_diplomados", "general_diplomados_pdf", "info_diplomados_url"]
 
+    // 1. Eliminar todas las entradas de configuraciones en la BD
     await supabase
       .from("platform_settings")
       .delete()
-      .eq("key", key)
+      .in("key", keysToDelete)
 
+    // 2. Listar y eliminar todos los archivos físicos almacenados en info/
     try {
-      const storagePath = type === "etdh" ? "info/general-etdh.pdf" : "info/general-diplomados.pdf"
-      await supabase.storage.from(BUCKET_NAME).remove([storagePath])
-    } catch (e) {}
+      const { data: files } = await supabase.storage.from(BUCKET_NAME).list("info")
+      if (files && files.length > 0) {
+        const prefix = type === "etdh" ? "general-etdh" : "general-diplomados"
+        const filesToRemove = files
+          .filter(f => f.name.startsWith(prefix) || f.name.includes(type))
+          .map(f => `info/${f.name}`)
 
-    revalidatePath("/diplomados")
-    revalidatePath("/formacion-academica")
-    revalidatePath("/admin/configuracion")
+        if (filesToRemove.length > 0) {
+          await supabase.storage.from(BUCKET_NAME).remove(filesToRemove)
+        }
+      }
+    } catch (e) {
+      console.warn("No se pudieron limpiar archivos de storage:", e)
+    }
+
+    revalidatePath("/diplomados", "page")
+    revalidatePath("/diplomados", "layout")
+    revalidatePath("/formacion-academica", "page")
+    revalidatePath("/formacion-academica", "layout")
+    revalidatePath("/admin/configuracion", "page")
+    revalidatePath("/admin/configuracion", "layout")
 
     return { success: true, message: "PDF general eliminado exitosamente." }
   } catch (err: any) {
