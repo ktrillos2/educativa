@@ -75,6 +75,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
       }
 
       let uploadedPdf = false
+      let newPdfUrl: string | null = null
 
       // 1. If a PDF file was selected, upload it using direct upload
       const pdfFileInput = formData.get("pdf_file") as File | null
@@ -124,6 +125,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
         }
 
         uploadedPdf = true
+        newPdfUrl = pdfResult.pdfUrl
         // Delete pdf_file from formData so server action does not upload it twice
         formData.delete("pdf_file")
       }
@@ -135,8 +137,8 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
         setIsPending(false)
       } else {
         const targetId = result?.finalId || course.id
-        if (uploadedPdf && pdfResult?.pdfUrl) {
-          setPdfUrlState(pdfResult.pdfUrl)
+        if (uploadedPdf && newPdfUrl) {
+          setPdfUrlState(newPdfUrl)
         }
         setSuccessMessage(
           uploadedPdf
@@ -364,7 +366,7 @@ export function EditCourseForm({ course, currentPdfUrl }: { course: any; current
               <p className="text-xs text-[oklch(0.55_0.04_145)]">
                 {pdfUrlState
                   ? "Sube un nuevo archivo PDF si deseas reemplazar el documento actualmente guardado."
-                  : "Sube un archivo PDF de información para este curso. Se mostrará en el botón \"¿Por qué cursar?\"."}
+                  : `Sube un archivo PDF de información para este ${courseType === "etdh" ? "programa ETDH" : "diplomado"}. Se mostrará en el botón "Por qué cursar nuestro ${courseType === "etdh" ? "programa" : "diplomado"}".`}
               </p>
             </div>
 

@@ -20,7 +20,7 @@ export async function CoursePdfButton({ type, courseId, courseName }: CoursePdfB
   const hasPdf = Boolean(coursePdfUrl)
   const viewerUrl = coursePdfUrl || ""
 
-  const buttonLabel = `Por qué cursar nuestro "${courseName}"`
+  const buttonLabel = `Por qué cursar nuestro ${type === "etdh" ? "programa" : "diplomado"} "${courseName}"`
 
   return (
     <div className="my-[1cm] flex justify-center">

@@ -13,6 +13,8 @@ export async function ProgramInfoDialog({ type }: ProgramInfoDialogProps) {
     (await getPdfUrl(isDiplomado ? "info_diplomados" : "info_etdh")) ||
     (await getPdfUrl(isDiplomado ? "general_diplomados_pdf" : "general_etdh_pdf"))
 
+  console.log(`[ProgramInfoDialog] Renderizando modal general para tipo: "${type}". storedUrl resuelto: "${storedUrl}"`)
+
   const hasPdf = Boolean(storedUrl)
   const viewerUrl = storedUrl || ""
 

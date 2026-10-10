@@ -1,7 +1,7 @@
 "use server"
 
 import { createAdminClient } from "@/utils/supabase/admin"
-import { revalidatePath } from "next/cache"
+import { revalidatePath, unstable_noStore as noStore } from "next/cache"
 
 /** Supabase Storage bucket configured for PDF files */
 const BUCKET_NAME = "course-modules"
@@ -203,6 +203,7 @@ export async function uploadCourseInfoPdf(formData: FormData) {
  */
 export async function getPdfUrl(key: string): Promise<string | null> {
   try {
+    noStore()
     const supabase = createAdminClient()
     const { data, error } = await supabase
       .from("platform_settings")
@@ -211,10 +212,12 @@ export async function getPdfUrl(key: string): Promise<string | null> {
       .maybeSingle()
 
     if (error || !data?.value) {
+      console.log(`[getPdfUrl] Key "${key}": No encontrado o error`, error)
       return null
     }
 
     const val = String(data.value).trim()
+    console.log(`[getPdfUrl] Key "${key}": Encontrado -> ${val}`)
     if (
       val.startsWith("http://") ||
       val.startsWith("https://") ||
@@ -297,11 +300,12 @@ export async function deleteGeneralInfoPdf(type: "diplomados" | "etdh") {
       ? ["info_etdh_pdf", "info_etdh", "general_etdh_pdf", "info_etdh_url"] 
       : ["info_diplomados_pdf", "info_diplomados", "general_diplomados_pdf", "info_diplomados_url"]
 
-    // 1. Eliminar todas las entradas de configuraciones en la BD
-    await supabase
-      .from("platform_settings")
-      .delete()
-      .in("key", keysToDelete)
+    // 1. Eliminar todas las entradas de configuraciones en la BD (incluyendo cualquier clave heredada)
+    if (type === "etdh") {
+      await supabase.from("platform_settings").delete().ilike("key", "%etdh%")
+    } else {
+      await supabase.from("platform_settings").delete().ilike("key", "%diplomado%")
+    }
 
     // 2. Listar y eliminar todos los archivos físicos almacenados en info/ e info-pdfs/
     try {

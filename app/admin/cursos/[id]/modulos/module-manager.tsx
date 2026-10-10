@@ -428,8 +428,12 @@ export function ModuleManager({
           <div className="flex items-center gap-3">
             <BookOpen className="w-5 h-5 text-secondary" />
             <div>
-              <h2 className="font-bold text-base text-white">PDF Específico del Curso</h2>
-              <p className="text-white/80 text-xs">Carga el documento "Por qué cursar nuestro programa" que se muestra a los estudiantes para este curso.</p>
+              <h2 className="font-bold text-base text-white">
+                {course.type === "etdh" ? "PDF Específico del Programa ETDH" : "PDF Específico del Diplomado"}
+              </h2>
+              <p className="text-white/80 text-xs">
+                Carga el documento "Por qué cursar nuestro {course.type === "etdh" ? "programa" : "diplomado"}" que se muestra a los estudiantes para este {course.type === "etdh" ? "programa" : "diplomado"}.
+              </p>
             </div>
           </div>
         </div>

@@ -2,6 +2,8 @@ import { getSession } from "@/lib/auth"
 import { createAdminClient } from "@/utils/supabase/admin"
 import { BookOpen, GraduationCap, Clock, Banknote, Flame, CheckCircle } from "lucide-react"
 import { CourseActions } from "./course-actions"
+import { AdminPdfConfig } from "@/components/admin-pdf-config"
+import { getPdfUrl } from "@/app/actions/pdf-info"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
@@ -9,6 +11,30 @@ export const revalidate = 0
 export default async function AdminCursosPage() {
   const session = await getSession()
   const supabase = createAdminClient()
+
+  const diplomadosPdfUrl =
+    (await getPdfUrl("info_diplomados_pdf")) ||
+    (await getPdfUrl("info_diplomados")) ||
+    (await getPdfUrl("general_diplomados_pdf"))
+  const etdhPdfUrl =
+    (await getPdfUrl("info_etdh_pdf")) || (await getPdfUrl("info_etdh")) || (await getPdfUrl("general_etdh_pdf"))
+
+  const sections = [
+    {
+      type: "diplomados" as const,
+      label: "PDF Principal de Diplomados",
+      description: "PDF general que se despliega al hacer clic en '¿Por qué cursar nuestros Diplomados?'",
+      hasContent: Boolean(diplomadosPdfUrl),
+      pdfUrl: diplomadosPdfUrl,
+    },
+    {
+      type: "etdh" as const,
+      label: "PDF Principal de Programas Académicos (ETDH)",
+      description: "PDF general que se despliega al hacer clic en '¿Por qué cursar nuestros Programas Académicos?'",
+      hasContent: Boolean(etdhPdfUrl),
+      pdfUrl: etdhPdfUrl,
+    },
+  ]
 
   const { data: courses } = await supabase
     .from("courses")
@@ -38,6 +64,14 @@ export default async function AdminCursosPage() {
         <a href="/admin/cursos/crear" className="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-primary/90 transition-colors flex items-center gap-2">
           + Crear Curso
         </a>
+      </div>
+
+      <div className="mb-8 bg-slate-50/50 p-6 rounded-xl border border-slate-200 shadow-inner">
+        <div className="mb-4">
+          <h2 className="text-xl font-bold text-slate-800">Información General (PDFs)</h2>
+          <p className="text-sm text-slate-500">Sube aquí los documentos que se muestran en los botones generales "¿Por qué cursar nuestros Diplomados/Programas?".</p>
+        </div>
+        <AdminPdfConfig sections={sections} />
       </div>
 
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

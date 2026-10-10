@@ -58,16 +58,38 @@ export async function POST(request: NextRequest) {
         keysToSave.push(`course_pdf_${slugId}`)
         keysToSave.push(`course_info_${slugId}`)
       }
+    } else if (type === "etdh") {
+      keysToSave.push("info_etdh", "general_etdh_pdf", "info_etdh_url")
+    } else {
+      keysToSave.push("info_diplomados", "general_diplomados_pdf", "info_diplomados_url")
+    }
+
+    console.log(`[API /api/upload-pdf] Payload recibido:`, { type, courseId, ts })
+    console.log(`[API /api/upload-pdf] viewerUrl generado: "${viewerUrl}", primaryKey: "${primaryKey}", keysToSave:`, keysToSave)
+
+    // Delete any old/legacy keys for general PDFs before setting new ones
+    if (type === "etdh") {
+      const { error: delErr } = await supabase.from("platform_settings").delete().ilike("key", "%etdh%")
+      console.log(`[API /api/upload-pdf] Borrando claves antiguas %etdh%. Error?:`, delErr)
+    } else if (type === "diplomados" || type === "diplomado") {
+      const { error: delErr } = await supabase.from("platform_settings").delete().ilike("key", "%diplomado%")
+      console.log(`[API /api/upload-pdf] Borrando claves antiguas %diplomado%. Error?:`, delErr)
     }
 
     // Actualizar base de datos
     for (const key of keysToSave) {
-      await supabase
+      const { error: upsertErr } = await supabase
         .from("platform_settings")
         .upsert(
           { key, value: viewerUrl, updated_at: new Date().toISOString() },
           { onConflict: "key" }
         )
+      if (upsertErr) {
+        console.error(`[API /api/upload-pdf] Error upserting key "${key}":`, upsertErr)
+        return NextResponse.json({ error: `Error en la base de datos al guardar la clave ${key}: ${upsertErr.message}` }, { status: 500 })
+      } else {
+        console.log(`[API /api/upload-pdf] Upsert exitoso para key "${key}" -> ${viewerUrl}`)
+      }
     }
 
     // Revalidaciones completas (page + layout)

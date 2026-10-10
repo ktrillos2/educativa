@@ -19,6 +19,8 @@ export async function GET(
 
     let storagePath: string | null = null
 
+    console.log(`[API /api/file] Petición recibida: "${decodedFilename}"`)
+
     if (generalMatch) {
         const gType = generalMatch[1].toLowerCase()
         const ts = generalMatch[2]
@@ -38,7 +40,10 @@ export async function GET(
         storagePath = ts ? `${courseId}/modulo-${moduleIndex}-${ts}.pdf` : `${courseId}/modulo-${moduleIndex}.pdf`
     }
 
+    console.log(`[API /api/file] RUTA RESUELTA STORAGE: "${storagePath}" (Match General: ${Boolean(generalMatch)})`)
+
     if (!storagePath) {
+        console.error(`[API /api/file] No se pudo resolver storagePath para "${decodedFilename}"`)
         return new NextResponse("File not found", { status: 404 })
     }
 
