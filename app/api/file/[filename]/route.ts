@@ -89,19 +89,67 @@ export async function GET(
         }
     }
 
-    // Generate a short-lived signed URL and redirect to it
+    // Helper to try creating a signed URL for a given path
     const adminSupabase = createAdminClient()
-    const { data, error } = await adminSupabase.storage
-        .from(MODULES_BUCKET)
-        .createSignedUrl(storagePath, 3600) // 1 hour
 
-    if (error || !data?.signedUrl) {
-        console.error("Error creating signed URL for storagePath:", storagePath, error)
+    const trySignedUrl = async (path: string): Promise<string | null> => {
+        const { data, error } = await adminSupabase.storage
+            .from(MODULES_BUCKET)
+            .createSignedUrl(path, 3600) // 1 hour
+        if (error || !data?.signedUrl) return null
+        return data.signedUrl
+    }
+
+    // Try the primary resolved path first
+    let signedUrl = await trySignedUrl(storagePath)
+
+    // Fallback for module PDFs: handle DB storing `true` but file saved with timestamp suffix (or vice-versa)
+    if (!signedUrl && moduleMatch) {
+        const moduleIndex = moduleMatch[1]
+        const courseId = moduleMatch[2]
+        const requestedTs = moduleMatch[3]
+
+        if (!requestedTs) {
+            // No timestamp in URL → file may have been stored WITH a timestamp suffix
+            // List bucket folder and find the matching file by prefix
+            const { data: listData } = await adminSupabase.storage
+                .from(MODULES_BUCKET)
+                .list(courseId, { search: `modulo-${moduleIndex}` })
+
+            if (listData && listData.length > 0) {
+                // Sort by most recently updated and try each candidate
+                const candidates = listData
+                    .filter(f => f.name.startsWith(`modulo-${moduleIndex}`) && f.name.endsWith(".pdf"))
+                    .sort((a, b) => (b.updated_at || "").localeCompare(a.updated_at || ""))
+
+                for (const candidate of candidates) {
+                    const altPath = `${courseId}/${candidate.name}`
+                    const altUrl = await trySignedUrl(altPath)
+                    if (altUrl) {
+                        signedUrl = altUrl
+                        console.log(`[API /api/file] Fallback con timestamp encontrado: "${altPath}"`)
+                        break
+                    }
+                }
+            }
+        } else {
+            // Timestamp in URL → try WITHOUT timestamp as fallback
+            const altPath = `${courseId}/modulo-${moduleIndex}.pdf`
+            const altUrl = await trySignedUrl(altPath)
+            if (altUrl) {
+                signedUrl = altUrl
+                console.log(`[API /api/file] Fallback sin timestamp: "${altPath}"`)
+            }
+        }
+    }
+
+    if (!signedUrl) {
+        console.error("Error creating signed URL for storagePath:", storagePath)
         return new NextResponse("File not found", { status: 404 })
     }
 
     // Redirect to the signed URL with strict no-cache headers so browser never caches old PDF versions
-    const res = NextResponse.redirect(data.signedUrl, { status: 307 })
+    const res = NextResponse.redirect(signedUrl, { status: 307 })
     res.headers.set("Cache-Control", "no-cache, no-store, must-revalidate, max-age=0")
     res.headers.set("Pragma", "no-cache")
     res.headers.set("Expires", "0")

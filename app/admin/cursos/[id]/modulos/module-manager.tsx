@@ -584,7 +584,7 @@ export function ModuleManager({
                             PDF ✓
                           </span>
                           <a
-                            href={`/api/file/Modulo ${mNum} - ${course.id}${hasPdf && hasPdf !== true ? ` - ${hasPdf}` : ""}.pdf?courseId=${course.id}`}
+                            href={`/api/file/${encodeURIComponent(`Modulo ${mNum} - ${course.id}${hasPdf && hasPdf !== true ? ` - ${hasPdf}` : ""}.pdf`)}?courseId=${course.id}`}
                             target="_blank"
                             rel="noopener noreferrer"
                             onClick={(e) => e.stopPropagation()}
