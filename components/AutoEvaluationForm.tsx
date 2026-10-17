@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useSession } from '@/lib/auth'; // assuming a hook similar to other pages
+"use client";
 
-// -----------------------------------------------------------------------------
-// Types
-// -----------------------------------------------------------------------------
+import React, { useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { CheckCircle, Award, ArrowRight } from '@/components/ui/icons';
+
 interface QuestionItem {
   id: string;
   text: string;
@@ -137,126 +138,207 @@ const calculateResults = (answers: Record<string, number>) => {
 };
 
 // -----------------------------------------------------------------------------
+// -----------------------------------------------------------------------------
 // Component
 // -----------------------------------------------------------------------------
-const AutoEvaluationForm: React.FC = () => {
-  const { data: session } = useSession(); // session.role === 'admin' for admin view
+interface AutoEvaluationFormProps {
+  programId?: string;
+}
+
+const AutoEvaluationForm: React.FC<AutoEvaluationFormProps> = ({ programId: propProgramId }) => {
+  const params = useParams();
+  const router = useRouter();
+  const routeProgramId = params?.id ? decodeURIComponent(params.id as string) : '';
+  const resolvedProgramId = propProgramId || routeProgramId;
+
   const [answers, setAnswers] = useState<Record<string, number>>({});
+  const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
-  const [results, setResults] = useState<ReturnType<typeof calculateResults> | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setAnswers((prev) => ({ ...prev, [name]: Number(value) }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // simple validation: every question must have a value (including 0 for N/A)
+    setError(null);
+
+    // Validación: verificar que cada ítem tenga respuesta seleccionada
     const allAnswered = sections.every((sec) =>
-      sec.items.every((it) => answers[`${sec.id}_${it.id}`] !== undefined),
+      sec.items.every((it) => answers[`${sec.id}_${it.id}`] !== undefined)
     );
+
     if (!allAnswered) {
-      alert('Por favor, responda todas las preguntas antes de enviar. Si no tiene información, seleccione N/A.');
+      setError('Por favor, responda todas las preguntas antes de enviar. Si no tiene información suficiente sobre algún punto, seleccione N/A.');
       return;
     }
-    const calc = calculateResults(answers);
-    setResults(calc);
-    setSubmitted(true);
-    console.log('Respuestas de la auto‑evaluación:', answers);
+
+    try {
+      setLoading(true);
+      const res = await fetch('/api/admin/autoevaluation', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          programId: resolvedProgramId,
+          answers,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || 'No se pudo guardar la evaluación.');
+      }
+
+      setSubmitted(true);
+      router.refresh();
+    } catch (err: any) {
+      console.error('Error al enviar autoevaluación:', err);
+      setError(err.message || 'Ocurrió un error al enviar las respuestas. Intente de nuevo.');
+    } finally {
+      setLoading(false);
+    }
   };
 
+  if (submitted) {
+    return (
+      <div className="max-w-3xl mx-auto bg-white rounded-xl shadow-lg border border-green-200 p-8 md:p-12 text-center animate-fade-in">
+        <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-6 shadow-inner">
+          <CheckCircle className="w-10 h-10" />
+        </div>
+        <h2 className="text-3xl font-extrabold text-gray-900 mb-3">
+          ¡Autoevaluación Completada!
+        </h2>
+        <p className="text-gray-600 text-lg mb-8 max-w-xl mx-auto leading-relaxed">
+          Muchas gracias por tus aportes. Tu percepción es fundamental para el mejoramiento continuo de la calidad formativa de nuestros programas.
+        </p>
+        <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-5 mb-8 text-emerald-800 text-sm">
+          ✅ <strong>Requisito cumplido:</strong> Tu autoevaluación ha sido registrada satisfactoriamente. Ya tienes habilitado el acceso a tu certificado y acta de grado.
+        </div>
+        <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
+          <Link
+            href={`/formacion-academica/${resolvedProgramId}/certificado`}
+            className="inline-flex items-center justify-center gap-2 bg-[#006838] hover:bg-[#00522c] text-white text-base font-bold px-8 py-3.5 rounded-lg shadow-md transition-all hover:shadow-lg"
+          >
+            <Award className="w-5 h-5" />
+            Continuar y Generar mi Certificado
+          </Link>
+          <Link
+            href={`/formacion-academica/${resolvedProgramId}`}
+            className="inline-flex items-center justify-center gap-2 bg-gray-100 hover:bg-gray-200 text-gray-800 text-base font-semibold px-6 py-3.5 rounded-lg transition-colors"
+          >
+            Volver al Programa
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+
   return (
-    <section className="auto-eval">
-      <h1 className="title">Auto‑evaluación del programa</h1>
-      <p className="intro">
-        Valoré cada afirmación de acuerdo con su experiencia en el programa. Marque una sola opción por ítem. Si no dispone de información suficiente, seleccione N/A.
-      </p>
-      <form onSubmit={handleSubmit} className="eval-form">
-        {sections.map((section) => (
-          <div key={section.id} className="section-block">
-            <h2 className="section-title">{section.title}</h2>
-            {section.items.map((item) => {
-              const fieldName = `${section.id}_${item.id}`;
-              return (
-                <div key={item.id} className="item-block">
-                  <h3 className="item-text">{item.text}</h3>
-                  <div className="options" role="radiogroup" aria-labelledby={fieldName}>
-                    {[1, 2, 3, 4, 5].map((val) => (
-                      <label key={val} className="option-label">
+    <section className="max-w-4xl mx-auto bg-white rounded-xl shadow-sm border border-gray-200 p-6 md:p-10">
+      <div className="border-b border-gray-200 pb-6 mb-8 text-center md:text-left">
+        <h1 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+          Instrumento de Percepción del Participante y Mejoramiento Continuo
+        </h1>
+        <p className="text-gray-600 text-sm md:text-base leading-relaxed">
+          Valore cada afirmación de acuerdo con su experiencia en el programa. Marque una sola opción por ítem. Si no dispone de información suficiente, seleccione <strong>N/A</strong>.
+        </p>
+        <div className="mt-4 inline-flex flex-wrap gap-2 text-xs font-semibold bg-gray-100 text-gray-700 px-4 py-2 rounded-md">
+          <span>Escala:</span>
+          <span>1 = Totalmente en desacuerdo</span>
+          <span>·</span>
+          <span>2 = En desacuerdo</span>
+          <span>·</span>
+          <span>3 = Neutral</span>
+          <span>·</span>
+          <span>4 = De acuerdo</span>
+          <span>·</span>
+          <span>5 = Totalmente de acuerdo</span>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-sm font-medium">
+          ⚠️ {error}
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-10">
+        {sections.map((section, sIdx) => (
+          <div key={section.id} className="border border-gray-200 rounded-lg p-5 md:p-6 bg-gray-50/50">
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-4 pb-2 border-b border-gray-200">
+              {section.title}
+            </h2>
+            <div className="space-y-6">
+              {section.items.map((item, iIdx) => {
+                const fieldName = `${section.id}_${item.id}`;
+                return (
+                  <div key={item.id} className="bg-white p-4 rounded-md border border-gray-100 shadow-2xs">
+                    <h3 className="text-sm md:text-base font-medium text-gray-800 mb-3">
+                      {sIdx + 1}.{iIdx + 1} {item.text}
+                    </h3>
+                    <div className="flex flex-wrap gap-3 items-center">
+                      {[1, 2, 3, 4, 5].map((val) => (
+                        <label
+                          key={val}
+                          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium cursor-pointer transition-colors ${
+                            answers[fieldName] === val
+                              ? 'bg-blue-600 text-white border-blue-600 shadow-xs'
+                              : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                          }`}
+                        >
+                          <input
+                            type="radio"
+                            name={fieldName}
+                            value={val}
+                            checked={answers[fieldName] === val}
+                            onChange={handleChange}
+                            className="sr-only"
+                          />
+                          {val}
+                        </label>
+                      ))}
+                      <label
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md border text-sm font-medium cursor-pointer transition-colors ${
+                          answers[fieldName] === 0
+                            ? 'bg-gray-700 text-white border-gray-700 shadow-xs'
+                            : 'bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100'
+                        }`}
+                      >
                         <input
                           type="radio"
                           name={fieldName}
-                          value={val}
-                          checked={answers[fieldName] === val}
+                          value={0}
+                          checked={answers[fieldName] === 0}
                           onChange={handleChange}
-                          required
+                          className="sr-only"
                         />
-                        {val}
+                        N/A
                       </label>
-                    ))}
-                    <label className="option-label na-label">
-                      <input
-                        type="radio"
-                        name={fieldName}
-                        value={0}
-                        checked={answers[fieldName] === 0}
-                        onChange={handleChange}
-                        required
-                      />
-                      N/A
-                    </label>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
         ))}
-        <button type="submit" className="submit-btn">
-          Enviar evaluación
-        </button>
-      </form>
 
-      {submitted && (
-        <div className="post-submit">
-          {session?.role === 'admin' && results ? (
-            <div className="results-block">
-              <h2>Resultados de la auto‑evaluación</h2>
-              <table className="results-table">
-                <thead>
-                  <tr>
-                    <th>Dimensión</th>
-                    <th>Respuestas válidas</th>
-                    <th>Promedio (1‑5)</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sections.map((sec) => {
-                    const { count, sum } = results.dimensionAverages[sec.id];
-                    const avg = count ? (sum / count).toFixed(2) : '-';
-                    return (
-                      <tr key={sec.id}>
-                        <td>{sec.title}</td>
-                        <td>{count}</td>
-                        <td>{avg}</td>
-                      </tr>
-                    );
-                  })}
-                  <tr className="overall-row">
-                    <td><strong>Resultado general</strong></td>
-                    <td>{Object.values(results.dimensionAverages).reduce((a, b) => a + b.count, 0)}</td>
-                    <td><strong>{results.overall.toFixed(2)}</strong></td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="thank-you">¡Gracias por completar la auto‑evaluación!</p>
-          )}
+        <div className="pt-4 text-center">
+          <button
+            type="submit"
+            disabled={loading}
+            className="inline-flex items-center justify-center gap-2 bg-[#006838] hover:bg-[#00522c] text-white text-lg font-bold px-10 py-4 rounded-lg shadow-md transition-all hover:shadow-lg disabled:opacity-50 cursor-pointer"
+          >
+            {loading ? 'Guardando evaluación...' : 'Enviar Evaluación y Continuar'}
+          </button>
         </div>
-      )}
+      </form>
     </section>
   );
 };
 
 export default AutoEvaluationForm;
+

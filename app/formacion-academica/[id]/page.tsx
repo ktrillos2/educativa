@@ -106,25 +106,28 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
         completedModules = progressCheck?.length || 0;
     }
 
-    // Build a set of approved module IDs for sequential locking
-    let approvedModuleIds = new Set<string>();
-    if (session?.userId && isEnrolled) {
-        const { data: approvedProgress } = await supabase
-            .from("progress")
-            .select("module_id")
-            .eq("user_id", session.userId)
-            .eq("course_id", course.id)
-            .eq("completed", true)
-        
-        approvedProgress?.forEach(p => approvedModuleIds.add(p.module_id))
-    }
-
     // Contar inscritos reales al curso usando admin client (bypass RLS para conteo público)
     const adminSupabase = createAdminClient()
     const { count: currentEnrollments } = await adminSupabase
         .from("enrollments")
         .select("*", { count: "exact", head: true })
         .eq("course_id", course.id)
+
+    let hasCompletedAutoEval = false;
+    if (session?.userId && isEnrolled) {
+        try {
+            const { data: autoEval } = await adminSupabase
+                .from("auto_evaluation_responses")
+                .select("id")
+                .eq("user_id", session.userId)
+                .eq("program_id", course.id)
+                .maybeSingle();
+            if (autoEval) hasCompletedAutoEval = true;
+        } catch (e) {
+            console.warn("auto_evaluation check error:", e);
+        }
+    }
+
 
     const minStudents = course.min_students ?? 15
     const enrolledCount = currentEnrollments ?? 0
@@ -469,22 +472,41 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             <AccordionContent>
                                 <div className="space-y-4 pt-6 pb-4 px-6 text-sm text-muted-foreground leading-relaxed">
                                     <p className="font-semibold text-foreground">
-                                        Mide tu progreso y asimila los conocimientos (Información Hipotética)
+                                        Instrumento de Percepción del Participante y Calidad Formativa
                                     </p>
                                     <p>
-                                        La autoevaluación es un proceso fundamental en tu aprendizaje. A través de este módulo, 
-                                        podrás reflexionar sobre las competencias adquiridas durante el desarrollo del programa 
-                                        e identificar áreas de mejora.
+                                        La autoevaluación es un instrumento fundamental para el mejoramiento continuo de la calidad académica. 
+                                        Permite valorar la claridad de contenidos, el dominio del formador y el cumplimiento de los objetivos.
                                     </p>
                                     <ul className="list-disc pl-5 space-y-2 mt-2">
-                                        <li>No tiene calificación numérica que afecte tu promedio.</li>
-                                        <li>Te permite prepararte mejor para los exámenes finales.</li>
-                                        <li>Incluye retroalimentación automática al finalizar.</li>
+                                        <li>Es un requisito obligatorio previo a la expedición del certificado oficial.</li>
+                                        <li>Mide 8 dimensiones clave de la experiencia formativa.</li>
+                                        <li>Tus respuestas son confidenciales y analizadas exclusivamente por el equipo administrativo.</li>
                                     </ul>
-                                    <div className="mt-4 p-4 bg-muted/30 border border-border/50 rounded-md">
-                                        <p className="text-xs font-medium">
-                                            * Esta sección estará disponible en tu aula virtual una vez inicies el programa y completes el primer módulo.
-                                        </p>
+                                    <div className="mt-4 pt-2">
+                                        {isEnrolled && paymentVerified ? (
+                                            hasCompletedAutoEval ? (
+                                                <div className="inline-flex items-center gap-2 text-sm font-bold text-green-700 bg-green-50 px-4 py-2 border border-green-200 rounded-md">
+                                                    <CheckCircle className="w-4 h-4 text-green-600" />
+                                                    Autoevaluación diligenciada correctamente
+                                                </div>
+                                            ) : isEligibleForCert ? (
+                                                <Link
+                                                    href={`/formacion-academica/${course.id}/auto-evaluacion`}
+                                                    className="inline-flex items-center gap-2 bg-[#006838] hover:bg-[#00522c] text-white font-bold text-sm px-5 py-2.5 rounded-md shadow-sm transition-colors"
+                                                >
+                                                    Diligenciar Autoevaluación Ahora <ChevronRight className="w-4 h-4" />
+                                                </Link>
+                                            ) : (
+                                                <p className="text-xs text-amber-700 font-semibold bg-amber-50 p-3 border border-amber-200 rounded-md">
+                                                    * Se habilitará una vez apruebes las unidades requeridas del programa.
+                                                </p>
+                                            )
+                                        ) : (
+                                            <p className="text-xs text-muted-foreground bg-gray-50 p-3 border border-gray-200 rounded-md">
+                                                * Disponible para estudiantes con matrícula activa y verificada.
+                                            </p>
+                                        )}
                                     </div>
                                 </div>
                             </AccordionContent>
@@ -497,18 +519,35 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                             initial={{ opacity: 0, scale: 0.95 }}
                             whileInView={{ opacity: 1, scale: 1 }}
                             viewport={{ once: true }}
-                            className="mt-20 text-center bg-primary/5 p-12 border border-primary/10"
+                            className="mt-20 text-center bg-primary/5 p-12 border border-primary/10 rounded-xl"
                         >
-                            <div className="w-16 h-16 bg-primary/10 text-primary flex items-center justify-center mx-auto mb-6">
+                            <div className="w-16 h-16 bg-primary/10 text-primary flex items-center justify-center mx-auto mb-6 rounded-full">
                                 <CheckCircle className="w-8 h-8" />
                             </div>
-                            <h3 className="text-2xl font-bold mb-4">Certificación Disponible</h3>
-                            <p className="text-muted-foreground mb-8 max-w-lg mx-auto">Has completado los requisitos de este programa. Ya puedes descargar tu certificado oficial y acta de finalización.</p>
-                            <Link href={`/formacion-academica/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1">
-                                Descargar Certificado <ChevronRight className="ml-2 w-5 h-5" />
-                            </Link>
+                            {hasCompletedAutoEval ? (
+                                <>
+                                    <h3 className="text-2xl font-bold mb-4 text-gray-900">Certificación Disponible</h3>
+                                    <p className="text-muted-foreground mb-8 max-w-lg mx-auto">
+                                        Has completado todos los módulos y la autoevaluación de calidad. Ya puedes visualizar y descargar tu certificado oficial y acta de grado.
+                                    </p>
+                                    <Link href={`/formacion-academica/${course.id}/certificado`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold text-white bg-primary hover:bg-primary/90 shadow-xl hover:shadow-primary/30 transition-all hover:-translate-y-1 rounded-lg">
+                                        Descargar Certificado <ChevronRight className="ml-2 w-5 h-5" />
+                                    </Link>
+                                </>
+                            ) : (
+                                <>
+                                    <h3 className="text-2xl font-bold mb-3 text-gray-900">Módulos Aprobados al 100%</h3>
+                                    <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
+                                        Has superado todas las evaluaciones del programa. Para habilitar la expedición de tu certificado oficial, debes completar la <strong>autoevaluación de percepción del participante</strong>.
+                                    </p>
+                                    <Link href={`/formacion-academica/${course.id}/auto-evaluacion`} className="inline-flex items-center justify-center px-8 py-4 border border-transparent text-lg font-bold text-white bg-[#006838] hover:bg-[#00522c] shadow-xl hover:shadow-green-900/20 transition-all hover:-translate-y-1 rounded-lg">
+                                        Diligenciar Autoevaluación <ChevronRight className="ml-2 w-5 h-5" />
+                                    </Link>
+                                </>
+                            )}
                         </motion.div>
                     )}
+
                     {isEnrolled && paymentVerified && !isEligibleForCert && (
                         <motion.div
                             initial={{ opacity: 0, scale: 0.95 }}

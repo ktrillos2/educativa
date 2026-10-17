@@ -149,6 +149,22 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
   const totalModules = course.modules || 1
   const isEligible = completedModules >= 4 || (completedModules / totalModules) >= 0.8
 
+  // Check auto-evaluation completion
+  let hasCompletedAutoEval = false
+  try {
+    const adminSupabase = createAdminClient()
+    const { data: autoEval } = await adminSupabase
+      .from("auto_evaluation_responses")
+      .select("id")
+      .eq("user_id", targetUserId)
+      .eq("program_id", course.id)
+      .maybeSingle()
+    if (autoEval) hasCompletedAutoEval = true
+  } catch (e) {
+    console.warn("auto_evaluation_responses check:", e)
+  }
+
+
   // Check previous downloads
   const { data: previousDownloads } = await supabase
     .from("study_acts")
@@ -197,6 +213,22 @@ export default async function CertificatePage(props: { params: Promise<{ id: str
             </div>
           ) : !hasPaid && !isAdmin ? (
             <CoursePayment courseId={course.id} programName={course.title} price={course.price} />
+          ) : !hasCompletedAutoEval && !isAdmin ? (
+            <div className="bg-white shadow-md border border-amber-200 p-8 text-center max-w-xl mx-auto rounded-xl">
+              <div className="w-16 h-16 bg-amber-100 text-amber-700 flex items-center justify-center mx-auto mb-4 rounded-full">
+                <Award className="w-8 h-8" />
+              </div>
+              <h2 className="text-2xl font-bold mb-3 text-gray-900">Autoevaluación Requerida</h2>
+              <p className="text-muted-foreground mb-6 text-sm leading-relaxed">
+                Has completado y aprobado satisfactoriamente los módulos de formación. Antes de expedir y descargar tu certificado oficial, debes completar la autoevaluación de percepción del programa.
+              </p>
+              <Link 
+                href={`/formacion-academica/${course.id}/auto-evaluacion`} 
+                className="inline-flex items-center justify-center gap-2 bg-[#006838] hover:bg-[#00522c] text-white px-7 py-3.5 font-bold rounded-lg shadow-md transition-all hover:shadow-lg"
+              >
+                Diligenciar Autoevaluación Ahora
+              </Link>
+            </div>
           ) : certificateExpired ? (
             <div className="bg-red-50 shadow-sm border border-red-200 p-8 text-center">
               <div className="w-16 h-16 bg-red-100 text-red-500 flex items-center justify-center mx-auto mb-4">
