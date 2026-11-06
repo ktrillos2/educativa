@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 
 import { Breadcrumb } from "@/components/breadcrumb"
@@ -24,6 +25,79 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.lideresdelmerito.com"
+
+// ─── SEO Dinámico por Diplomado ──────────────────────────────────────────────
+export async function generateMetadata(
+  props: { params: Promise<{ id: string }> }
+): Promise<Metadata> {
+  const { id } = await props.params
+  const courseId = decodeURIComponent(id)
+
+  const { createClient } = await import("@/utils/supabase/server")
+  const supabase = await createClient()
+
+  const { data: course } = await supabase
+    .from("courses")
+    .select("title, description, category, image, price, duration, modules")
+    .eq("id", courseId)
+    .maybeSingle()
+
+  if (!course) {
+    return {
+      title: "Diplomado no encontrado",
+      description: "El diplomado que buscas no existe o ya no está disponible.",
+    }
+  }
+
+  const title = `${course.title} | Diplomado Certificado`
+  const description =
+    course.description ||
+    `Inscríbete en el diplomado "${course.title}". Formación a tu propio ritmo con certificado oficial. Duración: ${course.duration}. ${course.modules} módulos.`
+
+  const ogImage = course.image && course.image.startsWith("/")
+    ? `${BASE_URL}${course.image}`
+    : course.image || `${BASE_URL}/images/og-default.png`
+
+  return {
+    title,
+    description,
+    keywords: [
+      course.title,
+      "diplomado certificado",
+      course.category,
+      "formación profesional",
+      "Líderes del Mérito",
+      "Colombia",
+    ].filter(Boolean) as string[],
+    alternates: {
+      canonical: `${BASE_URL}/diplomados/${courseId}`,
+    },
+    openGraph: {
+      type: "website",
+      locale: "es_CO",
+      url: `${BASE_URL}/diplomados/${courseId}`,
+      title,
+      description,
+      images: [
+        {
+          url: ogImage,
+          width: 1200,
+          height: 630,
+          alt: `Diplomado: ${course.title} – Líderes del Mérito`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [ogImage],
+    },
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
 
 export default async function DiplomadoDetailPage(props: { params: Promise<{ id: string }> }) {
     const params = await props.params

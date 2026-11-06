@@ -1,3 +1,4 @@
+import type { Metadata } from "next"
 import { DiplomadosList } from "@/components/diplomados-list"
 import { Breadcrumb } from "@/components/breadcrumb"
 import { GraduationCap } from "@/components/ui/icons"
@@ -9,6 +10,49 @@ import { ProgramInfoDialog } from "@/components/program-info-dialog"
 
 export const dynamic = "force-dynamic"
 export const revalidate = 0
+
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://www.lideresdelmerito.com"
+
+export const metadata: Metadata = {
+  title: "Diplomados Certificados | Formación Profesional Continua",
+  description:
+    "Explora nuestra oferta de diplomados certificados en gestión pública, finanzas y más. Estudia a tu propio ritmo con aval del Ministerio de Educación Nacional. Inscripciones abiertas.",
+  keywords: [
+    "diplomados certificados",
+    "formación continua",
+    "gestión pública",
+    "sector público Colombia",
+    "educación continua",
+    "diplomado en línea",
+    "Líderes del Mérito",
+  ],
+  alternates: {
+    canonical: `${BASE_URL}/diplomados`,
+  },
+  openGraph: {
+    type: "website",
+    locale: "es_CO",
+    url: `${BASE_URL}/diplomados`,
+    title: "Diplomados Certificados | Líderes del Mérito",
+    description:
+      "Explora nuestra oferta de diplomados certificados. Estudia a tu propio ritmo con aval del Ministerio de Educación Nacional.",
+    images: [
+      {
+        url: "/images/og-diplomados.png",
+        width: 1200,
+        height: 630,
+        alt: "Catálogo de Diplomados – Líderes del Mérito",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Diplomados Certificados | Líderes del Mérito",
+    description:
+      "Diplomados en gestión pública, finanzas y más. Inscripciones abiertas.",
+    images: ["/images/og-diplomados.png"],
+  },
+}
 
 export default async function DiplomadosPage() {
   const supabaseAdmin = createAdminClient()
