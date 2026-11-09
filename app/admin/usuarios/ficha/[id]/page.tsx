@@ -36,6 +36,11 @@ export default async function FichaEstudianteMinisterioPage({
     return <div className="p-8 text-center font-bold">Estudiante no encontrado. ID: {studentId}</div>
   }
 
+  // Los administradores no tienen ficha de estudiante
+  if (student.role === 'admin' || student.role === 'ADMIN') {
+    redirect("/admin/usuarios")
+  }
+
   // 2. Obtener TODAS sus inscripciones
   const { data: enrollments } = await supabase
     .from("enrollments")
