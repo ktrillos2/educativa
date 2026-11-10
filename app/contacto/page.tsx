@@ -81,7 +81,9 @@ export default function ContactoPage() {
                                         </div>
                                         <div>
                                             <h4 className="font-semibold text-base">Llámanos</h4>
-                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">+57 (300) 123 4567<br />+57 (601) 987 6543</p>
+                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">
+                                                <a href="tel:3115232106" className="hover:text-white transition-colors">3115232106</a>
+                                            </p>
                                         </div>
                                     </div>
 
@@ -91,7 +93,9 @@ export default function ContactoPage() {
                                         </div>
                                         <div>
                                             <h4 className="font-semibold text-base">Escríbenos</h4>
-                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">direccionacademica@lideresdelmerito.edu.co</p>
+                                            <p className="text-white/70 text-sm mt-1 leading-relaxed">
+                                                <a href="mailto:academicaadmin.edu@gmail.com" className="hover:text-white transition-colors break-all">academicaadmin.edu@gmail.com</a>
+                                            </p>
                                         </div>
                                     </div>
 
@@ -156,7 +160,7 @@ export default function ContactoPage() {
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                         <div className="space-y-2">
                                             <label htmlFor="phone" className="text-sm font-semibold text-foreground">Teléfono Móvil</label>
-                                            <Input id="phone" placeholder="+57 --- --- --" className="h-12 bg-muted/30 border-muted focus-visible:ring-primary/20 rounded-none" />
+                                            <Input id="phone" placeholder="Ej. 311 523 2106" className="h-12 bg-muted/30 border-muted focus-visible:ring-primary/20 rounded-none" />
                                         </div>
                                         <div className="space-y-2">
                                             <label htmlFor="subject" className="text-sm font-semibold text-foreground">Asunto</label>

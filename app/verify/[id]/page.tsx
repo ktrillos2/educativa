@@ -120,7 +120,7 @@ export default async function VerifyPage(props: { params: Promise<{ id: string }
         {/* Footer */}
         <div className="bg-gray-50 p-5 border-t border-border text-center">
           <p className="text-xs text-muted-foreground mb-3 max-w-sm mx-auto">
-            Para dudas sobre la autenticidad de este certificado, por favor contáctanos al correo academiadeformacion@lideresdelmerito.edu.co.
+            Para dudas sobre la autenticidad de este certificado, por favor contáctanos al correo academicaadmin.edu@gmail.com o al celular 3115232106.
           </p>
           <Link href="/" className="inline-flex items-center justify-center px-5 py-2 bg-primary text-white text-xs font-bold rounded-lg hover:bg-primary/90 transition-colors">
             Conocer la Academia

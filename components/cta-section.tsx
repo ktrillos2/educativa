@@ -94,7 +94,9 @@ export function CTASection() {
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-xs text-muted-foreground font-medium">Llámanos</p>
-                    <p className="font-bold text-foreground text-sm sm:text-base break-words">+57 (1) 234 5678</p>
+                    <a href="tel:3115232106" className="font-bold text-foreground text-sm sm:text-base break-words hover:text-primary transition-colors">
+                      3115232106
+                    </a>
                   </div>
                 </div>
 
@@ -104,9 +106,9 @@ export function CTASection() {
                   </div>
                   <div className="min-w-0 flex-1 overflow-hidden">
                     <p className="text-xs text-muted-foreground font-medium">Escríbenos</p>
-                    <p className="font-bold text-foreground text-xs sm:text-sm break-all leading-tight">
-                      direccionacademica@lideresdelmerito.edu.co
-                    </p>
+                    <a href="mailto:academicaadmin.edu@gmail.com" className="font-bold text-foreground text-xs sm:text-sm break-all leading-tight hover:text-primary transition-colors">
+                      academicaadmin.edu@gmail.com
+                    </a>
                   </div>
                 </div>
               </div>

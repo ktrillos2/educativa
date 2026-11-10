@@ -140,16 +140,22 @@ export function Footer() {
             </h3>
             <ul className="space-y-4">
               {[
-                { icon: MapPin, text: "CL 19E 18C 112\nBarrio Guatapurí, Valledupar" },
-                { icon: Phone, text: "+57 (1) 234 5678" },
-                { icon: Mail, text: "direccionacademica@lideresdelmerito.edu.co" },
-                { icon: Clock, text: "Lun - Vie: 8:00 am a 12:00 pm y de 2:00 pm a 6:00 pm" },
-              ].map(({ icon: Icon, text }, index) => (
+                { icon: MapPin, text: "CL 19E 18C 112\nBarrio Guatapurí, Valledupar", href: null },
+                { icon: Phone, text: "3115232106", href: "tel:3115232106" },
+                { icon: Mail, text: "academicaadmin.edu@gmail.com", href: "mailto:academicaadmin.edu@gmail.com" },
+                { icon: Clock, text: "Lun - Vie: 8:00 am a 12:00 pm y de 2:00 pm a 6:00 pm", href: null },
+              ].map(({ icon: Icon, text, href }, index) => (
                 <li key={index} className="flex items-start gap-3 group">
                   <div className="p-2 bg-secondary/20 group-hover:bg-secondary transition-colors ">
                     <Icon className="h-4 w-4 text-secondary group-hover:text-secondary-foreground transition-colors shrink-0" />
                   </div>
-                  <span className="text-background/70 text-sm whitespace-pre-line">{text}</span>
+                  {href ? (
+                    <a href={href} className="text-background/70 hover:text-secondary transition-colors text-sm whitespace-pre-line break-all">
+                      {text}
+                    </a>
+                  ) : (
+                    <span className="text-background/70 text-sm whitespace-pre-line">{text}</span>
+                  )}
                 </li>
               ))}
             </ul>
