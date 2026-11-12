@@ -238,7 +238,7 @@ export default async function ETDHDetailPage(props: { params: Promise<{ id: stri
                                                     ) : (
                                                         <>
                                                             <AlertCircle className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
-                                                            <span className="text-sm">Matrícula verificada. <strong>Tu cupo está reservado.</strong> Iniciaremos clases y te notificaremos por WhatsApp cuando completemos el grupo de {minStudents} estudiantes.</span>
+                                                            <span className="text-sm">Matrícula verificada. <strong>Tu cupo está reservado.</strong> Te notificaremos por WhatsApp en cuanto iniciemos clases.</span>
                                                         </>
                                                     )}
                                                 </div>

@@ -162,7 +162,7 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
                   </h3>
                   <p className="text-xs text-muted-foreground line-clamp-2 mb-3">{diplomado.description}</p>
 
-                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-4 pb-3 border-b border-border">
+                  <div className="flex items-center justify-between text-xs text-muted-foreground mb-6 pb-3 border-b border-border">
                     <div className="flex items-center gap-1">
                       <Clock className="h-3.5 w-3.5 text-primary" />
                       <span>{diplomado.duration}</span>
@@ -172,32 +172,6 @@ export function DiplomadosList({ initialCourses, initialCategories }: Diplomados
                       <span>{diplomado.students}</span>
                     </div>
                   </div>
-
-                  {/* ── Indicador de cupos persuasivo ── */}
-                  {(() => {
-                    const min = diplomado.minStudents ?? 5
-                    const enrolled = diplomado.enrolledCount ?? 0
-                    const ready = enrolled >= min
-                    const pct = Math.min(100, Math.round((enrolled / min) * 100))
-                    return (
-                      <div className="mb-4">
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className={`text-[10px] font-bold uppercase tracking-wide ${ready ? 'text-green-600' : 'text-amber-600'}`}>
-                            {ready ? '✓ Grupo confirmado' : 'Inscritos para iniciar'}
-                          </span>
-                          <span className={`text-[10px] font-bold ${ready ? 'text-green-600' : 'text-amber-600'}`}>
-                            {enrolled}/{min}
-                          </span>
-                        </div>
-                        <div className="w-full bg-secondary/20 rounded-full h-1.5 overflow-hidden">
-                          <div
-                            className={`h-1.5 rounded-full transition-all duration-700 ${ready ? 'bg-green-500' : 'bg-amber-400'}`}
-                            style={{ width: `${pct}%` }}
-                          />
-                        </div>
-                      </div>
-                    )
-                  })()}
 
                   <div className="mt-auto">
                     <Link href={`/diplomados/${diplomado.id}`}>
