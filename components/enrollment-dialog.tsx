@@ -17,8 +17,13 @@ const registerSchema = z.object({
     name: z.string().min(3, "El nombre debe tener al menos 3 caracteres"),
     document: z.string().min(5, "El documento es requerido"),
     phone: z.string().min(7, "El teléfono es requerido"),
+    address: z.string().min(3, "La dirección es requerida"),
     email: z.string().email("Correo electrónico inválido"),
     password: z.string().min(6, "La contraseña debe tener al menos 6 caracteres"),
+    confirmPassword: z.string().min(6, "Confirma tu contraseña"),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "Las contraseñas no coinciden",
+    path: ["confirmPassword"],
 })
 
 const loginSchema = z.object({
@@ -34,7 +39,7 @@ export function EnrollmentDialog({ courseId, courseName, price }: { courseId: st
 
     const registerForm = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
-        defaultValues: { name: "", document: "", phone: "", email: "", password: "" },
+        defaultValues: { name: "", document: "", phone: "", address: "", email: "", password: "", confirmPassword: "" },
     })
 
     const loginForm = useForm<z.infer<typeof loginSchema>>({
@@ -83,7 +88,8 @@ export function EnrollmentDialog({ courseId, courseName, price }: { courseId: st
 
     async function onRegisterSubmit(values: z.infer<typeof registerSchema>) {
         setLoading(true)
-        const result = await registerAction(values, courseId)
+        const { confirmPassword: _, ...dataToSend } = values
+        const result = await registerAction(dataToSend, courseId)
 
         if (result.error) {
             toast.error(result.error)
@@ -114,7 +120,7 @@ export function EnrollmentDialog({ courseId, courseName, price }: { courseId: st
                     Inscribirse al Diplomado
                 </Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[425px]">
+            <DialogContent className="sm:max-w-[460px] max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                     <DialogTitle>Inscripción a {courseName}</DialogTitle>
                     <DialogDescription>
@@ -130,35 +136,54 @@ export function EnrollmentDialog({ courseId, courseName, price }: { courseId: st
 
                     <TabsContent value="register">
                         <form onSubmit={registerForm.handleSubmit(onRegisterSubmit)} className="space-y-4 py-4">
+
+                            {/* Nombre Completo */}
                             <div className="space-y-2">
-                                <Label htmlFor="name">Nombre Completo</Label>
-                                <Input id="name" {...registerForm.register("name")} placeholder="Juan Pérez" />
+                                <Label htmlFor="reg-name">Nombre Completo</Label>
+                                <Input id="reg-name" {...registerForm.register("name")} placeholder="Juan Pérez" disabled={loading} />
                                 {registerForm.formState.errors.name && <p className="text-xs text-red-500">{registerForm.formState.errors.name.message}</p>}
                             </div>
 
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label htmlFor="document">Documento</Label>
-                                    <Input id="document" {...registerForm.register("document")} placeholder="123456789" />
-                                    {registerForm.formState.errors.document && <p className="text-xs text-red-500">{registerForm.formState.errors.document.message}</p>}
-                                </div>
-                                <div className="space-y-2">
-                                    <Label htmlFor="phone">Celular</Label>
-                                    <Input id="phone" {...registerForm.register("phone")} placeholder="3001234567" />
-                                    {registerForm.formState.errors.phone && <p className="text-xs text-red-500">{registerForm.formState.errors.phone.message}</p>}
-                                </div>
+                            {/* Documento */}
+                            <div className="space-y-2">
+                                <Label htmlFor="reg-document">Documento de Identidad (Cédula)</Label>
+                                <Input id="reg-document" {...registerForm.register("document")} placeholder="12345678" disabled={loading} />
+                                {registerForm.formState.errors.document && <p className="text-xs text-red-500">{registerForm.formState.errors.document.message}</p>}
                             </div>
 
+                            {/* Teléfono */}
                             <div className="space-y-2">
-                                <Label htmlFor="email">Correo Electrónico</Label>
-                                <Input id="email" type="email" {...registerForm.register("email")} placeholder="juan@ejemplo.com" />
+                                <Label htmlFor="reg-phone">Número de Teléfono</Label>
+                                <Input id="reg-phone" type="tel" {...registerForm.register("phone")} placeholder="3001234567" disabled={loading} />
+                                {registerForm.formState.errors.phone && <p className="text-xs text-red-500">{registerForm.formState.errors.phone.message}</p>}
+                            </div>
+
+                            {/* Dirección */}
+                            <div className="space-y-2">
+                                <Label htmlFor="reg-address">Dirección de Residencia</Label>
+                                <Input id="reg-address" {...registerForm.register("address")} placeholder="Calle 123 # 45-67, Ciudad" disabled={loading} />
+                                {registerForm.formState.errors.address && <p className="text-xs text-red-500">{registerForm.formState.errors.address.message}</p>}
+                            </div>
+
+                            {/* Correo */}
+                            <div className="space-y-2">
+                                <Label htmlFor="reg-email">Correo Electrónico</Label>
+                                <Input id="reg-email" type="email" {...registerForm.register("email")} placeholder="nombre@ejemplo.com" disabled={loading} />
                                 {registerForm.formState.errors.email && <p className="text-xs text-red-500">{registerForm.formState.errors.email.message}</p>}
                             </div>
 
+                            {/* Contraseña */}
                             <div className="space-y-2">
-                                <Label htmlFor="password">Contraseña</Label>
-                                <Input id="password" type="password" {...registerForm.register("password")} />
+                                <Label htmlFor="reg-password">Contraseña (Mínimo 6 caracteres)</Label>
+                                <Input id="reg-password" type="password" {...registerForm.register("password")} disabled={loading} />
                                 {registerForm.formState.errors.password && <p className="text-xs text-red-500">{registerForm.formState.errors.password.message}</p>}
+                            </div>
+
+                            {/* Confirmar Contraseña */}
+                            <div className="space-y-2">
+                                <Label htmlFor="reg-confirm-password">Confirmar Contraseña</Label>
+                                <Input id="reg-confirm-password" type="password" {...registerForm.register("confirmPassword")} disabled={loading} />
+                                {registerForm.formState.errors.confirmPassword && <p className="text-xs text-red-500">{registerForm.formState.errors.confirmPassword.message}</p>}
                             </div>
 
                             <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90 text-white" disabled={loading}>
@@ -171,12 +196,12 @@ export function EnrollmentDialog({ courseId, courseName, price }: { courseId: st
                         <form onSubmit={loginForm.handleSubmit(onLoginSubmit)} className="space-y-4 py-4">
                             <div className="space-y-2">
                                 <Label htmlFor="login-email">Correo Electrónico</Label>
-                                <Input id="login-email" type="email" {...loginForm.register("email")} />
+                                <Input id="login-email" type="email" {...loginForm.register("email")} placeholder="nombre@ejemplo.com" disabled={loading} />
                                 {loginForm.formState.errors.email && <p className="text-xs text-red-500">{loginForm.formState.errors.email.message}</p>}
                             </div>
                             <div className="space-y-2">
                                 <Label htmlFor="login-password">Contraseña</Label>
-                                <Input id="login-password" type="password" {...loginForm.register("password")} />
+                                <Input id="login-password" type="password" {...loginForm.register("password")} disabled={loading} />
                                 {loginForm.formState.errors.password && <p className="text-xs text-red-500">{loginForm.formState.errors.password.message}</p>}
                             </div>
                             <Button type="submit" className="w-full bg-secondary hover:bg-secondary/90 text-white" disabled={loading}>
