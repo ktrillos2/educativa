@@ -9,7 +9,7 @@ const registerSchema = z.object({
     name: z.string().min(3, "Name must be at least 3 characters"),
     document: z.string().min(5, "Document must be valid"),
     phone: z.string().min(7, "Phone number must be valid"),
-    address: z.string().min(3, "La dirección es requerida"),
+    address: z.string().optional(),
     email: z.string().email("Invalid email address"),
     password: z.string().min(6, "Password must be at least 6 characters"),
 })
