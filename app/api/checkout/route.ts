@@ -84,25 +84,33 @@ export async function POST(request: Request) {
 
     const cleanProgramName = programName.normalize("NFD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-zA-Z0-9\s-]/g, "")
     
+    // Separar nombre y apellido del campo name completo
+    const nameParts = user.name.trim().split(" ")
+    const firstName = nameParts[0].substring(0, 100)
+    const lastName = nameParts.slice(1).join(" ").substring(0, 100) || "."
+
     const openpayPayload = {
       method: "card",
       confirm: false,
-      amount: amountPesos, // Openpay Colombia espera el valor en COP (pesos)
+      amount: amountPesos,
       currency: "COP",
       description: `Certificado Academico - ${cleanProgramName}`.substring(0, 250),
       order_id: reference,
       redirect_url: redirectUrl,
       customer: {
-        name: user.name.substring(0, 250),
-        last_name: ".", // Required field for some regions
+        name: firstName,
+        last_name: lastName,
         email: user.email,
-        phone_number: user.phone || "0000000000"
-      },
-      send_email: false // Openpay enviará recibo si es true
+        phone_number: (user.phone || "0000000000").replace(/\D/g, "").substring(0, 10)
+      }
     }
 
-    // Llamada a la API de Openpay (Colombia usa /charges para Hosted Checkout)
-    const openpayRes = await fetch(`https://sandbox-api.openpay.co/v1/${merchantId}/charges`, {
+    // Llamada a la API de Openpay — sandbox o producción según variable de entorno
+    const openpayBaseUrl = process.env.OPENPAY_SANDBOX === 'true'
+      ? 'https://sandbox-api.openpay.co'
+      : 'https://api.openpay.co'
+
+    const openpayRes = await fetch(`${openpayBaseUrl}/v1/${merchantId}/charges`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
