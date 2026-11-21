@@ -1,87 +1,95 @@
 import { NextResponse } from 'next/server'
-import { createClient } from '@/utils/supabase/server'
+import { createAdminClient } from '@/utils/supabase/admin'
+import { fetchOpenpayCharge } from '@/lib/openpay'
+
+const CHARGE_COMPLETED_STATUS = 'completed'
+
+interface OpenpayWebhookBody {
+  type?: string
+  verification_code?: string
+  transaction?: { id?: string; order_id?: string }
+}
 
 export async function POST(request: Request) {
   try {
-    const body = await request.json()
+    const body = (await request.json()) as OpenpayWebhookBody
 
-    // Openpay events have a "type" and a "transaction" object
-    const eventType = body.type
-    const transaction = body.transaction
+    // Openpay envía este evento al registrar el webhook en el dashboard.
+    // El código aparece en los logs de Vercel y debe pegarse en el dashboard de Openpay.
+    if (body.type === 'verification') {
+      console.log('Openpay webhook verification_code:', body.verification_code)
+      return NextResponse.json({ success: true })
+    }
 
-    if (!transaction || !transaction.order_id) {
+    if (body.type !== 'charge.succeeded') {
+      return NextResponse.json({ success: true, message: 'Evento recibido pero no procesado' })
+    }
+
+    const chargeId = body.transaction?.id
+    if (!chargeId) {
       return NextResponse.json({ error: 'Payload inválido' }, { status: 400 })
     }
 
-    if (eventType === 'charge.succeeded') {
-      const reference = transaction.order_id // This is our order's reference
-      const supabase = await createClient()
+    // No confiamos en el payload: confirmamos el cargo directamente con Openpay.
+    const charge = await fetchOpenpayCharge(chargeId)
+    if (!charge || charge.status !== CHARGE_COMPLETED_STATUS || !charge.order_id) {
+      console.error('Openpay: cargo no verificado', chargeId, charge?.status)
+      return NextResponse.json({ error: 'Cargo no verificado' }, { status: 400 })
+    }
 
-      // 1. Find the order by reference
-      const { data: order, error: orderError } = await supabase
-        .from('orders')
-        .select('*')
-        .eq('reference', reference)
-        .maybeSingle()
+    // Webhook sin sesión de usuario → cliente admin (bypassa RLS, solo servidor).
+    const supabase = createAdminClient()
 
-      if (orderError || !order) {
-        console.error('Order not found for reference:', reference)
-        return NextResponse.json({ error: 'Order no encontrada' }, { status: 404 })
-      }
+    const { data: order, error: orderError } = await supabase
+      .from('orders')
+      .select('id, user_id, course_id, amount, status')
+      .eq('reference', charge.order_id)
+      .maybeSingle()
 
-      // 2. Update order status to PAID
+    if (orderError || !order) {
+      console.error('Order not found for reference:', charge.order_id)
+      return NextResponse.json({ error: 'Order no encontrada' }, { status: 404 })
+    }
+
+    if (Number(charge.amount) < Number(order.amount)) {
+      console.error('Openpay: monto inferior al de la orden', charge.order_id, charge.amount, order.amount)
+      return NextResponse.json({ error: 'Monto inválido' }, { status: 400 })
+    }
+
+    if (order.status !== 'PAID') {
       const { error: updateOrderError } = await supabase
         .from('orders')
-        .update({ 
-          status: 'PAID',
-          updated_at: new Date().toISOString()
-        })
+        .update({ status: 'PAID', updated_at: new Date().toISOString() })
         .eq('id', order.id)
 
       if (updateOrderError) {
         console.error('Error updating order:', updateOrderError)
         return NextResponse.json({ error: 'Error actualizando orden' }, { status: 500 })
       }
-
-      // 3. Crear o actualizar enrollment con payment_verified = true (upsert)
-      // El enrollment se crea aquí por primera vez si el usuario no existía antes en la tabla,
-      // garantizando que SOLO se inscribe cuando el pago fue confirmado por Openpay.
-      const { data: existingEnrollment } = await supabase
-        .from('enrollments')
-        .select('id')
-        .eq('user_id', order.user_id)
-        .eq('course_id', order.course_id)
-        .maybeSingle()
-
-      let updateEnrollmentError = null
-      if (existingEnrollment) {
-        const { error } = await supabase
-          .from('enrollments')
-          .update({ payment_verified: true })
-          .eq('id', existingEnrollment.id)
-        updateEnrollmentError = error
-      } else {
-        const { error } = await supabase
-          .from('enrollments')
-          .insert({
-            user_id: order.user_id,
-            course_id: order.course_id,
-            payment_verified: true
-          })
-        updateEnrollmentError = error
-      }
-
-      if (updateEnrollmentError) {
-        console.error('Error updating enrollment:', updateEnrollmentError)
-        return NextResponse.json({ error: 'Error actualizando matricula' }, { status: 500 })
-      }
-
-      return NextResponse.json({ success: true, message: 'Pago procesado y verificado con éxito' })
     }
 
-    // Si es otro tipo de evento (e.g. charge.failed, charge.created), simplemente devolvemos 200 OK para que Openpay sepa que lo recibimos
-    return NextResponse.json({ success: true, message: 'Evento recibido pero no procesado' })
+    // La inscripción se crea/activa SOLO cuando Openpay confirma el pago.
+    const { data: existingEnrollment } = await supabase
+      .from('enrollments')
+      .select('id')
+      .eq('user_id', order.user_id)
+      .eq('course_id', order.course_id)
+      .maybeSingle()
 
+    const { error: enrollmentError } = existingEnrollment
+      ? await supabase.from('enrollments').update({ payment_verified: true }).eq('id', existingEnrollment.id)
+      : await supabase.from('enrollments').insert({
+          user_id: order.user_id,
+          course_id: order.course_id,
+          payment_verified: true,
+        })
+
+    if (enrollmentError) {
+      console.error('Error updating enrollment:', enrollmentError)
+      return NextResponse.json({ error: 'Error actualizando matricula' }, { status: 500 })
+    }
+
+    return NextResponse.json({ success: true, message: 'Pago procesado y verificado con éxito' })
   } catch (error) {
     console.error('Openpay Webhook Error:', error)
     return NextResponse.json({ error: 'Error procesando el webhook' }, { status: 500 })

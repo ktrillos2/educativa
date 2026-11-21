@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 
 import { getSession } from '@/lib/auth'
 import { createClient } from '@/utils/supabase/server'
+import { getOpenpayConfig } from '@/lib/openpay'
 
 export async function POST(request: Request) {
   try {
@@ -70,11 +71,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `Error al registrar la orden: ${detail}` }, { status: 500 })
     }
 
-    // Configuración de Openpay
-    const merchantId = process.env.OPENPAY_MERCHANT_ID
-    const privateKey = process.env.OPENPAY_PRIVATE_KEY
+    // Configuración de Openpay (sandbox/producción según OPENPAY_SANDBOX)
+    const openpay = getOpenpayConfig()
 
-    if (!merchantId || !privateKey) {
+    if (!openpay) {
       console.error('Faltan las credenciales de Openpay en el entorno')
       return NextResponse.json({ error: 'Configuración de pagos incompleta' }, { status: 500 })
     }
@@ -105,16 +105,11 @@ export async function POST(request: Request) {
       }
     }
 
-    // Llamada a la API de Openpay — sandbox o producción según variable de entorno
-    const openpayBaseUrl = process.env.OPENPAY_SANDBOX === 'true'
-      ? 'https://sandbox-api.openpay.co'
-      : 'https://api.openpay.co'
-
-    const openpayRes = await fetch(`${openpayBaseUrl}/v1/${merchantId}/charges`, {
+    const openpayRes = await fetch(`${openpay.baseUrl}/v1/${openpay.merchantId}/charges`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Basic ${Buffer.from(`${privateKey}:`).toString('base64')}`
+        'Authorization': openpay.authHeader
       },
       body: JSON.stringify(openpayPayload)
     })
@@ -122,8 +117,10 @@ export async function POST(request: Request) {
     const openpayData = await openpayRes.json()
 
     if (!openpayRes.ok) {
-      console.error('Error desde Openpay:', openpayData)
-      return NextResponse.json({ error: 'Error al comunicarse con la pasarela de pagos' }, { status: 502 })
+      // Visible en los logs de Vercel: indica credenciales inválidas, entorno equivocado, etc.
+      console.error('Error desde Openpay:', openpayRes.status, openpayData)
+      await supabase.from("orders").update({ status: 'FAILED' }).eq("reference", reference)
+      return NextResponse.json({ error: 'No fue posible iniciar el pago. Intenta de nuevo o contáctanos.' }, { status: 502 })
     }
 
     // Retornamos el link de checkout para redirigir al usuario
