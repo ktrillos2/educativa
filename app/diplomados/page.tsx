@@ -245,12 +245,24 @@ export default async function DiplomadosPage() {
               if (!video.url) {
                 return (
                   <div key={index} className="bg-white p-4 rounded-xl shadow-sm border border-[oklch(0.88_0.04_145)] flex flex-col group hover:shadow-md transition-shadow">
-                    <div className="aspect-video bg-gray-100 rounded-lg overflow-hidden relative flex items-center justify-center border-2 border-dashed border-gray-300 group-hover:border-primary/50 transition-colors">
-                      <div className="text-center p-4">
-                        <div className="w-12 h-12 bg-primary/10 text-primary rounded-full flex items-center justify-center mx-auto mb-2">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                    <div className="aspect-video bg-gradient-to-br from-[oklch(0.97_0.03_145)] to-[oklch(0.93_0.06_145)] rounded-lg overflow-hidden relative flex items-center justify-center">
+                      {/* Insignia de diploma decorativa */}
+                      <div className="flex flex-col items-center gap-3 select-none">
+                        <div className="relative">
+                          {/* Círculo exterior con borde dorado */}
+                          <div className="w-20 h-20 rounded-full bg-[oklch(0.30_0.10_145)] flex items-center justify-center shadow-lg ring-4 ring-[oklch(0.80_0.14_80)] ring-offset-2 ring-offset-[oklch(0.95_0.04_145)]">
+                            {/* Diploma SVG */}
+                            <svg className="w-10 h-10 text-[oklch(0.90_0.14_80)]" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 1L3 5v6c0 5.25 3.75 10.15 9 11.25C17.25 21.15 21 16.25 21 11V5l-9-4zm-1 14l-3-3 1.41-1.41L11 12.17l4.59-4.58L17 9l-6 6z"/>
+                            </svg>
+                          </div>
+                          {/* Estrella decorativa superior */}
+                          <div className="absolute -top-1 -right-1 w-5 h-5 bg-[oklch(0.80_0.14_80)] rounded-full flex items-center justify-center shadow">
+                            <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>
+                            </svg>
+                          </div>
                         </div>
-                        <span className="text-sm font-bold text-gray-500">Espacio para Video {index + 1}</span>
                       </div>
                     </div>
                   </div>
